@@ -33,7 +33,6 @@ export function TaskDialog({ task, projectId, trigger, open, onOpenChange }: Tas
         status: 'TODO',
         priority: 'MEDIUM',
         assigneeId: '',
-        assigneeId: '',
         startDate: '',
         dueDate: '',
         estimatedHours: '',
