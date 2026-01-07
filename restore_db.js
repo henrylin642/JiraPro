@@ -20,6 +20,34 @@ async function restore() {
         }
     };
 
+    // 0. Clean up destination DB to avoid P2002 (Unique Constraint) errors on re-run
+    console.log('🧹 Cleaning existing data...');
+    try {
+        await prisma.expense.deleteMany();
+        await prisma.timesheetEntry.deleteMany();
+        await prisma.allocation.deleteMany();
+        await prisma.task.deleteMany();
+        await prisma.milestone.deleteMany();
+        await prisma.project.deleteMany();
+
+        await prisma.interaction.deleteMany();
+        await prisma.opportunity.deleteMany();
+        await prisma.contact.deleteMany();
+        await prisma.account.deleteMany();
+
+        await prisma.idea.deleteMany();
+        await prisma.feature.deleteMany();
+        await prisma.roadmapItem.deleteMany();
+        await prisma.businessModelCanvas.deleteMany();
+        await prisma.product.deleteMany();
+        await prisma.expenseCategory.deleteMany();
+
+        await prisma.resourceProfile.deleteMany();
+        await prisma.user.deleteMany();
+    } catch (e) {
+        console.warn('⚠️ Cleanup warning (ignore if empty DB):', e.message);
+    }
+
     // 1. Users & Profiles
     const users = readBackup('user');
     for (const u of users) {
