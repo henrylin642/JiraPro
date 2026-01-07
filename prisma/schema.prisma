@@ -41,6 +41,7 @@ model ResourceProfile {
   skills         String?  // Comma separated or JSON
   costRate       Decimal  @default(0) // Hourly cost to company
   billableRate   Decimal  @default(0) // Hourly rate billed to client
+  monthlySalary  Decimal  @default(0) // Monthly base salary
   capacityHours  Int      @default(40) // Weekly capacity
   
   allocations    Allocation[]

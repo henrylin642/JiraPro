@@ -23,19 +23,40 @@ export function CreateResourceDialog({ trigger }: CreateResourceDialogProps) {
         role: 'USER',
         title: '',
         skills: '',
+        monthlySalary: 0,
         costRate: 0,
         billableRate: 0,
         capacityHours: 40,
     });
 
+    const calculateRates = (salary: number) => {
+        // Cost/Hr = Salary / 30 days / 8 hours
+        const cost = Math.round((salary / 30 / 8) * 100) / 100;
+        // Bill/Hr = Cost * 2
+        const bill = Math.round((cost * 2) * 100) / 100;
+        return { cost, bill };
+    };
+
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
-        setFormData(prev => ({
-            ...prev,
-            [name]: name === 'costRate' || name === 'billableRate' || name === 'capacityHours'
-                ? Number(value)
-                : value
-        }));
+
+        if (name === 'monthlySalary') {
+            const salary = Number(value);
+            const { cost, bill } = calculateRates(salary);
+            setFormData(prev => ({
+                ...prev,
+                monthlySalary: salary,
+                costRate: cost,
+                billableRate: bill
+            }));
+        } else {
+            setFormData(prev => ({
+                ...prev,
+                [name]: name === 'costRate' || name === 'billableRate' || name === 'capacityHours'
+                    ? Number(value)
+                    : value
+            }));
+        }
     };
 
     const handleRoleChange = (value: string) => {
@@ -55,6 +76,7 @@ export function CreateResourceDialog({ trigger }: CreateResourceDialogProps) {
                     role: 'USER',
                     title: '',
                     skills: '',
+                    monthlySalary: 0,
                     costRate: 0,
                     billableRate: 0,
                     capacityHours: 40,
@@ -139,6 +161,18 @@ export function CreateResourceDialog({ trigger }: CreateResourceDialogProps) {
                             onChange={handleChange}
                             placeholder="Comma separated"
                             className="col-span-3"
+                        />
+                    </div>
+                    <div className="grid grid-cols-4 items-center gap-4">
+                        <Label htmlFor="monthlySalary" className="text-right">Monthly Salary</Label>
+                        <Input
+                            id="monthlySalary"
+                            name="monthlySalary"
+                            type="number"
+                            value={formData.monthlySalary}
+                            onChange={handleChange}
+                            className="col-span-3"
+                            placeholder="Auto-calculates rates"
                         />
                     </div>
                     <div className="grid grid-cols-4 items-center gap-4">

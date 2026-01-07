@@ -21,6 +21,7 @@ export async function getResources() {
                 ...user.resourceProfile,
                 costRate: Number(user.resourceProfile.costRate),
                 billableRate: Number(user.resourceProfile.billableRate),
+                monthlySalary: Number(user.resourceProfile.monthlySalary || 0),
             } : null
         }));
     } catch (error) {
@@ -34,6 +35,7 @@ export type UpdateResourceData = {
     role?: string;
     title?: string;
     skills?: string;
+    monthlySalary?: number;
     costRate?: number;
     billableRate?: number;
     capacityHours?: number;
@@ -63,6 +65,7 @@ export async function updateResource(userId: string, data: UpdateResourceData) {
                 data: {
                     title: data.title,
                     skills: data.skills,
+                    monthlySalary: data.monthlySalary,
                     costRate: data.costRate,
                     billableRate: data.billableRate,
                     capacityHours: data.capacityHours,
@@ -74,6 +77,7 @@ export async function updateResource(userId: string, data: UpdateResourceData) {
                     userId,
                     title: data.title,
                     skills: data.skills,
+                    monthlySalary: data.monthlySalary || 0,
                     costRate: data.costRate || 0,
                     billableRate: data.billableRate || 0,
                     capacityHours: data.capacityHours || 40,
@@ -137,6 +141,7 @@ export type CreateResourceData = {
     role: string;
     title?: string;
     skills?: string;
+    monthlySalary?: number;
     costRate?: number;
     billableRate?: number;
     capacityHours?: number;
@@ -159,6 +164,7 @@ export async function createResource(data: CreateResourceData) {
                 userId: user.id,
                 title: data.title,
                 skills: data.skills,
+                monthlySalary: data.monthlySalary || 0,
                 costRate: data.costRate || 0,
                 billableRate: data.billableRate || 0,
                 capacityHours: data.capacityHours || 40,
