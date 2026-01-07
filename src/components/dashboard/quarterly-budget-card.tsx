@@ -2,49 +2,51 @@
 
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import { CreditCard } from 'lucide-react';
 
 interface QuarterlyBudgetCardProps {
     data: {
-        Q1: number;
-        Q2: number;
-        Q3: number;
-        Q4: number;
-    };
+        name: string;
+        project: number;
+        opportunity: number;
+    }[];
 }
 
 export function QuarterlyBudgetCard({ data }: QuarterlyBudgetCardProps) {
-    const chartData = [
-        { name: 'Q1', value: data.Q1 },
-        { name: 'Q2', value: data.Q2 },
-        { name: 'Q3', value: data.Q3 },
-        { name: 'Q4', value: data.Q4 },
-    ];
+    const formatYAxis = (val: number) => {
+        return `$${val / 1000}k`;
+    };
 
-    const formatCurrency = (val: number) => {
+    const formatTooltip = (val: number) => {
         return new Intl.NumberFormat('en-US', {
             style: 'currency',
             currency: 'USD',
             maximumFractionDigits: 0,
-            notation: 'compact',
-            compactDisplay: 'short'
         }).format(val);
     };
 
-    const total = data.Q1 + data.Q2 + data.Q3 + data.Q4;
+    const totalProject = data.reduce((acc, curr) => acc + curr.project, 0);
+    const totalOpportunity = data.reduce((acc, curr) => acc + curr.opportunity, 0);
+    const grandTotal = totalProject + totalOpportunity;
 
     return (
         <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-                <CardTitle className="text-base font-medium">2026 Budget Distribution</CardTitle>
+                <CardTitle className="text-base font-medium">2026 Budget Projection</CardTitle>
                 <CreditCard className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-                <div className="text-2xl font-bold mb-4">{formatCurrency(total)} <span className="text-sm font-normal text-muted-foreground">Total</span></div>
+                <div className="flex gap-4 mb-4">
+                    <div>
+                        <div className="text-2xl font-bold">{formatTooltip(grandTotal)}</div>
+                        <div className="text-sm text-muted-foreground">Total Projected</div>
+                    </div>
+                </div>
+
                 <div className="h-[200px] w-full">
                     <ResponsiveContainer width="100%" height="100%">
-                        <BarChart data={chartData}>
+                        <BarChart data={data} margin={{ top: 5, right: 5, bottom: 0, left: 10 }}>
                             <XAxis
                                 dataKey="name"
                                 stroke="#888888"
@@ -57,18 +59,17 @@ export function QuarterlyBudgetCard({ data }: QuarterlyBudgetCardProps) {
                                 fontSize={12}
                                 tickLine={false}
                                 axisLine={false}
-                                tickFormatter={(value) => `$${value}`}
+                                tickFormatter={formatYAxis}
+                                width={60}
                             />
                             <Tooltip
                                 cursor={{ fill: 'transparent' }}
-                                formatter={(value: any) => [formatCurrency(Number(value || 0)), 'Budget']}
+                                formatter={(value: any) => formatTooltip(Number(value || 0))}
                                 contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
                             />
-                            <Bar dataKey="value" radius={[4, 4, 0, 0]}>
-                                {chartData.map((entry, index) => (
-                                    <Cell key={`cell-${index}`} fill={['#3b82f6', '#10b981', '#f59e0b', '#6366f1'][index]} />
-                                ))}
-                            </Bar>
+                            <Legend />
+                            <Bar dataKey="project" name="Projects" stackId="a" fill="#3b82f6" radius={[0, 0, 4, 4]} />
+                            <Bar dataKey="opportunity" name="Opportunities" stackId="a" fill="#f59e0b" radius={[4, 4, 0, 0]} />
                         </BarChart>
                     </ResponsiveContainer>
                 </div>

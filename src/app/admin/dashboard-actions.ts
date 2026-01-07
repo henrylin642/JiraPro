@@ -64,8 +64,15 @@ export async function getExecutiveStats() {
             utilizationRate: totalUsers > 0 ? (activeAllocations.length / totalUsers) * 100 : 0
         };
 
-        // 4. 2026 Quarterly Budget
-        const quarterlyBudgets2026 = { Q1: 0, Q2: 0, Q3: 0, Q4: 0 };
+        // 4. 2026 Quarterly Stats (Projects + Opportunities)
+        const quarterlyData = [
+            { name: 'Q1', project: 0, opportunity: 0 },
+            { name: 'Q2', project: 0, opportunity: 0 },
+            { name: 'Q3', project: 0, opportunity: 0 },
+            { name: 'Q4', project: 0, opportunity: 0 },
+        ];
+
+        // Projects
         const projects2026 = await prisma.project.findMany({
             where: {
                 startDate: {
@@ -79,12 +86,34 @@ export async function getExecutiveStats() {
 
         projects2026.forEach(p => {
             if (!p.startDate) return;
-            const month = p.startDate.getMonth(); // 0-11
+            const month = p.startDate.getMonth();
             const budget = Number(p.budget);
-            if (month <= 2) quarterlyBudgets2026.Q1 += budget;
-            else if (month <= 5) quarterlyBudgets2026.Q2 += budget;
-            else if (month <= 8) quarterlyBudgets2026.Q3 += budget;
-            else quarterlyBudgets2026.Q4 += budget;
+            const qIndex = Math.floor(month / 3);
+            if (qIndex >= 0 && qIndex <= 3) {
+                quarterlyData[qIndex].project += budget;
+            }
+        });
+
+        // Opportunities
+        const opportunities2026 = await prisma.opportunity.findMany({
+            where: {
+                expectedCloseDate: {
+                    gte: new Date('2026-01-01'),
+                    lte: new Date('2026-12-31')
+                },
+                stage: { notIn: ['CLOSED_LOST', 'CLOSED_WON'] } // Only open opportunities? Or all potential? Let's use Open + Won implies 'Project' usually. Let's use Open for "Potential".
+            },
+            select: { expectedCloseDate: true, estimatedValue: true }
+        });
+
+        opportunities2026.forEach(o => {
+            if (!o.expectedCloseDate) return;
+            const month = o.expectedCloseDate.getMonth();
+            const value = Number(o.estimatedValue);
+            const qIndex = Math.floor(month / 3);
+            if (qIndex >= 0 && qIndex <= 3) {
+                quarterlyData[qIndex].opportunity += value;
+            }
         });
         const recentMilestones = await prisma.milestone.findMany({
             where: { isPaid: false },
@@ -103,7 +132,8 @@ export async function getExecutiveStats() {
             finance,
             projectStats,
             resourceStats,
-            quarterlyBudgets2026,
+            resourceStats,
+            quarterlyBudgets2026: quarterlyData,
             recentMilestones: serializedMilestones
         };
 
