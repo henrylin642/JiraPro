@@ -34,7 +34,7 @@ export async function login(formData: FormData) {
         return { success: true };
     } catch (error) {
         console.error('Login error:', error);
-        return { error: 'An error occurred during login' };
+        return { error: `Login failed: ${(error as Error).message}` };
     }
 }
 
