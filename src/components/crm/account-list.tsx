@@ -15,9 +15,15 @@ import { Edit2, ExternalLink, Trash2 } from 'lucide-react';
 import { AccountDialog } from './account-dialog';
 import { deleteAccount } from '@/app/admin/crm/account-actions';
 
-import { Account as PrismaAccount } from '@prisma/client';
-
-type Account = PrismaAccount & {
+// Explicitly define the type to match AccountDialogProps and avoid Prisma Client mismatches
+type Account = {
+    id: string;
+    name: string;
+    industry: string | null;
+    website: string | null;
+    phone: string | null;
+    address: string | null;
+    taxId: string | null;
     _count?: {
         opportunities: number;
     };
