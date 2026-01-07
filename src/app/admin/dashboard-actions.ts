@@ -72,25 +72,24 @@ export async function getExecutiveStats() {
             { name: 'Q4', project: 0, opportunity: 0 },
         ];
 
-        // Projects
-        const projects2026 = await prisma.project.findMany({
+        // Projects (Now based on Milestones)
+        const milestones2026 = await prisma.milestone.findMany({
             where: {
-                startDate: {
+                dueDate: {
                     gte: new Date('2026-01-01'),
                     lte: new Date('2026-12-31')
-                },
-                status: { not: 'CANCELLED' }
+                }
             },
-            select: { startDate: true, budget: true }
+            select: { dueDate: true, amount: true }
         });
 
-        projects2026.forEach(p => {
-            if (!p.startDate) return;
-            const month = p.startDate.getMonth();
-            const budget = Number(p.budget);
+        milestones2026.forEach(m => {
+            if (!m.dueDate) return;
+            const month = m.dueDate.getMonth();
+            const amount = Number(m.amount);
             const qIndex = Math.floor(month / 3);
             if (qIndex >= 0 && qIndex <= 3) {
-                quarterlyData[qIndex].project += budget;
+                quarterlyData[qIndex].project += amount;
             }
         });
 
