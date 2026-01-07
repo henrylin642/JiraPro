@@ -2,6 +2,36 @@
 
 import { prisma } from '@/lib/prisma';
 import { revalidatePath } from 'next/cache';
+import { getCurrentUser } from '@/lib/auth';
+
+export async function changePassword(currentPassword: string, newPassword: string) {
+    try {
+        const user = await getCurrentUser();
+        if (!user) {
+            return { success: false, error: 'Unauthorized' };
+        }
+
+        // Verify current password
+        // Note: In a real app, use bcrypt.compare here. Currently using plain text as per existing pattern.
+        if (user.password !== currentPassword) {
+            return { success: false, error: 'Incorrect current password' };
+        }
+
+        // Update password
+        await prisma.user.update({
+            where: { id: user.id },
+            data: { password: newPassword }
+        });
+
+        // Revalidate
+        revalidatePath('/admin/settings');
+
+        return { success: true };
+    } catch (error) {
+        console.error('Change password failed:', error);
+        return { success: false, error: 'Failed to change password' };
+    }
+}
 
 export async function backupSystem() {
     try {
