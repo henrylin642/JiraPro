@@ -15,14 +15,9 @@ import { Edit2, ExternalLink, Trash2 } from 'lucide-react';
 import { AccountDialog } from './account-dialog';
 import { deleteAccount } from '@/app/admin/crm/account-actions';
 
-type Account = {
-    id: string;
-    name: string;
-    industry: string | null;
-    website: string | null;
-    phone: string | null;
-    address: string | null;
-    taxId: string | null;
+import { Account as PrismaAccount } from '@prisma/client';
+
+type Account = PrismaAccount & {
     _count?: {
         opportunities: number;
     };
