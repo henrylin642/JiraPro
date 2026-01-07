@@ -76,7 +76,6 @@ export default function LoginPage() {
                                     type={showPassword ? "text" : "password"}
                                     required
                                     className="pl-9 pr-9"
-                                    defaultValue="password123"
                                 />
                                 <button
                                     type="button"
@@ -103,13 +102,7 @@ export default function LoginPage() {
                         </Button>
                     </form>
                 </CardContent>
-                <CardFooter className="flex flex-col space-y-2 text-center text-sm text-muted-foreground">
-                    <div>
-                        <span className="opacity-70">Demo credentials:</span><br />
-                        admin@company.com / password123<br />
-                        alice@company.com / password123
-                    </div>
-                </CardFooter>
+
             </Card>
         </div>
     );
