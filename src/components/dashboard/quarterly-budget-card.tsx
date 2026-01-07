@@ -59,7 +59,7 @@ export function QuarterlyBudgetCard({ data }: QuarterlyBudgetCardProps) {
                             />
                             <Tooltip
                                 cursor={{ fill: 'transparent' }}
-                                formatter={(value: number) => [formatCurrency(value), 'Budget']}
+                                formatter={(value: any) => [formatCurrency(Number(value || 0)), 'Budget']}
                                 contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
                             />
                             <Bar dataKey="value" radius={[4, 4, 0, 0]}>
