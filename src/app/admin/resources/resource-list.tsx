@@ -26,6 +26,7 @@ type Resource = {
         skills: string | null;
         costRate: any;
         billableRate: any;
+        monthlySalary: any;
         capacityHours: number;
     } | null;
 };
