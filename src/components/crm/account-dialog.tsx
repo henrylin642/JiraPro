@@ -15,6 +15,9 @@ interface AccountDialogProps {
         name: string;
         industry: string | null;
         website: string | null;
+        phone: string | null;
+        address: string | null;
+        taxId: string | null;
     };
     open?: boolean;
     onOpenChange?: (open: boolean) => void;
