@@ -132,7 +132,6 @@ export async function getExecutiveStats() {
             finance,
             projectStats,
             resourceStats,
-            resourceStats,
             quarterlyBudgets2026: quarterlyData,
             recentMilestones: serializedMilestones
         };
