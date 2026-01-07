@@ -20,6 +20,9 @@ type Account = {
     name: string;
     industry: string | null;
     website: string | null;
+    phone: string | null;
+    address: string | null;
+    taxId: string | null;
     _count?: {
         opportunities: number;
     };
