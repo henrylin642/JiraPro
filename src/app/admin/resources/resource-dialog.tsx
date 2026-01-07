@@ -27,6 +27,7 @@ interface ResourceDialogProps {
             skills: string | null;
             costRate: any; // Decimal
             billableRate: any; // Decimal
+            monthlySalary: any; // Decimal
             capacityHours: number;
         } | null;
     };
@@ -40,19 +41,40 @@ export function ResourceDialog({ open, onOpenChange, resource }: ResourceDialogP
         role: resource.role,
         title: resource.resourceProfile?.title || '',
         skills: resource.resourceProfile?.skills || '',
+        monthlySalary: Number(resource.resourceProfile?.monthlySalary) || 0,
         costRate: Number(resource.resourceProfile?.costRate) || 0,
         billableRate: Number(resource.resourceProfile?.billableRate) || 0,
         capacityHours: resource.resourceProfile?.capacityHours || 40,
     });
 
+    const calculateRates = (salary: number) => {
+        // Cost/Hr = Salary / 30 days / 8 hours
+        const cost = Math.round((salary / 30 / 8) * 100) / 100;
+        // Bill/Hr = Cost * 2
+        const bill = Math.round((cost * 2) * 100) / 100;
+        return { cost, bill };
+    };
+
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
-        setFormData(prev => ({
-            ...prev,
-            [name]: name === 'costRate' || name === 'billableRate' || name === 'capacityHours'
-                ? Number(value)
-                : value
-        }));
+
+        if (name === 'monthlySalary') {
+            const salary = Number(value);
+            const { cost, bill } = calculateRates(salary);
+            setFormData(prev => ({
+                ...prev,
+                monthlySalary: salary,
+                costRate: cost,
+                billableRate: bill
+            }));
+        } else {
+            setFormData(prev => ({
+                ...prev,
+                [name]: name === 'costRate' || name === 'billableRate' || name === 'capacityHours'
+                    ? Number(value)
+                    : value
+            }));
+        }
     };
 
     const handleRoleChange = (value: string) => {
@@ -124,6 +146,18 @@ export function ResourceDialog({ open, onOpenChange, resource }: ResourceDialogP
                             value={formData.skills || ''}
                             onChange={handleChange}
                             placeholder="Java, Python, React"
+                            className="col-span-3"
+                        />
+                    </div>
+                    <div className="grid grid-cols-4 items-center gap-4">
+                        <Label htmlFor="monthlySalary" className="text-right">Monthly Salary</Label>
+                        <Input
+                            id="monthlySalary"
+                            name="monthlySalary"
+                            type="number"
+                            value={formData.monthlySalary}
+                            onChange={handleChange}
+                            placeholder="Auto-calculates rates"
                             className="col-span-3"
                         />
                     </div>
