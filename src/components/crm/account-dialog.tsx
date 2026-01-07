@@ -8,17 +8,19 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { createAccount, updateAccount } from '@/app/admin/crm/account-actions';
 
+export type AccountDialogAccountType = {
+    id: string;
+    name: string;
+    industry: string | null;
+    website: string | null;
+    phone: string | null;
+    address: string | null;
+    taxId: string | null;
+};
+
 interface AccountDialogProps {
     trigger?: React.ReactNode;
-    account?: {
-        id: string;
-        name: string;
-        industry: string | null;
-        website: string | null;
-        phone: string | null;
-        address: string | null;
-        taxId: string | null;
-    };
+    account?: AccountDialogAccountType;
     open?: boolean;
     onOpenChange?: (open: boolean) => void;
 }

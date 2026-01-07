@@ -12,18 +12,11 @@ import {
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Edit2, ExternalLink, Trash2 } from 'lucide-react';
-import { AccountDialog } from './account-dialog';
+import { AccountDialog, AccountDialogAccountType } from './account-dialog';
 import { deleteAccount } from '@/app/admin/crm/account-actions';
 
-// Explicitly define the type to match AccountDialogProps and avoid Prisma Client mismatches
-type Account = {
-    id: string;
-    name: string;
-    industry: string | null;
-    website: string | null;
-    phone: string | null;
-    address: string | null;
-    taxId: string | null;
+// Use the type exported from the Dialog to guarantee compatibility
+type Account = AccountDialogAccountType & {
     _count?: {
         opportunities: number;
     };
