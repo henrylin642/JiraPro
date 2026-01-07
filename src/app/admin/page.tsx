@@ -14,11 +14,12 @@ import {
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
 import { PortfolioTable } from '@/components/dashboard/portfolio-table';
+import { QuarterlyBudgetCard } from '@/components/dashboard/quarterly-budget-card';
 
 export const dynamic = 'force-dynamic';
 
 export default async function AdminDashboardPage() {
-    const { finance, projectStats, resourceStats, recentMilestones } = await getExecutiveStats();
+    const { finance, projectStats, resourceStats, recentMilestones, quarterlyBudgets2026 } = await getExecutiveStats();
     const portfolio = await getPortfolio();
 
     const formatCurrency = (val: number) => {
@@ -128,6 +129,9 @@ export default async function AdminDashboardPage() {
                         </div>
                     </CardContent>
                 </Card>
+
+                {/* 2026 Quarterly Budget Distribution */}
+                <QuarterlyBudgetCard data={quarterlyBudgets2026} />
 
                 {/* Upcoming Milestones */}
                 <Card>

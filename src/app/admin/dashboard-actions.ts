@@ -64,7 +64,28 @@ export async function getExecutiveStats() {
             utilizationRate: totalUsers > 0 ? (activeAllocations.length / totalUsers) * 100 : 0
         };
 
-        // 4. Recent Milestones
+        // 4. 2026 Quarterly Budget
+        const quarterlyBudgets2026 = { Q1: 0, Q2: 0, Q3: 0, Q4: 0 };
+        const projects2026 = await prisma.project.findMany({
+            where: {
+                startDate: {
+                    gte: new Date('2026-01-01'),
+                    lte: new Date('2026-12-31')
+                },
+                status: { not: 'CANCELLED' }
+            },
+            select: { startDate: true, budget: true }
+        });
+
+        projects2026.forEach(p => {
+            if (!p.startDate) return;
+            const month = p.startDate.getMonth(); // 0-11
+            const budget = Number(p.budget);
+            if (month <= 2) quarterlyBudgets2026.Q1 += budget;
+            else if (month <= 5) quarterlyBudgets2026.Q2 += budget;
+            else if (month <= 8) quarterlyBudgets2026.Q3 += budget;
+            else quarterlyBudgets2026.Q4 += budget;
+        });
         const recentMilestones = await prisma.milestone.findMany({
             where: { isPaid: false },
             orderBy: { dueDate: 'asc' },
@@ -82,6 +103,7 @@ export async function getExecutiveStats() {
             finance,
             projectStats,
             resourceStats,
+            quarterlyBudgets2026,
             recentMilestones: serializedMilestones
         };
 
