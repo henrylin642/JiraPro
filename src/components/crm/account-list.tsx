@@ -115,7 +115,7 @@ export function AccountList({ data }: { data: Account[] }) {
                 <AccountDialog
                     open={!!editingAccount}
                     onOpenChange={(open) => !open && setEditingAccount(null)}
-                    account={editingAccount}
+                    account={editingAccount || undefined}
                 />
             )}
         </div>
