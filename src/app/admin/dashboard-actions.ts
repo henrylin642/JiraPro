@@ -167,6 +167,9 @@ export async function getPortfolio() {
                     estimatedValue: true,
                     probability: true,
                     expectedCloseDate: true,
+                    owner: {
+                        select: { name: true }
+                    }
                 }
             })
         ]);
@@ -194,7 +197,7 @@ export async function getPortfolio() {
                 probability: o.probability,
                 weightedValue: Number(o.estimatedValue) * (o.probability / 100),
                 date: o.expectedCloseDate,
-                owner: null, // Opportunities don't have an owner field yet
+                owner: o.owner?.name || null,
             }))
         ];
 

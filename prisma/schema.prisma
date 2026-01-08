@@ -26,6 +26,7 @@ model User {
   // Relations
   resourceProfile ResourceProfile?
   managedProjects Project[]        @relation("ProjectManager")
+  ownedOpportunities Opportunity[] @relation("OpportunityOwner")
   assignedTasks   Task[]           @relation("TaskAssignee")
   timesheets      TimesheetEntry[]
   createdIdeas    Idea[]
@@ -115,6 +116,9 @@ model Opportunity {
   
   checklist      String?          // Stores checked items as JSON string e.g. "[\"BANT_Budget\"]"
   lossReason     String?          // Reason for closing as lost
+
+  ownerId        String?
+  owner          User?            @relation("OpportunityOwner", fields: [ownerId], references: [id])
 
   
   // Pre-sales
