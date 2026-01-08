@@ -275,3 +275,79 @@ export async function deleteExpenseCategory(id: string) {
         return { success: false, error: "Failed to delete category" };
     }
 }
+
+export async function getServiceAreas() {
+    try {
+        const areas = await prisma.serviceArea.findMany({
+            orderBy: { name: 'asc' }
+        });
+        return areas;
+    } catch (error) {
+        console.error("Error fetching service areas:", error);
+        return [];
+    }
+}
+
+export async function addServiceArea(name: string) {
+    try {
+        const existing = await prisma.serviceArea.findUnique({
+            where: { name }
+        });
+
+        if (existing) {
+            return { success: false, error: "Service Area already exists" };
+        }
+
+        const area = await prisma.serviceArea.create({
+            data: { name }
+        });
+        revalidatePath('/admin/settings');
+        revalidatePath('/admin/project');
+        revalidatePath('/admin/crm');
+        return { success: true, area };
+    } catch (error) {
+        console.error("Error adding service area:", error);
+        return { success: false, error: "Failed to add service area: " + (error as Error).message };
+    }
+}
+
+export async function deleteServiceArea(id: string) {
+    try {
+        await prisma.serviceArea.delete({
+            where: { id }
+        });
+        revalidatePath('/admin/settings');
+        revalidatePath('/admin/project');
+        revalidatePath('/admin/crm');
+        return { success: true };
+    } catch (error) {
+        console.error("Error deleting service area:", error);
+        return { success: false, error: "Failed to delete service area" };
+    }
+}
+
+export async function seedServiceAreas() {
+    const TAIWAN_AREAS = [
+        "Keelung City", "Taipei City", "New Taipei City", "Taoyuan City",
+        "Hsinchu City", "Hsinchu County", "Miaoli County", "Taichung City",
+        "Changhua County", "Nantou County", "Yunlin County", "Chiayi City",
+        "Chiayi County", "Tainan City", "Kaohsiung City", "Pingtung County",
+        "Yilan County", "Hualien County", "Taitung County", "Penghu County",
+        "Kinmen County", "Lienchiang County"
+    ];
+
+    try {
+        for (const area of TAIWAN_AREAS) {
+            await prisma.serviceArea.upsert({
+                where: { name: area },
+                update: {},
+                create: { name: area }
+            });
+        }
+        revalidatePath('/admin/settings');
+        return { success: true };
+    } catch (error) {
+        console.error("Error seeding service areas:", error);
+        return { success: false, error: "Failed to seed service areas" };
+    }
+}
