@@ -223,6 +223,7 @@ export async function createOpportunity(data: {
     estimatedValue: number;
     accountId: string;
     expectedCloseDate?: Date;
+    ownerId?: string;
 }) {
     try {
         const opportunity = await prisma.opportunity.create({
@@ -233,6 +234,7 @@ export async function createOpportunity(data: {
                 estimatedValue: data.estimatedValue,
                 accountId: data.accountId,
                 expectedCloseDate: data.expectedCloseDate,
+                ownerId: data.ownerId,
             },
         });
         revalidatePath('/admin/crm');
@@ -248,6 +250,38 @@ export async function createOpportunity(data: {
     } catch (error) {
         console.error("Error creating opportunity:", error);
         return { success: false, error: "Failed to create opportunity" };
+    }
+}
+
+export async function updateOpportunity(id: string, data: {
+    title: string;
+    stage: string;
+    probability: number;
+    estimatedValue: number;
+    accountId: string;
+    expectedCloseDate?: Date | null;
+    ownerId?: string | null;
+}) {
+    try {
+        const opportunity = await prisma.opportunity.update({
+            where: { id },
+            data: {
+                title: data.title,
+                stage: data.stage,
+                probability: data.probability,
+                estimatedValue: data.estimatedValue,
+                accountId: data.accountId,
+                expectedCloseDate: data.expectedCloseDate,
+                ownerId: data.ownerId,
+            },
+        });
+        revalidatePath('/admin/crm');
+        revalidatePath(`/admin/crm/${id}`);
+
+        return { success: true };
+    } catch (error) {
+        console.error("Error updating opportunity:", error);
+        return { success: false, error: "Failed to update opportunity" };
     }
 }
 

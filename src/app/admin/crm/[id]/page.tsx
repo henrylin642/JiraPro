@@ -7,12 +7,15 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { getOpportunityById, getResources } from '@/app/admin/crm/actions';
+import { getOpportunityById, getResources, getUsers, getAccounts } from '@/app/admin/crm/actions';
 import { ResourceBooking } from '@/components/crm/resource-booking';
 import { ConvertToProjectDialog } from '@/components/crm/convert-project-dialog';
 import { DeleteOpportunityButton } from '@/components/crm/delete-opportunity-button';
 import { StageChecklist } from '@/components/crm/stage-checklist';
-import { getInteractions, getUsers } from '@/app/admin/crm/actions';
+import { getInteractions } from '@/app/admin/crm/actions';
 import { ActivityTimeline } from '@/components/crm/activity-timeline';
+import { OpportunityDialog } from '@/components/crm/opportunity-dialog';
+import { Pencil } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
 
@@ -22,6 +25,7 @@ export default async function OpportunityDetailPage({ params }: { params: Promis
     const resources = await getResources();
     const interactions = await getInteractions(id);
     const users = await getUsers();
+    const accounts = await getAccounts();
 
     if (!opportunity) {
         notFound();
@@ -41,7 +45,17 @@ export default async function OpportunityDetailPage({ params }: { params: Promis
                         <Building2 className="h-4 w-4" />
                         <span>{opportunity.account.name}</span>
                     </div>
-                    <div className="ml-auto">
+                    <div className="ml-auto flex items-center gap-2">
+                        <OpportunityDialog
+                            opportunity={opportunity}
+                            accounts={accounts}
+                            users={users}
+                            trigger={
+                                <Button variant="outline" size="sm" className="gap-2">
+                                    <Pencil className="h-4 w-4" /> Edit
+                                </Button>
+                            }
+                        />
                         <DeleteOpportunityButton id={opportunity.id} title={opportunity.title} />
                     </div>
                 </div>
