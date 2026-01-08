@@ -1,7 +1,8 @@
 import React from 'react';
 import Link from 'next/link';
+import { getProjects } from './actions';
 import { getServiceAreas } from '@/app/admin/settings/actions';
-import { getAccounts } from '@/app/admin/crm/actions';
+import { getAccounts } from '@/app/admin/crm/account-actions';
 import { getUsers } from '@/app/admin/crm/actions';
 
 export const dynamic = 'force-dynamic';

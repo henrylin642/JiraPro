@@ -1,12 +1,13 @@
 import React from 'react';
 import { getOpportunities } from './actions';
 import { getSalesStats } from './dashboard-actions';
-import { getAccounts } from './account-actions';
 import { KanbanBoard } from '@/components/crm/kanban-board';
 import { SalesDashboard } from './sales-dashboard';
 import { AccountList } from '@/components/crm/account-list';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
+import { getOpportunities, getSalesStats } from '@/app/admin/crm/actions';
+import { getAccounts } from '@/app/admin/crm/account-actions';
 import { PipelineTable } from '@/components/crm/pipeline-table';
 import { OpportunityDialog } from '@/components/crm/opportunity-dialog';
 import { CrmAnalytics } from '@/components/crm/crm-analytics';
