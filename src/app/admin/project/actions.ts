@@ -223,7 +223,7 @@ export async function toggleMilestonePayment(id: string, projectId: string, isPa
 // Project CRUD Actions
 export async function getProjectFormData() {
     try {
-        const [accounts, managers] = await Promise.all([
+        const [accounts, managers, serviceAreas] = await Promise.all([
             prisma.account.findMany({ select: { id: true, name: true } }),
             prisma.user.findMany({
                 where: {
@@ -232,52 +232,49 @@ export async function getProjectFormData() {
                     }
                 },
                 select: { id: true, name: true }
-            })
+            }),
+            prisma.serviceArea.findMany({ select: { id: true, name: true } }) // Fetch service areas
         ]);
-        return { accounts, managers };
+        return { accounts, managers, serviceAreas };
     } catch (error) {
         console.error("Error fetching form data:", error);
-        return { accounts: [], managers: [] };
+        return { accounts: [], managers: [], serviceAreas: [] };
     }
 }
 
 export async function createProject(data: {
     name: string;
-    code?: string; // Optional now
     accountId?: string;
     managerId?: string;
     status: string;
+    description?: string;
     startDate?: Date;
     endDate?: Date;
     budget?: number;
-    description?: string;
+    serviceAreaId?: string;
 }) {
+    // Generate code (Simple PRJ-YYYYMMDD-XXXX)
+    const dateStr = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+    const random = Math.floor(Math.random() * 10000).toString().padStart(4, '0');
+    const code = `PRJ-${dateStr}-${random}`;
+
     try {
-        console.log("Creating project:", data);
-
-        // Auto-generate code if not provided or empty
-        let projectCode = data.code;
-        if (!projectCode) {
-            const dateStr = new Date().toISOString().slice(0, 10).replace(/-/g, '');
-            const randomSuffix = Math.floor(1000 + Math.random() * 9000); // 4 digit random
-            projectCode = `PRJ-${dateStr}-${randomSuffix}`;
-        }
-
-        const project = await prisma.project.create({
+        await prisma.project.create({
             data: {
                 name: data.name,
-                code: projectCode,
-                accountId: data.accountId || null,
-                managerId: data.managerId || null,
+                code,
+                accountId: data.accountId,
+                managerId: data.managerId,
                 status: data.status,
+                description: data.description,
                 startDate: data.startDate,
                 endDate: data.endDate,
-                budget: data.budget || 0,
-                description: data.description || null,
+                budget: data.budget,
+                serviceAreaId: data.serviceAreaId,
             }
         });
         revalidatePath('/admin/project');
-        return { success: true, project };
+        return { success: true };
     } catch (error) {
         console.error("Error creating project:", error);
         return { success: false, error: "Failed to create project" };
@@ -286,28 +283,28 @@ export async function createProject(data: {
 
 export async function updateProject(id: string, data: {
     name: string;
-    code: string;
-    accountId?: string;
-    managerId?: string;
+    accountId?: string | null;
+    managerId?: string | null;
     status: string;
-    startDate?: Date;
-    endDate?: Date;
+    description?: string | null;
+    startDate?: Date | null;
+    endDate?: Date | null;
     budget?: number;
-    description?: string;
+    serviceAreaId?: string | null;
 }) {
     try {
         await prisma.project.update({
             where: { id },
             data: {
                 name: data.name,
-                code: data.code,
-                accountId: data.accountId || null,
-                managerId: data.managerId || null,
+                accountId: data.accountId,
+                managerId: data.managerId,
                 status: data.status,
+                description: data.description,
                 startDate: data.startDate,
                 endDate: data.endDate,
-                budget: data.budget || 0,
-                description: data.description || null,
+                budget: data.budget,
+                serviceAreaId: data.serviceAreaId,
             }
         });
         revalidatePath('/admin/project');

@@ -24,6 +24,7 @@ export async function getOpportunities() {
                 owner: {
                     select: { id: true, name: true },
                 },
+                serviceArea: true,
             },
         });
 
@@ -38,91 +39,7 @@ export async function getOpportunities() {
     }
 }
 
-
-export async function updateOpportunityStage(id: string, newStage: string, lossReason?: string) {
-    await prisma.opportunity.update({
-        where: { id },
-        data: {
-            stage: newStage,
-            lossReason: newStage === 'CLOSED_LOST' ? lossReason : null,
-            probability: newStage === 'CLOSED_WON' ? 100 : newStage === 'CLOSED_LOST' ? 0 : undefined
-        },
-    });
-    revalidatePath('/admin/crm');
-}
-
-export async function getSalesForecast() {
-    try {
-        const opportunities = await prisma.opportunity.findMany({
-            where: {
-                stage: { notIn: ['CLOSED_LOST'] },
-                expectedCloseDate: { not: null }
-            },
-            select: {
-                expectedCloseDate: true,
-                estimatedValue: true,
-                probability: true
-            }
-        });
-
-        // Group by month YYYY-MM
-        const forecast: Record<string, number> = {};
-
-        opportunities.forEach(opp => {
-            if (!opp.expectedCloseDate) return;
-            const month = opp.expectedCloseDate.toISOString().substring(0, 7); // "2023-10"
-            const value = Number(opp.estimatedValue);
-            const weighedValue = value * (opp.probability / 100);
-
-            forecast[month] = (forecast[month] || 0) + weighedValue;
-        });
-
-        // Convert to array and sort
-        return Object.entries(forecast)
-            .map(([month, value]) => ({ month, value }))
-            .sort((a, b) => a.month.localeCompare(b.month));
-
-    } catch (error) {
-        console.error("Error fetching sales forecast:", error);
-        return [];
-    }
-}
-
-export async function getWinLossStats() {
-    try {
-        const closedOpps = await prisma.opportunity.findMany({
-            where: {
-                stage: { in: ['CLOSED_WON', 'CLOSED_LOST'] }
-            },
-            select: {
-                stage: true,
-                lossReason: true
-            }
-        });
-
-        const stats = {
-            won: 0,
-            lost: 0,
-            reasons: {} as Record<string, number>
-        };
-
-        closedOpps.forEach(opp => {
-            if (opp.stage === 'CLOSED_WON') {
-                stats.won++;
-            } else {
-                stats.lost++;
-                if (opp.lossReason) {
-                    stats.reasons[opp.lossReason] = (stats.reasons[opp.lossReason] || 0) + 1;
-                }
-            }
-        });
-
-        return stats;
-    } catch (error) {
-        console.error("Error fetching win/loss stats:", error);
-        return { won: 0, lost: 0, reasons: {} };
-    }
-}
+// ... existing code ...
 
 export async function getOpportunityById(id: string) {
     const opportunity = await prisma.opportunity.findUnique({
@@ -130,6 +47,7 @@ export async function getOpportunityById(id: string) {
         include: {
             account: true,
             owner: { select: { id: true, name: true } },
+            serviceArea: true,
             allocations: {
                 include: {
                     resource: {
@@ -158,67 +76,7 @@ export async function getOpportunityById(id: string) {
     };
 }
 
-export async function getResources() {
-    const resources = await prisma.resourceProfile.findMany({
-        include: {
-            user: true,
-        },
-    });
-
-    return resources.map((res) => ({
-        ...res,
-        costRate: Number(res.costRate),
-        billableRate: Number(res.billableRate),
-    }));
-}
-
-export async function createAllocation(data: {
-    opportunityId: string;
-    resourceId: string;
-    startDate: Date;
-    endDate: Date;
-    percentage: number;
-}) {
-    await prisma.allocation.create({
-        data: {
-            opportunityId: data.opportunityId,
-            resourceId: data.resourceId,
-            startDate: data.startDate,
-            endDate: data.endDate,
-            percentage: data.percentage,
-            type: 'SOFT', // Default to SOFT for Opportunities
-        },
-    });
-    revalidatePath(`/admin/crm/${data.opportunityId}`);
-}
-
-export async function deleteAllocation(id: string) {
-    await prisma.allocation.delete({
-        where: { id },
-    });
-    revalidatePath('/admin/crm');
-}
-
-export async function deleteOpportunity(id: string) {
-    try {
-        // Delete related allocations first
-        await prisma.allocation.deleteMany({
-            where: { opportunityId: id }
-        });
-
-        // Delete the opportunity
-        await prisma.opportunity.delete({
-            where: { id }
-        });
-
-        revalidatePath('/admin/crm');
-        return { success: true };
-    } catch (error) {
-        console.error("Error deleting opportunity:", error);
-        return { success: false, error: "Failed to delete opportunity" };
-    }
-}
-
+// ... existing code ...
 
 export async function createOpportunity(data: {
     title: string;
@@ -228,6 +86,7 @@ export async function createOpportunity(data: {
     accountId: string;
     expectedCloseDate?: Date;
     ownerId?: string;
+    serviceAreaId?: string;
 }) {
     try {
         const opportunity = await prisma.opportunity.create({
@@ -239,6 +98,7 @@ export async function createOpportunity(data: {
                 accountId: data.accountId,
                 expectedCloseDate: data.expectedCloseDate,
                 ownerId: data.ownerId,
+                serviceAreaId: data.serviceAreaId,
             },
         });
         revalidatePath('/admin/crm');
@@ -265,6 +125,7 @@ export async function updateOpportunity(id: string, data: {
     accountId: string;
     expectedCloseDate?: Date | null;
     ownerId?: string | null;
+    serviceAreaId?: string | null;
 }) {
     try {
         const opportunity = await prisma.opportunity.update({
@@ -277,6 +138,7 @@ export async function updateOpportunity(id: string, data: {
                 accountId: data.accountId,
                 expectedCloseDate: data.expectedCloseDate,
                 ownerId: data.ownerId,
+                serviceAreaId: data.serviceAreaId,
             },
         });
         revalidatePath('/admin/crm');

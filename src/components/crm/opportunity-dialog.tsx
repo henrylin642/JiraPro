@@ -43,6 +43,11 @@ type User = {
     name: string;
 };
 
+type ServiceArea = {
+    id: string;
+    name: string;
+};
+
 type OpportunityData = {
     id: string;
     title: string;
@@ -52,16 +57,18 @@ type OpportunityData = {
     probability: number;
     expectedCloseDate: Date | null;
     ownerId: string | null;
+    serviceAreaId?: string | null;
 };
 
 interface OpportunityDialogProps {
     accounts?: Account[];
     users?: User[];
+    serviceAreas?: ServiceArea[];
     opportunity?: OpportunityData; // If present, we are in Edit mode
     trigger?: React.ReactNode;
 }
 
-export function OpportunityDialog({ accounts = [], users = [], opportunity, trigger }: OpportunityDialogProps) {
+export function OpportunityDialog({ accounts = [], users = [], serviceAreas = [], opportunity, trigger }: OpportunityDialogProps) {
     const [open, setOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const router = useRouter();
@@ -76,6 +83,7 @@ export function OpportunityDialog({ accounts = [], users = [], opportunity, trig
         probability: 10,
         expectedCloseDate: '',
         ownerId: 'unassigned',
+        serviceAreaId: 'unassigned',
     });
 
     useEffect(() => {
@@ -89,6 +97,7 @@ export function OpportunityDialog({ accounts = [], users = [], opportunity, trig
                     probability: opportunity.probability,
                     expectedCloseDate: opportunity.expectedCloseDate ? new Date(opportunity.expectedCloseDate).toISOString().split('T')[0] : '',
                     ownerId: opportunity.ownerId || 'unassigned',
+                    serviceAreaId: opportunity.serviceAreaId || 'unassigned',
                 });
             } else {
                 // Reset for Create mode
@@ -100,6 +109,7 @@ export function OpportunityDialog({ accounts = [], users = [], opportunity, trig
                     probability: 10,
                     expectedCloseDate: '',
                     ownerId: 'unassigned',
+                    serviceAreaId: 'unassigned',
                 });
             }
         }
@@ -117,6 +127,7 @@ export function OpportunityDialog({ accounts = [], users = [], opportunity, trig
             probability: Number(formData.probability),
             expectedCloseDate: formData.expectedCloseDate ? new Date(formData.expectedCloseDate) : undefined,
             ownerId: formData.ownerId === 'unassigned' ? undefined : (formData.ownerId || undefined),
+            serviceAreaId: formData.serviceAreaId === 'unassigned' ? undefined : (formData.serviceAreaId || undefined),
         };
 
         try {
@@ -209,6 +220,27 @@ export function OpportunityDialog({ accounts = [], users = [], opportunity, trig
                                 </SelectContent>
                             </Select>
                         </div>
+
+                        <div className="grid grid-cols-4 items-center gap-4">
+                            <Label htmlFor="serviceArea" className="text-right">Service Area</Label>
+                            <Select
+                                value={formData.serviceAreaId}
+                                onValueChange={(value) => setFormData({ ...formData, serviceAreaId: value })}
+                            >
+                                <SelectTrigger className="col-span-3">
+                                    <SelectValue placeholder="Select Area" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="unassigned">Unassigned</SelectItem>
+                                    {serviceAreas.map((area) => (
+                                        <SelectItem key={area.id} value={area.id}>
+                                            {area.name}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </div>
+
                         <div className="grid grid-cols-4 items-center gap-4">
                             <Label htmlFor="stage" className="text-right">Stage</Label>
                             <Select

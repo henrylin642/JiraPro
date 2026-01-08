@@ -1,18 +1,17 @@
 import React from 'react';
 import Link from 'next/link';
-import { getProjects } from './actions';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Progress } from '@/components/ui/progress';
-import { CalendarDays, Users, CheckSquare, ArrowRight, LayoutGrid, List } from 'lucide-react';
-import { ProjectDialog } from '@/components/project/project-dialog';
-import { ProjectTableView } from '@/components/project/project-table-view';
+import { getServiceAreas } from '@/app/admin/settings/actions';
+import { getAccounts } from '@/app/admin/crm/actions';
+import { getUsers } from '@/app/admin/crm/actions';
 
 export const dynamic = 'force-dynamic';
 
 export default async function ProjectsPage({ searchParams }: { searchParams: Promise<{ view?: string }> }) {
     const projects = await getProjects();
+    const accounts = await getAccounts();
+    const users = await getUsers();
+    const serviceAreas = await getServiceAreas();
+
     const { view } = await searchParams;
     const isTableView = view !== 'gallery';
 
@@ -37,7 +36,7 @@ export default async function ProjectsPage({ searchParams }: { searchParams: Pro
                             </Button>
                         </Link>
                     </div>
-                    <ProjectDialog trigger={<Button>New Project</Button>} />
+                    <ProjectDialog accounts={accounts} users={users} serviceAreas={serviceAreas} trigger={<Button>New Project</Button>} />
                 </div>
             </div>
 

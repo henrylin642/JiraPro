@@ -14,9 +14,12 @@ interface ProjectDialogProps {
     trigger?: React.ReactNode;
     open?: boolean;
     onOpenChange?: (open: boolean) => void;
+    accounts?: { id: string, name: string }[];
+    users?: { id: string, name: string }[];
+    serviceAreas?: { id: string, name: string }[];
 }
 
-export function ProjectDialog({ project, trigger, open, onOpenChange }: ProjectDialogProps) {
+export function ProjectDialog({ project, trigger, open, onOpenChange, accounts = [], users = [], serviceAreas = [] }: ProjectDialogProps) {
     const [isOpen, setIsOpen] = useState(false);
     const router = useRouter();
     const [formData, setFormData] = useState({
@@ -28,10 +31,9 @@ export function ProjectDialog({ project, trigger, open, onOpenChange }: ProjectD
         startDate: '',
         endDate: '',
         budget: '',
-        description: ''
+        description: '',
+        serviceAreaId: ''
     });
-
-    const [options, setOptions] = useState<{ accounts: any[], managers: any[] }>({ accounts: [], managers: [] });
 
     // Handle Open State
     const handleOpenChange = (newOpen: boolean) => {
@@ -42,7 +44,6 @@ export function ProjectDialog({ project, trigger, open, onOpenChange }: ProjectD
     useEffect(() => {
         const isDialogOpen = open !== undefined ? open : isOpen;
         if (isDialogOpen) {
-            fetchOptions();
             if (project) {
                 setFormData({
                     name: project.name || '',
@@ -53,7 +54,8 @@ export function ProjectDialog({ project, trigger, open, onOpenChange }: ProjectD
                     startDate: project.startDate ? new Date(project.startDate).toISOString().split('T')[0] : '',
                     endDate: project.endDate ? new Date(project.endDate).toISOString().split('T')[0] : '',
                     budget: project.budget ? String(project.budget) : '',
-                    description: project.description || ''
+                    description: project.description || '',
+                    serviceAreaId: project.serviceAreaId || ''
                 });
             } else {
                 setFormData({
@@ -65,16 +67,13 @@ export function ProjectDialog({ project, trigger, open, onOpenChange }: ProjectD
                     startDate: '',
                     endDate: '',
                     budget: '',
-                    description: ''
+                    description: '',
+                    serviceAreaId: ''
                 });
             }
         }
     }, [project, open, isOpen]);
 
-    const fetchOptions = async () => {
-        const data = await getProjectFormData();
-        setOptions(data);
-    };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -84,8 +83,9 @@ export function ProjectDialog({ project, trigger, open, onOpenChange }: ProjectD
             startDate: formData.startDate ? new Date(formData.startDate) : undefined,
             endDate: formData.endDate ? new Date(formData.endDate) : undefined,
             budget: formData.budget ? Number(formData.budget) : 0,
-            accountId: formData.accountId === 'none' ? undefined : formData.accountId, // Handle clearing
-            managerId: formData.managerId === 'none' ? undefined : formData.managerId
+            accountId: formData.accountId === 'none' || !formData.accountId ? undefined : formData.accountId,
+            managerId: formData.managerId === 'none' || !formData.managerId ? undefined : formData.managerId,
+            serviceAreaId: formData.serviceAreaId === 'none' || !formData.serviceAreaId ? undefined : formData.serviceAreaId
         };
 
         try {
@@ -149,7 +149,7 @@ export function ProjectDialog({ project, trigger, open, onOpenChange }: ProjectD
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectItem value="none">None</SelectItem>
-                                    {options.accounts.map(a => (
+                                    {accounts.map(a => (
                                         <SelectItem key={a.id} value={a.id}>{a.name}</SelectItem>
                                     ))}
                                 </SelectContent>
@@ -166,12 +166,30 @@ export function ProjectDialog({ project, trigger, open, onOpenChange }: ProjectD
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectItem value="none">None</SelectItem>
-                                    {options.managers.map(m => (
+                                    {users.map(m => (
                                         <SelectItem key={m.id} value={m.id}>{m.name}</SelectItem>
                                     ))}
                                 </SelectContent>
                             </Select>
                         </div>
+                    </div>
+
+                    <div className="space-y-2">
+                        <Label>Service Area</Label>
+                        <Select
+                            value={formData.serviceAreaId}
+                            onValueChange={v => setFormData({ ...formData, serviceAreaId: v })}
+                        >
+                            <SelectTrigger>
+                                <SelectValue placeholder="Select Service Area" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="none">None</SelectItem>
+                                {serviceAreas.map(a => (
+                                    <SelectItem key={a.id} value={a.id}>{a.name}</SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
                     </div>
 
                     <div className="grid grid-cols-3 gap-4">
