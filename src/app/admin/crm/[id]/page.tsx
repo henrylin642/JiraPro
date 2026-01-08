@@ -15,7 +15,6 @@ import { DeleteOpportunityButton } from '@/components/crm/delete-opportunity-but
 import { StageChecklist } from '@/components/crm/stage-checklist';
 import { ActivityTimeline } from '@/components/crm/activity-timeline';
 import { OpportunityDialog } from '@/components/crm/opportunity-dialog';
-import { Pencil } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
 
@@ -50,11 +49,6 @@ export default async function OpportunityDetailPage({ params }: { params: Promis
                             opportunity={opportunity}
                             accounts={accounts}
                             users={users}
-                            trigger={
-                                <Button variant="outline" size="sm" className="gap-2">
-                                    <Pencil className="h-4 w-4" /> Edit
-                                </Button>
-                            }
                         />
                         <DeleteOpportunityButton id={opportunity.id} title={opportunity.title} />
                     </div>
