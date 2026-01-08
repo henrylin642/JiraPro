@@ -9,6 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { getOpportunityById, getResources, getUsers } from '@/app/admin/crm/actions';
 import { getAccounts } from '@/app/admin/crm/account-actions';
 import { getInteractions } from '@/app/admin/crm/actions';
+import { getServiceAreas } from '@/app/admin/settings/actions';
 import { ResourceBooking } from '@/components/crm/resource-booking';
 import { ConvertToProjectDialog } from '@/components/crm/convert-project-dialog';
 import { DeleteOpportunityButton } from '@/components/crm/delete-opportunity-button';
@@ -25,6 +26,7 @@ export default async function OpportunityDetailPage({ params }: { params: Promis
     const interactions = await getInteractions(id);
     const users = await getUsers();
     const accounts = await getAccounts();
+    const serviceAreas = await getServiceAreas();
 
     if (!opportunity) {
         notFound();
@@ -49,6 +51,7 @@ export default async function OpportunityDetailPage({ params }: { params: Promis
                             opportunity={opportunity}
                             accounts={accounts}
                             users={users}
+                            serviceAreas={serviceAreas}
                         />
                         <DeleteOpportunityButton id={opportunity.id} title={opportunity.title} />
                     </div>

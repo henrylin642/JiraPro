@@ -31,9 +31,12 @@ type Project = Projects[number];
 
 interface ProjectTableViewProps {
     projects: Projects;
+    accounts?: { id: string, name: string }[];
+    users?: { id: string, name: string }[];
+    serviceAreas?: { id: string, name: string }[];
 }
 
-export function ProjectTableView({ projects }: ProjectTableViewProps) {
+export function ProjectTableView({ projects, accounts = [], users = [], serviceAreas = [] }: ProjectTableViewProps) {
     const router = useRouter();
     const [editingProject, setEditingProject] = React.useState<Project | null>(null);
     const [isEditOpen, setIsEditOpen] = React.useState(false);
@@ -71,6 +74,9 @@ export function ProjectTableView({ projects }: ProjectTableViewProps) {
                     project={editingProject}
                     open={isEditOpen}
                     onOpenChange={setIsEditOpen}
+                    accounts={accounts}
+                    users={users}
+                    serviceAreas={serviceAreas}
                 />
             )}
             <Table>

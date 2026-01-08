@@ -1,6 +1,8 @@
 import React from 'react';
 import { getProjectById } from '../actions';
-import { getExpenseCategories } from '@/app/admin/settings/actions';
+import { getExpenseCategories, getServiceAreas } from '@/app/admin/settings/actions';
+import { getAccounts } from '@/app/admin/crm/account-actions';
+import { getUsers } from '@/app/admin/crm/actions';
 import { ProjectDialog } from '@/components/project/project-dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -18,6 +20,9 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
     const { id } = await params;
     const rawProject = await getProjectById(id);
     const expenseCategories = await getExpenseCategories();
+    const serviceAreas = await getServiceAreas();
+    const accounts = await getAccounts();
+    const users = await getUsers();
     const { serializeDecimal } = await import('@/lib/serialize');
     const project = serializeDecimal(rawProject);
 
@@ -41,6 +46,9 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
                     <ProjectDialog
                         project={project}
                         trigger={<Button>Edit Project</Button>}
+                        accounts={accounts}
+                        users={users}
+                        serviceAreas={serviceAreas}
                     />
                     <Badge variant="outline" className="text-lg px-3 py-1">{project.status}</Badge>
                 </div>

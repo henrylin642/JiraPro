@@ -48,7 +48,7 @@ export default async function ProjectsPage({ searchParams }: { searchParams: Pro
             </div>
 
             {isTableView ? (
-                <ProjectTableView projects={projects} />
+                <ProjectTableView projects={projects} accounts={accounts} users={users} serviceAreas={serviceAreas} />
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {projects.map((project) => {
