@@ -144,8 +144,7 @@ export async function backupSystem() {
             tasks,
             allocations,
             ideas,
-            allocations,
-            ideas,
+
             timesheetEntries,
             expenseCategories,
             serviceAreas
