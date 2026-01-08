@@ -6,30 +6,15 @@ async function main() {
     console.log('🌱 Starting seed...');
 
     // 1. Clean up existing data (Order matters for foreign keys!)
-    await prisma.expense.deleteMany(); // Delete Expenses first
-    await prisma.timesheetEntry.deleteMany();
-    await prisma.allocation.deleteMany();
-    await prisma.task.deleteMany();
-    await prisma.milestone.deleteMany();
-    await prisma.project.deleteMany();
-
-    await prisma.interaction.deleteMany(); // Delete Interactions
-    await prisma.opportunity.deleteMany();
-    await prisma.contact.deleteMany();
-    await prisma.account.deleteMany();
-
-    await prisma.idea.deleteMany();
-    await prisma.feature.deleteMany();
-    await prisma.roadmapItem.deleteMany();
-    await prisma.businessModelCanvas.deleteMany(); // Delete BMC
-    await prisma.product.deleteMany();
-
-    await prisma.resourceProfile.deleteMany();
-    await prisma.user.deleteMany();
+    // Removed deleteMany to prevent data loss on re-seeding
+    // await prisma.expense.deleteMany(); 
+    // ...
 
     // 2. Create Users & Resources
-    const admin = await prisma.user.create({
-        data: {
+    const admin = await prisma.user.upsert({
+        where: { email: 'admin@company.com' },
+        update: {},
+        create: {
             email: 'admin@company.com',
             password: 'password123',
             name: 'Admin User',
@@ -45,25 +30,29 @@ async function main() {
         },
     });
 
-    const sales = await prisma.user.create({
-        data: {
+    const sales = await prisma.user.upsert({
+        where: { email: 'alice@company.com' },
+        update: {},
+        create: {
             email: 'alice@company.com',
             password: 'password123',
             name: 'Alice Sales',
-            role: 'MANAGER', // Sales Manager
+            role: 'MANAGER',
             resourceProfile: {
                 create: {
                     title: 'Sales Director',
                     skills: 'Negotiation, CRM',
                     costRate: 80,
-                    billableRate: 0, // Sales usually non-billable
+                    billableRate: 0,
                 },
             },
         },
     });
 
-    const pm = await prisma.user.create({
-        data: {
+    const pm = await prisma.user.upsert({
+        where: { email: 'bob@company.com' },
+        update: {},
+        create: {
             email: 'bob@company.com',
             password: 'password123',
             name: 'Bob PM',
@@ -79,8 +68,10 @@ async function main() {
         },
     });
 
-    const dev = await prisma.user.create({
-        data: {
+    const dev = await prisma.user.upsert({
+        where: { email: 'charlie@company.com' },
+        update: {},
+        create: {
             email: 'charlie@company.com',
             password: 'password123',
             name: 'Charlie Dev',
@@ -96,8 +87,10 @@ async function main() {
         },
     });
 
-    const designer = await prisma.user.create({
-        data: {
+    const designer = await prisma.user.upsert({
+        where: { email: 'diana@company.com' },
+        update: {},
+        create: {
             email: 'diana@company.com',
             password: 'password123',
             name: 'Diana Design',
@@ -114,8 +107,10 @@ async function main() {
     });
 
     // Add Henry's account
-    await prisma.user.create({
-        data: {
+    await prisma.user.upsert({
+        where: { email: 'henry.lin@lig.com.tw' },
+        update: {},
+        create: {
             email: 'henry.lin@lig.com.tw',
             password: 'password123', // Default password
             name: 'Henry Lin',
@@ -134,8 +129,10 @@ async function main() {
     console.log('✅ Users created');
 
     // 3. Create Accounts
-    const acme = await prisma.account.create({
-        data: {
+    const acme = await prisma.account.upsert({
+        where: { name: 'Acme Corp' },
+        update: {},
+        create: {
             name: 'Acme Corp',
             industry: 'Manufacturing',
             website: 'https://acme.com',
@@ -147,8 +144,10 @@ async function main() {
         },
     });
 
-    const globex = await prisma.account.create({
-        data: {
+    const globex = await prisma.account.upsert({
+        where: { name: 'Globex Corporation' },
+        update: {},
+        create: {
             name: 'Globex Corporation',
             industry: 'Technology',
             website: 'https://globex.com',
@@ -160,8 +159,10 @@ async function main() {
         },
     });
 
-    const soylent = await prisma.account.create({
-        data: {
+    const soylent = await prisma.account.upsert({
+        where: { name: 'Soylent Corp' },
+        update: {},
+        create: {
             name: 'Soylent Corp',
             industry: 'Food & Beverage',
             website: 'https://soylent.com',
@@ -171,79 +172,87 @@ async function main() {
     console.log('✅ Accounts created');
 
     // 4. Create Opportunities (The Pipeline)
-    await prisma.opportunity.create({
-        data: {
-            title: 'Acme E-commerce Replatform',
-            accountId: acme.id,
-            stage: 'PROPOSAL',
-            probability: 60,
-            estimatedValue: 500000,
-            expectedCloseDate: new Date('2025-12-31'),
-        },
-    });
+    // Opportunities don't have unique names, so we might skip upserting or just try create if not exists
+    // For simplicity in seed, let's just check if one exists to avoid duplicates on re-run
+    if (await prisma.opportunity.count() === 0) {
+        await prisma.opportunity.create({
+            data: {
+                title: 'Acme E-commerce Replatform',
+                accountId: acme.id,
+                stage: 'PROPOSAL',
+                probability: 60,
+                estimatedValue: 500000,
+                expectedCloseDate: new Date('2025-12-31'),
+            },
+        });
 
-    await prisma.opportunity.create({
-        data: {
-            title: 'Globex AI Assistant',
-            accountId: globex.id,
-            stage: 'NEGOTIATION',
-            probability: 90,
-            estimatedValue: 1200000,
-            expectedCloseDate: new Date('2025-12-15'),
-        },
-    });
+        await prisma.opportunity.create({
+            data: {
+                title: 'Globex AI Assistant',
+                accountId: globex.id,
+                stage: 'NEGOTIATION',
+                probability: 90,
+                estimatedValue: 1200000,
+                expectedCloseDate: new Date('2025-12-15'),
+            },
+        });
 
-    await prisma.opportunity.create({
-        data: {
-            title: 'Soylent Mobile App',
-            accountId: soylent.id,
-            stage: 'LEAD',
-            probability: 10,
-            estimatedValue: 300000,
-            expectedCloseDate: new Date('2026-03-01'),
-        },
-    });
+        await prisma.opportunity.create({
+            data: {
+                title: 'Soylent Mobile App',
+                accountId: soylent.id,
+                stage: 'LEAD',
+                probability: 10,
+                estimatedValue: 300000,
+                expectedCloseDate: new Date('2026-03-01'),
+            },
+        });
+        console.log('✅ Opportunities created');
+    }
 
-    console.log('✅ Opportunities created');
 
     // 5. Create Products & Roadmap
-    const product = await prisma.product.create({
-        data: {
-            name: 'JiraPro SaaS',
-            description: 'Our flagship project management tool',
-            roadmap: {
-                create: [
-                    {
-                        title: 'Q1 Release',
-                        version: 'v1.0',
-                        startDate: new Date('2026-01-01'),
-                        endDate: new Date('2026-03-31'),
-                    },
-                ],
-            },
-            features: {
-                create: [
-                    {
-                        title: 'AI Assistant',
-                        description: 'Automated task summarization',
-                        status: 'PLANNED',
-                        opportunities: {
-                            connect: [{ id: (await prisma.opportunity.findFirst({ where: { title: 'Globex AI Assistant' } }))?.id || '' }],
+    const existingProduct = await prisma.product.findFirst({ where: { name: 'JiraPro SaaS' } });
+    if (!existingProduct) {
+        await prisma.product.create({
+            data: {
+                name: 'JiraPro SaaS',
+                description: 'Our flagship project management tool',
+                roadmap: {
+                    create: [
+                        {
+                            title: 'Q1 Release',
+                            version: 'v1.0',
+                            startDate: new Date('2026-01-01'),
+                            endDate: new Date('2026-03-31'),
                         },
-                    },
-                ],
+                    ],
+                },
+                features: {
+                    create: [
+                        {
+                            title: 'AI Assistant',
+                            description: 'Automated task summarization',
+                            status: 'PLANNED',
+                            opportunities: {
+                                connect: [{ id: (await prisma.opportunity.findFirst({ where: { title: 'Globex AI Assistant' } }))?.id || '' }],
+                            },
+                        },
+                    ],
+                },
             },
-        },
-    });
-
-    console.log('✅ Products created');
+        });
+        console.log('✅ Products created');
+    }
 
     // 6. Create Projects & Tasks
     const globexOpp = await prisma.opportunity.findFirst({ where: { title: 'Globex AI Assistant' } });
     const devResource = await prisma.resourceProfile.findUnique({ where: { userId: dev.id } });
     const designerResource = await prisma.resourceProfile.findUnique({ where: { userId: designer.id } });
 
-    if (globexOpp && devResource && designerResource) {
+    const existingProject = await prisma.project.findFirst({ where: { code: 'PRJ-GLBX-001' } });
+
+    if (globexOpp && devResource && designerResource && !existingProject) {
         const project = await prisma.project.create({
             data: {
                 name: 'Globex AI Implementation',
@@ -330,6 +339,8 @@ async function main() {
         });
 
         console.log('✅ Projects & Tasks created');
+    } else {
+        console.log('ℹ️ Project already exists or dependencies missing, skipping.');
     }
 
     console.log('🌱 Seed completed!');
