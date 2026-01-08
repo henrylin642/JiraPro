@@ -113,6 +113,24 @@ async function main() {
         },
     });
 
+    // Add Henry's account
+    await prisma.user.create({
+        data: {
+            email: 'henry.lin@lig.com.tw',
+            password: 'password123', // Default password
+            name: 'Henry Lin',
+            role: 'ADMIN',
+            resourceProfile: {
+                create: {
+                    title: 'Administrator',
+                    skills: 'System Admin',
+                    costRate: 100,
+                    billableRate: 200,
+                },
+            },
+        },
+    });
+
     console.log('✅ Users created');
 
     // 3. Create Accounts
