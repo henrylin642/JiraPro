@@ -3,6 +3,80 @@
 import { prisma } from '@/lib/prisma';
 import { revalidatePath } from 'next/cache';
 import { getCurrentUser } from '@/lib/auth';
+import { Prisma } from '@prisma/client';
+
+export async function getBackupSettings() {
+    try {
+        const setting = await prisma.systemSetting.findUnique({
+            where: { key: 'backup_schedule_hour' }
+        });
+        return {
+            enabled: !!setting,
+            hour: setting ? parseInt(setting.value) : 19 // Default 7 PM
+        };
+    } catch (error) {
+        console.error("Error getting backup settings:", error);
+        return { enabled: true, hour: 19 };
+    }
+}
+
+export async function updateBackupSettings(enabled: boolean, hour: number) {
+    try {
+        if (enabled) {
+            await prisma.systemSetting.upsert({
+                where: { key: 'backup_schedule_hour' },
+                update: { value: hour.toString() },
+                create: { key: 'backup_schedule_hour', value: hour.toString() }
+            });
+        } else {
+            await prisma.systemSetting.deleteMany({
+                where: { key: 'backup_schedule_hour' }
+            });
+        }
+        revalidatePath('/admin/settings');
+        return { success: true };
+    } catch (error) {
+        console.error("Error updating backup settings:", error);
+        return { success: false, error: "Failed to update settings" };
+    }
+}
+
+export async function getBackups() {
+    try {
+        const backups = await prisma.systemBackup.findMany({
+            orderBy: { createdAt: 'desc' },
+            take: 10,
+            select: { id: true, filename: true, size: true, createdAt: true }
+        });
+        return backups;
+    } catch (error) {
+        console.error("Error fetching backups:", error);
+        return [];
+    }
+}
+
+export async function restoreFromBackupId(id: string) {
+    try {
+        const backup = await prisma.systemBackup.findUnique({
+            where: { id }
+        });
+
+        if (!backup) return { success: false, error: "Backup not found" };
+
+        // Convert Json to strong type or string for processing
+        // Prisma Json type is mapped to any/object.
+        // We can treat it as the data object directly.
+        const data = backup.data as any; // Cast for now
+
+        // Reuse restore logic - create a mock File/FormData or extract logic
+        // Refactoring restoreSystem to take an object is better.
+        return await restoreSystemData(data);
+
+    } catch (error) {
+        console.error("Error restoring from backup ID:", error);
+        return { success: false, error: "Failed to restore from backup" };
+    }
+}
 
 export async function changePassword(currentPassword: string, newPassword: string) {
     try {
@@ -51,6 +125,7 @@ export async function backupSystem() {
         const ideas = await prisma.idea.findMany();
         const timesheetEntries = await prisma.timesheetEntry.findMany();
         const expenseCategories = await prisma.expenseCategory.findMany();
+        const serviceAreas = await prisma.serviceArea.findMany(); // Added Service Areas
 
         const data = {
             timestamp: new Date().toISOString(),
@@ -69,11 +144,27 @@ export async function backupSystem() {
             tasks,
             allocations,
             ideas,
+            allocations,
+            ideas,
             timesheetEntries,
-            expenseCategories
+            expenseCategories,
+            serviceAreas
         };
 
-        return { success: true, data: JSON.stringify(data, null, 2) };
+        // Save to SystemBackup table
+        const jsonString = JSON.stringify(data, null, 2);
+        const size = new TextEncoder().encode(jsonString).length;
+        const filename = `backup_${new Date().toISOString().replace(/[:.]/g, '-')}.json`;
+
+        await prisma.systemBackup.create({
+            data: {
+                filename,
+                data: data as any, // Cast to any for Prisma Json
+                size
+            }
+        });
+
+        return { success: true, data: jsonString }; // Return string for download if needed
     } catch (error) {
         console.error('Backup failed:', error);
         return { success: false, error: 'Backup generation failed' };
@@ -99,6 +190,7 @@ export async function restoreSystem(formData: FormData) {
             // 1. DELETE ALL (Reverse Order)
             // Note: Use deleteMany({}) to clear tables. Order matters for FK constraints.
             await tx.expenseCategory.deleteMany();
+            await tx.serviceArea.deleteMany(); // Delete Service Areas
             await tx.timesheetEntry.deleteMany();
             await tx.allocation.deleteMany();
             await tx.idea.deleteMany();
@@ -213,6 +305,9 @@ export async function restoreSystem(formData: FormData) {
             // P. Expense Categories
             if (data.expenseCategories?.length) await tx.expenseCategory.createMany({ data: data.expenseCategories });
 
+            // Q. Service Areas
+            if (data.serviceAreas?.length) await tx.serviceArea.createMany({ data: data.serviceAreas });
+
         }, {
             maxWait: 10000,
             timeout: 20000
@@ -223,6 +318,102 @@ export async function restoreSystem(formData: FormData) {
     } catch (error) {
         console.error('Restore failed:', error);
         return { success: false, error: 'Restore failed: ' + (error as Error).message };
+    }
+}
+
+// Internal helper for restoring raw data object
+async function restoreSystemData(data: any) {
+    if (!data.version || !data.users) {
+        return { success: false, error: 'Invalid backup format' };
+    }
+
+    try {
+        await prisma.$transaction(async (tx) => {
+            // 1. DELETE ALL
+            await tx.expenseCategory.deleteMany();
+            await tx.serviceArea.deleteMany();
+            await tx.timesheetEntry.deleteMany();
+            await tx.allocation.deleteMany();
+            await tx.idea.deleteMany();
+            await tx.interaction.deleteMany();
+            await tx.contact.deleteMany();
+            await tx.task.deleteMany();
+            await tx.milestone.deleteMany();
+            await tx.project.deleteMany();
+            await tx.opportunity.deleteMany();
+            await tx.roadmapItem.deleteMany();
+            await tx.feature.deleteMany();
+            await tx.product.deleteMany();
+            await tx.resourceProfile.deleteMany();
+            await tx.account.deleteMany();
+            await tx.user.deleteMany();
+
+            // 2. RESTORE (Simplified copy-paste from original function for now, or we can refactor original to call this if we extract logic properly)
+            // A. Users
+            if (data.users?.length) await tx.user.createMany({ data: data.users });
+            // B. Accounts
+            if (data.accounts?.length) await tx.account.createMany({ data: data.accounts });
+            // C. Products
+            if (data.products?.length) await tx.product.createMany({ data: data.products });
+            // D. ResourceProfiles
+            if (data.resourceProfiles?.length) await tx.resourceProfile.createMany({ data: data.resourceProfiles });
+            // E. Contacts
+            if (data.contacts?.length) await tx.contact.createMany({ data: data.contacts });
+            // F. Interactions
+            if (data.interactions?.length) await tx.interaction.createMany({ data: data.interactions });
+            // G. Features
+            for (const f of data.features || []) {
+                const { opportunities, ...rest } = f;
+                await tx.feature.create({ data: rest });
+            }
+            // H. RoadmapItems
+            if (data.roadmapItems?.length) await tx.roadmapItem.createMany({ data: data.roadmapItems });
+            // I. Opportunities
+            for (const o of data.opportunities || []) {
+                const { features, ...rest } = o;
+                await tx.opportunity.create({
+                    data: {
+                        ...rest,
+                        features: {
+                            connect: features
+                        }
+                    }
+                });
+            }
+            // J. Projects
+            if (data.projects?.length) await tx.project.createMany({ data: data.projects });
+            // K. Milestones
+            if (data.milestones?.length) await tx.milestone.createMany({ data: data.milestones });
+            // L. Tasks
+            if (data.tasks?.length) {
+                const tasksWithParents = [];
+                for (const t of data.tasks) {
+                    const { parentId, parent, subtasks, ...rest } = t;
+                    if (parentId) tasksWithParents.push({ id: t.id, parentId });
+                    await tx.task.create({ data: rest });
+                }
+                for (const t of tasksWithParents) {
+                    await tx.task.update({ where: { id: t.id }, data: { parentId: t.parentId } });
+                }
+            }
+            // M. Allocations
+            if (data.allocations?.length) await tx.allocation.createMany({ data: data.allocations });
+            // N. Ideas
+            if (data.ideas?.length) await tx.idea.createMany({ data: data.ideas });
+            // O. TimesheetEntries
+            if (data.timesheetEntries?.length) await tx.timesheetEntry.createMany({ data: data.timesheetEntries });
+            // P. Expense Categories
+            if (data.expenseCategories?.length) await tx.expenseCategory.createMany({ data: data.expenseCategories });
+            // Q. Service Areas
+            if (data.serviceAreas?.length) await tx.serviceArea.createMany({ data: data.serviceAreas });
+
+        }, { maxWait: 20000, timeout: 40000 });
+
+        revalidatePath('/');
+        return { success: true };
+    } catch (e) {
+        console.error("Restore logic failed", e);
+        throw e;
     }
 }
 

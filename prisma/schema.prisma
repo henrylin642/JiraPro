@@ -346,3 +346,20 @@ model TimesheetEntry {
   
   createdAt   DateTime @default(now())
 }
+
+// --- System Management ---
+
+model SystemSetting {
+  id        String   @id @default(uuid())
+  key       String   @unique
+  value     String
+  updatedAt DateTime @updatedAt
+}
+
+model SystemBackup {
+  id        String   @id @default(uuid())
+  filename  String
+  data      Json
+  size      Int
+  createdAt DateTime @default(now())
+}
