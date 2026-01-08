@@ -4,7 +4,13 @@ import { getProjects } from './actions';
 import { getServiceAreas } from '@/app/admin/settings/actions';
 import { getAccounts } from '@/app/admin/crm/account-actions';
 import { getUsers } from '@/app/admin/crm/actions';
-
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Progress } from '@/components/ui/progress';
+import { CalendarDays, Users, CheckSquare, ArrowRight, LayoutGrid, List } from 'lucide-react';
+import { ProjectDialog } from '@/components/project/project-dialog';
+import { ProjectTableView } from '@/components/project/project-table-view';
 export const dynamic = 'force-dynamic';
 
 export default async function ProjectsPage({ searchParams }: { searchParams: Promise<{ view?: string }> }) {
