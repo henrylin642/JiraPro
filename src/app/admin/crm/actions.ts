@@ -154,6 +154,80 @@ export async function updateOpportunity(id: string, data: {
 
 import { STAGE_CHECKLISTS, BASE_PROBABILITIES } from '@/lib/crm-constants';
 
+export async function updateOpportunityStage(id: string, newStage: string, lossReason?: string) {
+    await prisma.opportunity.update({
+        where: { id },
+        data: {
+            stage: newStage,
+            lossReason: newStage === 'CLOSED_LOST' ? lossReason : null,
+            probability: newStage === 'CLOSED_WON' ? 100 : newStage === 'CLOSED_LOST' ? 0 : undefined
+        },
+    });
+    revalidatePath('/admin/crm');
+}
+
+export async function deleteOpportunity(id: string) {
+    try {
+        // Delete related allocations first
+        await prisma.allocation.deleteMany({
+            where: { opportunityId: id }
+        });
+
+        // Delete the opportunity
+        await prisma.opportunity.delete({
+            where: { id }
+        });
+
+        revalidatePath('/admin/crm');
+        return { success: true };
+    } catch (error) {
+        console.error("Error deleting opportunity:", error);
+        return { success: false, error: "Failed to delete opportunity" };
+    }
+}
+
+export async function getResources() {
+    const resources = await prisma.resourceProfile.findMany({
+        include: {
+            user: true,
+        },
+    });
+
+    return resources.map((res) => ({
+        ...res,
+        costRate: Number(res.costRate),
+        billableRate: Number(res.billableRate),
+    }));
+}
+
+export async function createAllocation(data: {
+    opportunityId: string;
+    resourceId: string;
+    startDate: Date;
+    endDate: Date;
+    percentage: number;
+}) {
+    await prisma.allocation.create({
+        data: {
+            opportunityId: data.opportunityId,
+            resourceId: data.resourceId,
+            startDate: data.startDate,
+            endDate: data.endDate,
+            percentage: data.percentage,
+            type: 'SOFT', // Default to SOFT for Opportunities
+        },
+    });
+    revalidatePath(`/admin/crm/${data.opportunityId}`);
+}
+
+export async function deleteAllocation(id: string) {
+    await prisma.allocation.delete({
+        where: { id },
+    });
+    revalidatePath('/admin/crm');
+}
+
+
 export async function updateOpportunityChecklist(id: string, checklist: string[]) {
     try {
         // Fetch current opportunity to get the stage
