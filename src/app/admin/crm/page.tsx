@@ -41,7 +41,7 @@ export default async function CRMPage() {
                     </TabsContent>
 
                     <TabsContent value="pipeline" className="m-0 h-full">
-                        <KanbanBoard initialOpportunities={opportunities} />
+                        <KanbanBoard initialOpportunities={opportunities} users={users} />
                     </TabsContent>
 
                     <TabsContent value="accounts" className="m-0 h-full">

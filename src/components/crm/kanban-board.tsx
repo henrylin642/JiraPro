@@ -39,6 +39,12 @@ type Opportunity = {
     probability: number;
     estimatedValue: number;
     account: { name: string };
+    owner?: { id: string; name: string } | null;
+};
+
+type User = {
+    id: string;
+    name: string;
 };
 
 const STAGES = [
@@ -78,20 +84,27 @@ function SortableItem({ id, opportunity }: { id: string; opportunity: Opportunit
     };
 
     return (
-        <div ref={setNodeRef} style={style} {...attributes} {...listeners} className="mb-3">
+        <div ref={setNodeRef} style={style} {...attributes} {...listeners} className="mb-2">
             <Link href={`/admin/crm/${opportunity.id}`} className="block">
                 <Card className="cursor-grab hover:shadow-md transition-shadow hover:border-primary/50">
-                    <CardContent className="p-4">
-                        <div className="flex justify-between items-start mb-2">
-                            <Badge variant="outline" className="text-xs">
+                    <CardContent className="p-3">
+                        <div className="flex justify-between items-start mb-1.5">
+                            <Badge variant="outline" className="text-[10px] px-1.5 py-0 h-5">
                                 {opportunity.account.name}
                             </Badge>
-                            <span className={`text-xs font-mono ${opportunity.stage === 'CLOSED_LOST' ? 'text-destructive' : 'text-muted-foreground'}`}>
-                                {opportunity.probability}%
-                            </span>
+                            <div className="flex items-center gap-2">
+                                {opportunity.owner && (
+                                    <span className="text-[10px] text-muted-foreground bg-secondary px-1.5 py-0.5 rounded-sm">
+                                        {opportunity.owner.name}
+                                    </span>
+                                )}
+                                <span className={`text-[10px] font-mono ${opportunity.stage === 'CLOSED_LOST' ? 'text-destructive' : 'text-muted-foreground'}`}>
+                                    {opportunity.probability}%
+                                </span>
+                            </div>
                         </div>
-                        <h4 className="font-semibold text-sm mb-1">{opportunity.title}</h4>
-                        <div className="text-sm font-medium text-green-600">
+                        <h4 className="font-semibold text-xs mb-1 line-clamp-2 leading-tight">{opportunity.title}</h4>
+                        <div className="text-xs font-medium text-green-600">
                             ${opportunity.estimatedValue.toLocaleString()}
                         </div>
                     </CardContent>
@@ -108,17 +121,17 @@ function Column({ id, title, opportunities }: { id: string; title: string; oppor
     const weightedValue = opportunities.reduce((sum, opp) => sum + (opp.estimatedValue * opp.probability / 100), 0);
 
     return (
-        <div className="flex flex-col w-80 min-w-80 bg-muted/30 rounded-lg p-3 mr-4 h-full max-h-[calc(100vh-120px)]">
-            <div className="flex justify-between items-center mb-3 px-1">
-                <h3 className="font-bold text-sm text-foreground">{title}</h3>
-                <Badge variant="secondary">{opportunities.length}</Badge>
+        <div className="flex flex-col w-72 min-w-72 bg-muted/30 rounded-lg p-2 mr-4 h-full max-h-[calc(100vh-140px)]">
+            <div className="flex justify-between items-center mb-2 px-1">
+                <h3 className="font-bold text-xs text-foreground uppercase tracking-wider">{title}</h3>
+                <Badge variant="secondary" className="h-5 text-[10px] px-1.5">{opportunities.length}</Badge>
             </div>
-            <div className="mb-3 px-1 text-xs text-muted-foreground">
-                <div>Total: ${totalValue.toLocaleString()}</div>
-                <div>Weighted: ${Math.round(weightedValue).toLocaleString()}</div>
+            <div className="mb-2 px-1 text-[10px] text-muted-foreground flex justify-between">
+                <span>Total: ${totalValue.toLocaleString()}</span>
+                <span>W: ${Math.round(weightedValue).toLocaleString()}</span>
             </div>
 
-            <div ref={setNodeRef} className="flex-1 overflow-y-auto min-h-[100px]">
+            <div ref={setNodeRef} className="flex-1 overflow-y-auto min-h-[100px] pr-1">
                 <SortableContext items={opportunities.map((o) => o.id)} strategy={verticalListSortingStrategy}>
                     {opportunities.map((opp) => (
                         <SortableItem key={opp.id} id={opp.id} opportunity={opp} />
@@ -129,8 +142,9 @@ function Column({ id, title, opportunities }: { id: string; title: string; oppor
     );
 }
 
-export function KanbanBoard({ initialOpportunities }: { initialOpportunities: Opportunity[] }) {
+export function KanbanBoard({ initialOpportunities, users = [] }: { initialOpportunities: Opportunity[], users?: User[] }) {
     const [opportunities, setOpportunities] = useState<Opportunity[]>(initialOpportunities);
+    const [selectedOwner, setSelectedOwner] = useState<string>("all");
 
     // Sync state with props when server revalidates
     React.useEffect(() => {
@@ -154,13 +168,19 @@ export function KanbanBoard({ initialOpportunities }: { initialOpportunities: Op
         })
     );
 
+    const filteredOpportunities = useMemo(() => {
+        if (selectedOwner === "all") return opportunities;
+        if (selectedOwner === "unassigned") return opportunities.filter(o => !o.owner);
+        return opportunities.filter(o => o.owner?.id === selectedOwner);
+    }, [opportunities, selectedOwner]);
+
     const columns = useMemo(() => {
         const cols: Record<string, Opportunity[]> = {};
         STAGES.forEach((stage) => {
-            cols[stage] = opportunities.filter((o) => o.stage === stage);
+            cols[stage] = filteredOpportunities.filter((o) => o.stage === stage);
         });
         return cols;
-    }, [opportunities]);
+    }, [filteredOpportunities]);
 
     function handleDragStart(event: DragStartEvent) {
         setActiveId(event.active.id as string);
@@ -226,7 +246,24 @@ export function KanbanBoard({ initialOpportunities }: { initialOpportunities: Op
     }
 
     return (
-        <>
+        <div className="flex flex-col h-full">
+            <div className="flex justify-end mb-4 px-1">
+                <div className="w-[200px]">
+                    <Select value={selectedOwner} onValueChange={setSelectedOwner}>
+                        <SelectTrigger>
+                            <SelectValue placeholder="Filter by Owner" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="all">All Owners</SelectItem>
+                            <SelectItem value="unassigned">Unassigned</SelectItem>
+                            {users.map(user => (
+                                <SelectItem key={user.id} value={user.id}>{user.name}</SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+                </div>
+            </div>
+
             <DndContext
                 sensors={sensors}
                 collisionDetection={closestCorners}
@@ -247,23 +284,28 @@ export function KanbanBoard({ initialOpportunities }: { initialOpportunities: Op
 
                 <DragOverlay>
                     {activeId ? (
-                        // Recreating the card visually for drag overlay needs access to the opportunity data
-                        // Using inline lookup since we have opportunities in state
                         <Card className="w-72 cursor-grabbing shadow-xl rotate-2">
                             {(() => {
                                 const activeOpportunity = opportunities.find((o) => o.id === activeId);
                                 if (!activeOpportunity) return null;
                                 return (
-                                    <CardContent className="p-4">
-                                        <div className="flex justify-between items-start mb-2">
-                                            <Badge variant="outline" className="text-xs">
+                                    <CardContent className="p-3">
+                                        <div className="flex justify-between items-start mb-1.5">
+                                            <Badge variant="outline" className="text-[10px] px-1.5 py-0 h-5">
                                                 {activeOpportunity.account.name}
                                             </Badge>
-                                            <span className="text-xs text-muted-foreground font-mono">
-                                                {activeOpportunity.probability}%
-                                            </span>
+                                            <div className="flex items-center gap-2">
+                                                {activeOpportunity.owner && (
+                                                    <span className="text-[10px] text-muted-foreground bg-secondary px-1.5 py-0.5 rounded-sm">
+                                                        {activeOpportunity.owner.name}
+                                                    </span>
+                                                )}
+                                                <span className="text-[10px] text-muted-foreground font-mono">
+                                                    {activeOpportunity.probability}%
+                                                </span>
+                                            </div>
                                         </div>
-                                        <h4 className="font-semibold text-sm mb-1">{activeOpportunity.title}</h4>
+                                        <h4 className="font-semibold text-xs mb-1 line-clamp-2 leading-tight">{activeOpportunity.title}</h4>
                                         <div className="text-sm font-medium text-green-600">
                                             ${activeOpportunity.estimatedValue.toLocaleString()}
                                         </div>
@@ -301,6 +343,6 @@ export function KanbanBoard({ initialOpportunities }: { initialOpportunities: Op
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
-        </>
+        </div>
     );
 }
