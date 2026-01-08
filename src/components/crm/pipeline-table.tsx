@@ -25,13 +25,13 @@ type Opportunity = {
     expectedCloseDate?: Date | string | null;
 };
 
-type SortConfig = {
+type SortState = {
     key: keyof Opportunity | 'accountName' | 'ownerName';
     direction: 'asc' | 'desc';
-} | null;
+};
 
 export function PipelineTable({ data }: { data: Opportunity[] }) {
-    const [sortConfig, setSortConfig] = useState<SortConfig>(null);
+    const [sortConfig, setSortConfig] = useState<SortState | null>(null);
 
     const formatCurrency = (val: number) => {
         return new Intl.NumberFormat('en-US', {
@@ -46,7 +46,7 @@ export function PipelineTable({ data }: { data: Opportunity[] }) {
         return new Date(date).toLocaleDateString();
     };
 
-    const handleSort = (key: SortConfig['key']) => {
+    const handleSort = (key: SortState['key']) => {
         let direction: 'asc' | 'desc' = 'asc';
         if (sortConfig && sortConfig.key === key && sortConfig.direction === 'asc') {
             direction = 'desc';
@@ -54,7 +54,7 @@ export function PipelineTable({ data }: { data: Opportunity[] }) {
         setSortConfig({ key, direction });
     };
 
-    const getSortValue = (item: Opportunity, key: SortConfig['key']) => {
+    const getSortValue = (item: Opportunity, key: SortState['key']) => {
         if (key === 'accountName') return item.account.name;
         if (key === 'ownerName') return item.owner?.name || '';
         return item[key as keyof Opportunity];
