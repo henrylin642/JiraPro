@@ -11,7 +11,10 @@ import {
 } from "@/components/ui/table";
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Briefcase, Target } from 'lucide-react';
+import { ArrowUpDown, Filter, Search, X } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { useState } from 'react';
 
 type PortfolioItem = {
     id: string;
@@ -23,9 +26,17 @@ type PortfolioItem = {
     probability: number;
     weightedValue: number;
     date: Date | null;
+    owner: string | null;
 };
 
+type SortConfig = {
+    key: keyof PortfolioItem;
+    direction: 'asc' | 'desc';
+} | null;
+
 export function PortfolioTable({ data }: { data: PortfolioItem[] }) {
+    const [sortConfig, setSortConfig] = useState<SortConfig>(null);
+    const [filterOwner, setFilterOwner] = useState('');
 
     const formatCurrency = (val: number) => {
         return new Intl.NumberFormat('en-US', {
@@ -40,27 +51,83 @@ export function PortfolioTable({ data }: { data: PortfolioItem[] }) {
         return new Date(date).toLocaleDateString();
     };
 
+    const handleSort = (key: keyof PortfolioItem) => {
+        let direction: 'asc' | 'desc' = 'asc';
+        if (sortConfig && sortConfig.key === key && sortConfig.direction === 'asc') {
+            direction = 'desc';
+        }
+        setSortConfig({ key, direction });
+    };
+
+    const sortedData = [...data].sort((a, b) => {
+        if (!sortConfig) return 0;
+
+        const aValue = a[sortConfig.key];
+        const bValue = b[sortConfig.key];
+
+        if (aValue === null && bValue === null) return 0;
+        if (aValue === null) return 1;
+        if (bValue === null) return -1;
+
+        if (aValue < bValue) {
+            return sortConfig.direction === 'asc' ? -1 : 1;
+        }
+        if (aValue > bValue) {
+            return sortConfig.direction === 'asc' ? 1 : -1;
+        }
+        return 0;
+    });
+
+    const filteredData = sortedData.filter(item => {
+        if (!filterOwner) return true;
+        return item.owner?.toLowerCase().includes(filterOwner.toLowerCase());
+    });
+
     return (
         <Card>
-            <CardHeader>
+            <CardHeader className="flex flex-row items-center justify-between">
                 <CardTitle>Master Portfolio (Projects & Opportunities)</CardTitle>
+                <div className="flex items-center gap-2">
+                    <div className="relative">
+                        <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+                        <Input
+                            placeholder="Filter by Owner..."
+                            value={filterOwner}
+                            onChange={(e) => setFilterOwner(e.target.value)}
+                            className="pl-8 w-[200px]"
+                        />
+                    </div>
+                </div>
             </CardHeader>
             <CardContent>
                 <div className="rounded-md border">
                     <Table>
                         <TableHeader>
                             <TableRow>
-                                <TableHead className="w-[300px]">Name</TableHead>
+                                <TableHead className="w-[300px] cursor-pointer hover:bg-slate-50" onClick={() => handleSort('name')}>
+                                    <div className="flex items-center">
+                                        Name {sortConfig?.key === 'name' && <ArrowUpDown className="ml-2 h-4 w-4" />}
+                                    </div>
+                                </TableHead>
                                 <TableHead>Type</TableHead>
+                                <TableHead>Owner</TableHead>
                                 <TableHead>Status</TableHead>
-                                <TableHead className="text-right">Value</TableHead>
+                                <TableHead className="text-right cursor-pointer hover:bg-slate-50" onClick={() => handleSort('value')}>
+                                    <div className="flex items-center justify-end">
+                                        Value {sortConfig?.key === 'value' && <ArrowUpDown className="ml-2 h-4 w-4" />}
+                                    </div>
+                                </TableHead>
                                 <TableHead className="text-right">Probability</TableHead>
-                                <TableHead className="text-right">Weighted Value</TableHead>
+                                <TableHead className="text-right cursor-pointer hover:bg-slate-50" onClick={() => handleSort('weightedValue')}>
+                                    <div className="flex items-center justify-end">
+                                        Weighted Value {sortConfig?.key === 'weightedValue' && <ArrowUpDown className="ml-2 h-4 w-4" />}
+                                    </div>
+                                </TableHead>
                                 <TableHead className="text-right">Est. End/Close</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
-                            {data.map((item) => (
+                            {filteredData.map((item) => (
                                 <TableRow key={item.id}>
                                     <TableCell className="font-medium">
                                         <div className="flex flex-col">
@@ -80,6 +147,9 @@ export function PortfolioTable({ data }: { data: PortfolioItem[] }) {
                                         )}
                                     </TableCell>
                                     <TableCell>
+                                        {item.owner || <span className="text-muted-foreground">-</span>}
+                                    </TableCell>
+                                    <TableCell>
                                         <Badge variant="outline">{item.status.replace('_', ' ')}</Badge>
                                     </TableCell>
                                     <TableCell className="text-right">
@@ -96,10 +166,10 @@ export function PortfolioTable({ data }: { data: PortfolioItem[] }) {
                                     </TableCell>
                                 </TableRow>
                             ))}
-                            {data.length === 0 && (
+                            {filteredData.length === 0 && (
                                 <TableRow>
-                                    <TableCell colSpan={7} className="text-center h-24 text-muted-foreground">
-                                        No active projects or opportunities found.
+                                    <TableCell colSpan={8} className="text-center h-24 text-muted-foreground">
+                                        No matching records found.
                                     </TableCell>
                                 </TableRow>
                             )}

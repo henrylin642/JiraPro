@@ -153,6 +153,9 @@ export async function getPortfolio() {
                     status: true,
                     budget: true,
                     endDate: true,
+                    manager: {
+                        select: { name: true }
+                    }
                 }
             }),
             prisma.opportunity.findMany({
@@ -179,6 +182,7 @@ export async function getPortfolio() {
                 probability: 100, // Projects are already won/active
                 weightedValue: Number(p.budget),
                 date: p.endDate,
+                owner: p.manager?.name || null,
             })),
             ...opportunities.map(o => ({
                 id: o.id,
@@ -190,6 +194,7 @@ export async function getPortfolio() {
                 probability: o.probability,
                 weightedValue: Number(o.estimatedValue) * (o.probability / 100),
                 date: o.expectedCloseDate,
+                owner: null, // Opportunities don't have an owner field yet
             }))
         ];
 
