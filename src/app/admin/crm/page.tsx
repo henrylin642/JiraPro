@@ -7,6 +7,7 @@ import { SalesDashboard } from './sales-dashboard';
 import { AccountList } from '@/components/crm/account-list';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
+import { PipelineTable } from '@/components/crm/pipeline-table';
 import { OpportunityDialog } from '@/components/crm/opportunity-dialog';
 import { CrmAnalytics } from '@/components/crm/crm-analytics';
 import { getUsers } from '@/app/admin/crm/actions';
@@ -28,9 +29,10 @@ export default async function CRMPage() {
             </div>
 
             <Tabs defaultValue="dashboard" className="flex-1 flex flex-col overflow-hidden">
-                <TabsList className="w-[500px]">
+                <TabsList className="w-[600px]">
                     <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
                     <TabsTrigger value="pipeline">Pipeline (Kanban)</TabsTrigger>
+                    <TabsTrigger value="table">Pipeline (Table)</TabsTrigger>
                     <TabsTrigger value="accounts">Accounts</TabsTrigger>
                     <TabsTrigger value="reports">Reports</TabsTrigger>
                 </TabsList>
@@ -42,6 +44,10 @@ export default async function CRMPage() {
 
                     <TabsContent value="pipeline" className="m-0 h-full">
                         <KanbanBoard initialOpportunities={opportunities} users={users} />
+                    </TabsContent>
+
+                    <TabsContent value="table" className="m-0 h-full">
+                        <PipelineTable data={opportunities} />
                     </TabsContent>
 
                     <TabsContent value="accounts" className="m-0 h-full">
