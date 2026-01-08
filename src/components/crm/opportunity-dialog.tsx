@@ -68,9 +68,73 @@ export function OpportunityDialog({ accounts = [], users = [], opportunity, trig
 
     const isEdit = !!opportunity;
 
-    // ... state initialization ...
+    const [formData, setFormData] = useState({
+        title: '',
+        accountId: '',
+        stage: 'LEAD',
+        estimatedValue: 0,
+        probability: 10,
+        expectedCloseDate: '',
+        ownerId: 'unassigned',
+    });
 
-    // ... handleSubmit ...
+    useEffect(() => {
+        if (open) {
+            if (opportunity) {
+                setFormData({
+                    title: opportunity.title,
+                    accountId: opportunity.accountId,
+                    stage: opportunity.stage,
+                    estimatedValue: opportunity.estimatedValue,
+                    probability: opportunity.probability,
+                    expectedCloseDate: opportunity.expectedCloseDate ? new Date(opportunity.expectedCloseDate).toISOString().split('T')[0] : '',
+                    ownerId: opportunity.ownerId || 'unassigned',
+                });
+            } else {
+                // Reset for Create mode
+                setFormData({
+                    title: '',
+                    accountId: '',
+                    stage: 'LEAD',
+                    estimatedValue: 0,
+                    probability: 10,
+                    expectedCloseDate: '',
+                    ownerId: 'unassigned',
+                });
+            }
+        }
+    }, [open, opportunity]);
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setIsLoading(true);
+
+        const payload = {
+            title: formData.title,
+            accountId: formData.accountId,
+            stage: formData.stage,
+            estimatedValue: Number(formData.estimatedValue),
+            probability: Number(formData.probability),
+            expectedCloseDate: formData.expectedCloseDate ? new Date(formData.expectedCloseDate) : undefined,
+            ownerId: formData.ownerId === 'unassigned' ? undefined : (formData.ownerId || undefined),
+        };
+
+        try {
+            if (isEdit && opportunity) {
+                await updateOpportunity(opportunity.id, payload);
+            } else {
+                await createOpportunity(payload);
+            }
+
+            setOpen(false);
+            router.refresh();
+        } catch (error) {
+            console.error(error);
+            alert(`Failed to ${isEdit ? 'update' : 'create'} opportunity`);
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>
