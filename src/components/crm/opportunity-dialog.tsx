@@ -116,7 +116,7 @@ export function OpportunityDialog({ accounts = [], users = [], opportunity, trig
             estimatedValue: Number(formData.estimatedValue),
             probability: Number(formData.probability),
             expectedCloseDate: formData.expectedCloseDate ? new Date(formData.expectedCloseDate) : undefined,
-            ownerId: formData.ownerId === 'unassigned' ? null : formData.ownerId,
+            ownerId: formData.ownerId === 'unassigned' ? undefined : (formData.ownerId || undefined),
         };
 
         try {
