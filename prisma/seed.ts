@@ -129,45 +129,48 @@ async function main() {
     console.log('✅ Users created');
 
     // 3. Create Accounts
-    const acme = await prisma.account.upsert({
-        where: { name: 'Acme Corp' },
-        update: {},
-        create: {
-            name: 'Acme Corp',
-            industry: 'Manufacturing',
-            website: 'https://acme.com',
-            contacts: {
-                create: [
-                    { name: 'Wile E. Coyote', email: 'coyote@acme.com', title: 'CEO' },
-                ],
+    let acme = await prisma.account.findFirst({ where: { name: 'Acme Corp' } });
+    if (!acme) {
+        acme = await prisma.account.create({
+            data: {
+                name: 'Acme Corp',
+                industry: 'Manufacturing',
+                website: 'https://acme.com',
+                contacts: {
+                    create: [
+                        { name: 'Wile E. Coyote', email: 'coyote@acme.com', title: 'CEO' },
+                    ],
+                },
             },
-        },
-    });
+        });
+    }
 
-    const globex = await prisma.account.upsert({
-        where: { name: 'Globex Corporation' },
-        update: {},
-        create: {
-            name: 'Globex Corporation',
-            industry: 'Technology',
-            website: 'https://globex.com',
-            contacts: {
-                create: [
-                    { name: 'Hank Scorpio', email: 'hank@globex.com', title: 'CEO' },
-                ],
+    let globex = await prisma.account.findFirst({ where: { name: 'Globex Corporation' } });
+    if (!globex) {
+        globex = await prisma.account.create({
+            data: {
+                name: 'Globex Corporation',
+                industry: 'Technology',
+                website: 'https://globex.com',
+                contacts: {
+                    create: [
+                        { name: 'Hank Scorpio', email: 'hank@globex.com', title: 'CEO' },
+                    ],
+                },
             },
-        },
-    });
+        });
+    }
 
-    const soylent = await prisma.account.upsert({
-        where: { name: 'Soylent Corp' },
-        update: {},
-        create: {
-            name: 'Soylent Corp',
-            industry: 'Food & Beverage',
-            website: 'https://soylent.com',
-        },
-    });
+    let soylent = await prisma.account.findFirst({ where: { name: 'Soylent Corp' } });
+    if (!soylent) {
+        soylent = await prisma.account.create({
+            data: {
+                name: 'Soylent Corp',
+                industry: 'Food & Beverage',
+                website: 'https://soylent.com',
+            },
+        });
+    }
 
     console.log('✅ Accounts created');
 
