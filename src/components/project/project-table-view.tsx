@@ -85,6 +85,7 @@ export function ProjectTableView({ projects, accounts = [], users = [], serviceA
                         <TableHead>Code</TableHead>
                         <TableHead>Project Name</TableHead>
                         <TableHead>Client</TableHead>
+                        <TableHead>Service Area</TableHead>
                         <TableHead>Status</TableHead>
                         <TableHead>Manager</TableHead>
                         <TableHead className="text-right">Budget</TableHead>
@@ -123,6 +124,7 @@ export function ProjectTableView({ projects, accounts = [], users = [], serviceA
                                     <span className="font-medium">{project.name}</span>
                                 </TableCell>
                                 <TableCell>{project.account?.name || 'Internal'}</TableCell>
+                                <TableCell>{project.serviceArea?.name || '-'}</TableCell>
                                 <TableCell>
                                     <Badge variant={project.status === 'ACTIVE' ? 'default' : (project.status === 'ARCHIVED' ? 'outline' : 'secondary')}>
                                         {project.status}

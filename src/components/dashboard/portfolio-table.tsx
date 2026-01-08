@@ -27,6 +27,7 @@ type PortfolioItem = {
     weightedValue: number;
     date: Date | null;
     owner: string | null;
+    serviceArea: string | null;
 };
 
 type SortConfig = {
@@ -110,6 +111,7 @@ export function PortfolioTable({ data }: { data: PortfolioItem[] }) {
                                     </div>
                                 </TableHead>
                                 <TableHead>Type</TableHead>
+                                <TableHead>Service Area</TableHead>
                                 <TableHead>Owner</TableHead>
                                 <TableHead>Status</TableHead>
                                 <TableHead className="text-right cursor-pointer hover:bg-slate-50" onClick={() => handleSort('value')}>
@@ -145,6 +147,9 @@ export function PortfolioTable({ data }: { data: PortfolioItem[] }) {
                                                 <Target className="w-3 h-3 mr-1" /> Opportunity
                                             </Badge>
                                         )}
+                                    </TableCell>
+                                    <TableCell>
+                                        {item.serviceArea || <span className="text-muted-foreground">-</span>}
                                     </TableCell>
                                     <TableCell>
                                         {item.owner || <span className="text-muted-foreground">-</span>}

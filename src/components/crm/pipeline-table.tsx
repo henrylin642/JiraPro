@@ -22,13 +22,16 @@ type Opportunity = {
     estimatedValue: number;
     account: { name: string };
     owner?: { id: string; name: string } | null;
+    serviceArea?: { name: string } | null;
     expectedCloseDate?: Date | string | null;
 };
 
 type SortState = {
     key: keyof Opportunity | 'accountName' | 'ownerName';
-    direction: 'asc' | 'desc';
-};
+type SortState = {
+        key: keyof Opportunity | 'accountName' | 'ownerName' | 'serviceAreaName';
+        direction: 'asc' | 'desc';
+    };
 
 export function PipelineTable({ data }: { data: Opportunity[] }) {
     const [sortConfig, setSortConfig] = useState<SortState | null>(null);
@@ -57,6 +60,7 @@ export function PipelineTable({ data }: { data: Opportunity[] }) {
     const getSortValue = (item: Opportunity, key: SortState['key']) => {
         if (key === 'accountName') return item.account.name;
         if (key === 'ownerName') return item.owner?.name || '';
+        if (key === 'serviceAreaName') return item.serviceArea?.name || '';
         return item[key as keyof Opportunity];
     };
 
@@ -101,6 +105,11 @@ export function PipelineTable({ data }: { data: Opportunity[] }) {
                                         Account {sortConfig?.key === 'accountName' && <ArrowUpDown className="ml-2 h-4 w-4" />}
                                     </div>
                                 </TableHead>
+                                <TableHead className="cursor-pointer hover:bg-slate-50" onClick={() => handleSort('serviceAreaName')}>
+                                    <div className="flex items-center">
+                                        Service Area {sortConfig?.key === 'serviceAreaName' && <ArrowUpDown className="ml-2 h-4 w-4" />}
+                                    </div>
+                                </TableHead>
                                 <TableHead className="cursor-pointer hover:bg-slate-50" onClick={() => handleSort('ownerName')}>
                                     <div className="flex items-center">
                                         Owner {sortConfig?.key === 'ownerName' && <ArrowUpDown className="ml-2 h-4 w-4" />}
@@ -137,6 +146,7 @@ export function PipelineTable({ data }: { data: Opportunity[] }) {
                                         </Link>
                                     </TableCell>
                                     <TableCell>{item.account.name}</TableCell>
+                                    <TableCell>{item.serviceArea?.name || '-'}</TableCell>
                                     <TableCell>
                                         {item.owner ? (
                                             <Badge variant="outline" className="bg-muted text-muted-foreground font-normal">

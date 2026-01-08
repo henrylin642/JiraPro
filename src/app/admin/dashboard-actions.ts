@@ -155,6 +155,9 @@ export async function getPortfolio() {
                     endDate: true,
                     manager: {
                         select: { name: true }
+                    },
+                    serviceArea: {
+                        select: { name: true }
                     }
                 }
             }),
@@ -168,6 +171,9 @@ export async function getPortfolio() {
                     probability: true,
                     expectedCloseDate: true,
                     owner: {
+                        select: { name: true }
+                    },
+                    serviceArea: {
                         select: { name: true }
                     }
                 }
@@ -186,6 +192,7 @@ export async function getPortfolio() {
                 weightedValue: Number(p.budget),
                 date: p.endDate,
                 owner: p.manager?.name || null,
+                serviceArea: p.serviceArea?.name || null,
             })),
             ...opportunities.map(o => ({
                 id: o.id,
@@ -198,6 +205,7 @@ export async function getPortfolio() {
                 weightedValue: Number(o.estimatedValue) * (o.probability / 100),
                 date: o.expectedCloseDate,
                 owner: o.owner?.name || null,
+                serviceArea: o.serviceArea?.name || null,
             }))
         ];
 
