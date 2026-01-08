@@ -154,6 +154,79 @@ export async function updateOpportunity(id: string, data: {
 
 import { STAGE_CHECKLISTS, BASE_PROBABILITIES } from '@/lib/crm-constants';
 
+export async function getSalesForecast() {
+    try {
+        const opportunities = await prisma.opportunity.findMany({
+            where: {
+                stage: { notIn: ['CLOSED_LOST'] },
+                expectedCloseDate: { not: null }
+            },
+            select: {
+                expectedCloseDate: true,
+                estimatedValue: true,
+                probability: true
+            }
+        });
+
+        // Group by month YYYY-MM
+        const forecast: Record<string, number> = {};
+
+        opportunities.forEach(opp => {
+            if (!opp.expectedCloseDate) return;
+            const month = opp.expectedCloseDate.toISOString().substring(0, 7); // "2023-10"
+            const value = Number(opp.estimatedValue);
+            const weighedValue = value * (opp.probability / 100);
+
+            forecast[month] = (forecast[month] || 0) + weighedValue;
+        });
+
+        // Convert to array and sort
+        return Object.entries(forecast)
+            .map(([month, value]) => ({ month, value }))
+            .sort((a, b) => a.month.localeCompare(b.month));
+
+    } catch (error) {
+        console.error("Error fetching sales forecast:", error);
+        return [];
+    }
+}
+
+export async function getWinLossStats() {
+    try {
+        const closedOpps = await prisma.opportunity.findMany({
+            where: {
+                stage: { in: ['CLOSED_WON', 'CLOSED_LOST'] }
+            },
+            select: {
+                stage: true,
+                lossReason: true
+            }
+        });
+
+        const stats = {
+            won: 0,
+            lost: 0,
+            reasons: {} as Record<string, number>
+        };
+
+        closedOpps.forEach(opp => {
+            if (opp.stage === 'CLOSED_WON') {
+                stats.won++;
+            } else {
+                stats.lost++;
+                if (opp.lossReason) {
+                    stats.reasons[opp.lossReason] = (stats.reasons[opp.lossReason] || 0) + 1;
+                }
+            }
+        });
+
+        return stats;
+    } catch (error) {
+        console.error("Error fetching win/loss stats:", error);
+        return { won: 0, lost: 0, reasons: {} };
+    }
+}
+
 export async function updateOpportunityStage(id: string, newStage: string, lossReason?: string) {
     await prisma.opportunity.update({
         where: { id },
