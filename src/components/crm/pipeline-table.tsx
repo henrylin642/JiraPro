@@ -27,11 +27,9 @@ type Opportunity = {
 };
 
 type SortState = {
-    key: keyof Opportunity | 'accountName' | 'ownerName';
-type SortState = {
-        key: keyof Opportunity | 'accountName' | 'ownerName' | 'serviceAreaName';
-        direction: 'asc' | 'desc';
-    };
+    key: keyof Opportunity | 'accountName' | 'ownerName' | 'serviceAreaName';
+    direction: 'asc' | 'desc';
+};
 
 export function PipelineTable({ data }: { data: Opportunity[] }) {
     const [sortConfig, setSortConfig] = useState<SortState | null>(null);

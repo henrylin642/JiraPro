@@ -16,6 +16,7 @@ export async function getProjects() {
                     }
                 },
                 expenses: true,
+                serviceArea: true,
             },
             orderBy: {
                 updatedAt: 'desc',
