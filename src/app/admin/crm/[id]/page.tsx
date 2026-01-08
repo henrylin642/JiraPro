@@ -67,20 +67,18 @@ export default async function OpportunityDetailPage({ params }: { params: Promis
                             )}
                         </div>
                     </div>
-                    <div className="flex gap-4 text-right">
-                        <div>
-                            <div className="text-sm text-muted-foreground flex items-center justify-end gap-1">
-                                <DollarSign className="h-3 w-3" /> Est. Value
-                            </div>
-                            <div className="text-xl font-bold">
-                                ${opportunity.estimatedValue.toLocaleString()}
-                            </div>
+                    <div className="flex items-center gap-6">
+                        <div className="text-right">
+                            <div className="text-[10px] text-muted-foreground uppercase tracking-wider font-semibold">Owner</div>
+                            <div className="font-medium">{opportunity.owner?.name || 'Unassigned'}</div>
                         </div>
-                        <div>
-                            <div className="text-sm text-muted-foreground flex items-center justify-end gap-1">
-                                <Percent className="h-3 w-3" /> Probability
-                            </div>
-                            <div className="text-xl font-bold">{opportunity.probability}%</div>
+                        <div className="text-right">
+                            <div className="text-[10px] text-muted-foreground uppercase tracking-wider font-semibold">$ Est. Value</div>
+                            <div className="font-mono font-bold text-xl">${opportunity.estimatedValue.toLocaleString()}</div>
+                        </div>
+                        <div className="text-right">
+                            <div className="text-[10px] text-muted-foreground uppercase tracking-wider font-semibold">% Probability</div>
+                            <div className="font-mono font-bold text-xl">{opportunity.probability}%</div>
                         </div>
                     </div>
                 </div>

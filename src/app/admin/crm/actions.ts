@@ -21,6 +21,9 @@ export async function getOpportunities() {
                 account: {
                     select: { name: true },
                 },
+                owner: {
+                    select: { id: true, name: true },
+                },
             },
         });
 
@@ -126,6 +129,7 @@ export async function getOpportunityById(id: string) {
         where: { id },
         include: {
             account: true,
+            owner: { select: { id: true, name: true } },
             allocations: {
                 include: {
                     resource: {
