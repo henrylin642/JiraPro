@@ -112,7 +112,31 @@ export async function getProjectById(id: string) {
         return null;
     }
 }
+export async function getAllTasks() {
+    try {
+        const tasks = await prisma.task.findMany({
+            include: {
+                assignee: {
+                    select: { id: true, name: true, avatarUrl: true }
+                },
+                project: {
+                    select: { id: true, name: true }
+                }
+            },
+            orderBy: { createdAt: 'desc' }
+        });
 
+        // Simple serialization if needed, or return directly as Date objects are often handled by Next.js now, 
+        // but to be safe and match patterns:
+        return tasks.map(task => ({
+            ...task,
+            // Ensure no huge objects if not needed
+        }));
+    } catch (error) {
+        console.error("Error fetching all tasks:", error);
+        return [];
+    }
+}
 export async function updateTaskStatus(taskId: string, projectId: string, status: string) {
     try {
         await prisma.task.update({
