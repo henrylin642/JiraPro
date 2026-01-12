@@ -8,6 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { createProject, updateProject, getProjectFormData } from '@/app/admin/project/actions';
 import { useRouter } from 'next/navigation';
+import { Plus } from 'lucide-react';
 
 interface ProjectDialogProps {
     project?: any; // If provided, edit mode
@@ -110,7 +111,16 @@ export function ProjectDialog({ project, trigger, open, onOpenChange, accounts =
 
     return (
         <Dialog open={open !== undefined ? open : isOpen} onOpenChange={handleOpenChange}>
-            {trigger && <DialogTrigger asChild>{trigger}</DialogTrigger>}
+            {trigger ? (
+                <DialogTrigger asChild>{trigger}</DialogTrigger>
+            ) : !project ? (
+                <DialogTrigger asChild>
+                    <Button>
+                        <Plus className="mr-2 h-4 w-4" />
+                        Create Project
+                    </Button>
+                </DialogTrigger>
+            ) : null}
             <DialogContent className="sm:max-w-[600px]">
                 <DialogHeader>
                     <DialogTitle>{project ? 'Edit Project' : 'New Project'}</DialogTitle>
