@@ -1,9 +1,10 @@
 import React from 'react';
 import Link from 'next/link';
-import { getProjects } from './actions';
+import { getProjects, getAllTasks } from './actions';
 import { getServiceAreas } from '@/app/admin/settings/actions';
 import { getAccounts } from '@/app/admin/crm/account-actions';
 import { getUsers } from '@/app/admin/crm/actions';
+import { GlobalTaskBoard } from '@/components/project/global-task-board';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -14,12 +15,16 @@ import { ProjectTableView } from '@/components/project/project-table-view';
 export const dynamic = 'force-dynamic';
 
 export default async function ProjectsPage({ searchParams }: { searchParams: Promise<{ view?: string }> }) {
-    const [projects, accounts, users, serviceAreas] = await Promise.all([
+    const [projects, accounts, users, serviceAreas, allTasks] = await Promise.all([
         getProjects(),
         getAccounts(),
         getUsers(),
-        getServiceAreas()
+        getServiceAreas(),
+        getAllTasks()
     ]);
+    const { serializeDecimal } = await import('@/lib/serialize');
+    const serializedProjects = serializeDecimal(projects);
+    const serializedTasks = serializeDecimal(allTasks);
 
     const { view } = await searchParams;
     const isTableView = view !== 'gallery';
@@ -107,6 +112,12 @@ export default async function ProjectsPage({ searchParams }: { searchParams: Pro
                     })}
                 </div>
             )}
+
+            <GlobalTaskBoard
+                tasks={serializedTasks}
+                projects={serializedProjects}
+                users={users}
+            />
         </div>
     );
 }

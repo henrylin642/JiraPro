@@ -36,6 +36,11 @@ type Task = {
         avatarUrl: string | null;
     } | null;
     dueDate: Date | string | null;
+    projectId?: string;
+    project?: {
+        id: string;
+        name: string;
+    };
 };
 
 const STAGES = [
@@ -136,7 +141,7 @@ import { TaskDialog } from './task-dialog';
 
 // ... (Imports remain similar, added TaskDialog and Button)
 
-export function TaskBoard({ initialTasks, projectId }: { initialTasks: Task[]; projectId: string }) {
+export function TaskBoard({ initialTasks, projectId }: { initialTasks: Task[]; projectId?: string }) {
     const [tasks, setTasks] = useState<Task[]>(initialTasks);
     const [activeId, setActiveId] = useState<string | null>(null);
     const [editingTask, setEditingTask] = useState<Task | null>(null);
@@ -203,7 +208,14 @@ export function TaskBoard({ initialTasks, projectId }: { initialTasks: Task[]; p
             setTasks((prev) =>
                 prev.map((t) => (t.id === activeId ? { ...t, status: newStatus } : t))
             );
-            await updateTaskStatus(activeId, projectId, newStatus);
+            // Determine projectId: prefer task's own project, fallback to prop
+            const targetProjectId = activeTask.projectId || activeTask.project?.id || projectId;
+
+            if (targetProjectId) {
+                await updateTaskStatus(activeId, targetProjectId, newStatus);
+            } else {
+                console.error("Missing projectId for task update");
+            }
         }
     }
 
@@ -224,12 +236,14 @@ export function TaskBoard({ initialTasks, projectId }: { initialTasks: Task[]; p
 
     return (
         <div className="h-full flex flex-col">
-            <div className="flex justify-end mb-4">
-                <Button onClick={openNewTaskDialog} size="sm">
-                    <Plus className="mr-2 h-4 w-4" />
-                    New Task
-                </Button>
-            </div>
+            {projectId && (
+                <div className="flex justify-end mb-4">
+                    <Button onClick={openNewTaskDialog} size="sm">
+                        <Plus className="mr-2 h-4 w-4" />
+                        New Task
+                    </Button>
+                </div>
+            )}
 
             <DndContext
                 sensors={sensors}
@@ -261,12 +275,14 @@ export function TaskBoard({ initialTasks, projectId }: { initialTasks: Task[]; p
                 </DragOverlay>
             </DndContext>
 
-            <TaskDialog
-                projectId={projectId}
-                task={editingTask}
-                open={isTaskDialogOpen}
-                onOpenChange={setIsTaskDialogOpen}
-            />
+            {projectId && (
+                <TaskDialog
+                    projectId={projectId}
+                    task={editingTask}
+                    open={isTaskDialogOpen}
+                    onOpenChange={setIsTaskDialogOpen}
+                />
+            )}
         </div>
     );
 }
