@@ -86,6 +86,11 @@ function SortableItem({ id, task, onClick }: { id: string; task: Task; onClick: 
                         } className="text-[10px] px-1 py-0">
                             {task.priority}
                         </Badge>
+                        {task.project && (
+                            <Badge variant="outline" className="text-[10px] px-1 py-0 max-w-[100px] truncate">
+                                {task.project.name}
+                            </Badge>
+                        )}
                         {task.dueDate && (
                             <span className="text-[10px] text-muted-foreground" suppressHydrationWarning>
                                 Due {new Date(task.dueDate).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
