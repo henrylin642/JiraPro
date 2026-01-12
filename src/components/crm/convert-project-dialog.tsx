@@ -24,11 +24,20 @@ export function ConvertToProjectDialog({ opportunityId, opportunityTitle }: { op
 
     const [formData, setFormData] = useState({
         name: opportunityTitle,
-        code: `PRJ-${new Date().getFullYear()}-${Math.floor(Math.random() * 1000)}`,
-        managerId: '', // Ideally this would be a select from users
-        startDate: new Date().toISOString().split('T')[0],
-        endDate: new Date(new Date().setMonth(new Date().getMonth() + 3)).toISOString().split('T')[0],
+        code: '',
+        managerId: '',
+        startDate: '',
+        endDate: '',
     });
+
+    React.useEffect(() => {
+        setFormData(prev => ({
+            ...prev,
+            code: `PRJ-${new Date().getFullYear()}-${Math.floor(Math.random() * 1000)}`,
+            startDate: new Date().toISOString().split('T')[0],
+            endDate: new Date(new Date().setMonth(new Date().getMonth() + 3)).toISOString().split('T')[0],
+        }));
+    }, []);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();

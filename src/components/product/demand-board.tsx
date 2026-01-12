@@ -178,7 +178,7 @@ export function DemandBoard({ ideas, users, products }: { ideas: Idea[], users: 
                                     </div>
                                 </CardTitle>
                             </div>
-                            <CardDescription>by {idea.creator.name} • {new Date(idea.createdAt).toLocaleDateString()}</CardDescription>
+                            <CardDescription>by {idea.creator.name} • <span suppressHydrationWarning>{new Date(idea.createdAt).toLocaleDateString()}</span></CardDescription>
                         </CardHeader>
                         <CardContent className="flex-grow">
                             <p className="text-sm text-muted-foreground whitespace-pre-wrap">{idea.description}</p>

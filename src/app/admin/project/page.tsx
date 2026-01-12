@@ -14,10 +14,12 @@ import { ProjectTableView } from '@/components/project/project-table-view';
 export const dynamic = 'force-dynamic';
 
 export default async function ProjectsPage({ searchParams }: { searchParams: Promise<{ view?: string }> }) {
-    const projects = await getProjects();
-    const accounts = await getAccounts();
-    const users = await getUsers();
-    const serviceAreas = await getServiceAreas();
+    const [projects, accounts, users, serviceAreas] = await Promise.all([
+        getProjects(),
+        getAccounts(),
+        getUsers(),
+        getServiceAreas()
+    ]);
 
     const { view } = await searchParams;
     const isTableView = view !== 'gallery';

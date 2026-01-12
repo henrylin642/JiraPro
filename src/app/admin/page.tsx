@@ -19,8 +19,11 @@ import { QuarterlyBudgetCard } from '@/components/dashboard/quarterly-budget-car
 export const dynamic = 'force-dynamic';
 
 export default async function AdminDashboardPage() {
-    const { finance, projectStats, resourceStats, recentMilestones, quarterlyBudgets2026 } = await getExecutiveStats();
-    const portfolio = await getPortfolio();
+    const [stats, portfolio] = await Promise.all([
+        getExecutiveStats(),
+        getPortfolio()
+    ]);
+    const { finance, projectStats, resourceStats, recentMilestones, quarterlyBudgets2026 } = stats;
 
     const formatCurrency = (val: number) => {
         return new Intl.NumberFormat('en-US', {

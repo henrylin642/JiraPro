@@ -169,9 +169,9 @@ function RiceScoreDialog({ feature }: { feature: Feature }) {
     );
 }
 
-export function RoadmapView({ products }: { products: Product[] }) {
+export function RoadmapView({ products, initialDate }: { products: Product[], initialDate?: Date }) {
     // Determine timeline range (e.g., next 12 months)
-    const today = new Date();
+    const today = initialDate || new Date();
     const start = startOfMonth(today);
     const end = endOfMonth(addMonths(today, 11));
 

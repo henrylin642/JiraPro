@@ -51,7 +51,7 @@ type TaskNode = Task & {
 
 type ViewMode = 'Day' | 'Week' | 'Month' | 'Quarter';
 
-export function GanttView({ tasks, projectId }: { tasks: Task[]; projectId?: string }) {
+export function GanttView({ tasks, projectId, initialDate }: { tasks: Task[]; projectId?: string; initialDate?: Date }) {
     const [selectedTask, setSelectedTask] = React.useState<Task | null>(null);
     const [viewMode, setViewMode] = useState<ViewMode>('Day');
     const [expandedTasks, setExpandedTasks] = useState<Record<string, boolean>>({});
@@ -115,20 +115,21 @@ export function GanttView({ tasks, projectId }: { tasks: Task[]; projectId?: str
 
     // 1. Calculate Timeline Range
     const { minDate, maxDate } = useMemo(() => {
+        const now = initialDate || new Date();
         if (displayTasks.length === 0) {
-            return { minDate: new Date(), maxDate: addDays(new Date(), 30) };
+            return { minDate: now, maxDate: addDays(now, 30) };
         }
-        const startDates = displayTasks.map(t => t.startDate ? new Date(t.startDate) : new Date()).filter(Boolean);
-        const endDates = displayTasks.map(t => t.dueDate ? new Date(t.dueDate) : new Date()).filter(Boolean);
+        const startDates = displayTasks.map(t => t.startDate ? new Date(t.startDate) : now).filter(Boolean);
+        const endDates = displayTasks.map(t => t.dueDate ? new Date(t.dueDate) : now).filter(Boolean);
 
-        if (startDates.length === 0) startDates.push(new Date());
-        if (endDates.length === 0) endDates.push(addDays(new Date(), 30));
+        if (startDates.length === 0) startDates.push(now);
+        if (endDates.length === 0) endDates.push(addDays(now, 30));
 
         return {
             minDate: new Date(Math.min(...startDates.map(d => d.getTime()))),
             maxDate: new Date(Math.max(...endDates.map(d => d.getTime())))
         };
-    }, [displayTasks]);
+    }, [displayTasks, initialDate]);
 
     // 2. Configure View Strategy
     const strategy = useMemo(() => {

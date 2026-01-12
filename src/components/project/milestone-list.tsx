@@ -78,7 +78,7 @@ export function MilestoneList({ milestones, projectId }: { milestones: Milestone
                             <TableRow key={m.id}>
                                 <TableCell className="font-medium">{m.name}</TableCell>
                                 <TableCell>
-                                    {m.dueDate ? new Date(m.dueDate).toLocaleDateString() : 'TBD'}
+                                    <span suppressHydrationWarning>{m.dueDate ? new Date(m.dueDate).toLocaleDateString() : 'TBD'}</span>
                                 </TableCell>
                                 <TableCell className="text-right font-mono">
                                     ${Number(m.amount).toLocaleString()}

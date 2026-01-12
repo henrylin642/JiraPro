@@ -18,11 +18,14 @@ export const dynamic = 'force-dynamic';
 
 export default async function ProjectDetailPage({ params }: { params: Promise<{ id: string }> }) {
     const { id } = await params;
-    const rawProject = await getProjectById(id);
-    const expenseCategories = await getExpenseCategories();
-    const serviceAreas = await getServiceAreas();
-    const accounts = await getAccounts();
-    const users = await getUsers();
+
+    const [rawProject, expenseCategories, serviceAreas, accounts, users] = await Promise.all([
+        getProjectById(id),
+        getExpenseCategories(),
+        getServiceAreas(),
+        getAccounts(),
+        getUsers()
+    ]);
     const { serializeDecimal } = await import('@/lib/serialize');
     const project = serializeDecimal(rawProject);
 
@@ -139,7 +142,7 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
                             <CardTitle>Timeline</CardTitle>
                         </CardHeader>
                         <CardContent>
-                            <GanttView tasks={project.tasks} projectId={project.id} />
+                            <GanttView tasks={project.tasks} projectId={project.id} initialDate={new Date()} />
                         </CardContent>
                     </Card>
                 </TabsContent>

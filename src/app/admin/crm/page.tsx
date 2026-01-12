@@ -12,11 +12,13 @@ import { CrmAnalytics } from '@/components/crm/crm-analytics';
 import { getServiceAreas } from '@/app/admin/settings/actions';
 
 export default async function CRMPage() {
-    const opportunities = await getOpportunities();
-    const stats = await getSalesStats();
-    const accounts = await getAccounts();
-    const users = await getUsers();
-    const serviceAreas = await getServiceAreas();
+    const [opportunities, stats, accounts, users, serviceAreas] = await Promise.all([
+        getOpportunities(),
+        getSalesStats(),
+        getAccounts(),
+        getUsers(),
+        getServiceAreas()
+    ]);
 
     return (
         <div className="flex flex-col h-screen p-6 bg-background">

@@ -164,7 +164,7 @@ export function PipelineTable({ data }: { data: Opportunity[] }) {
                                         {item.probability}%
                                     </TableCell>
                                     <TableCell className="text-right text-muted-foreground text-sm">
-                                        {formatDate(item.expectedCloseDate)}
+                                        <span suppressHydrationWarning>{formatDate(item.expectedCloseDate)}</span>
                                     </TableCell>
                                 </TableRow>
                             ))}

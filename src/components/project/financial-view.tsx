@@ -364,7 +364,7 @@ export function FinancialView({ project, expenseCategories }: FinancialViewProps
                                                         <div>
                                                             <div className="font-medium text-sm">{e.description}</div>
                                                             <div className="text-xs text-muted-foreground flex gap-2">
-                                                                <span>{new Date(e.date).toLocaleDateString()}</span>
+                                                                <span suppressHydrationWarning>{new Date(e.date).toLocaleDateString()}</span>
                                                                 {e.incurredBy && <span>• {e.incurredBy}</span>}
                                                             </div>
                                                         </div>
@@ -487,7 +487,7 @@ export function FinancialView({ project, expenseCategories }: FinancialViewProps
                                     <div key={m.id} className="flex items-center justify-between border-b pb-2 last:border-0">
                                         <div>
                                             <div className="font-medium">{m.name}</div>
-                                            <div className="text-xs text-muted-foreground">Due: {m.dueDate ? new Date(m.dueDate).toLocaleDateString() : 'N/A'}</div>
+                                            <div className="text-xs text-muted-foreground">Due: <span suppressHydrationWarning>{m.dueDate ? new Date(m.dueDate).toLocaleDateString() : 'N/A'}</span></div>
                                         </div>
                                         <div className="text-right">
                                             <div className="font-bold">${Number(m.amount).toLocaleString()}</div>

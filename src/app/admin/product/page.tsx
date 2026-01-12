@@ -8,10 +8,12 @@ import { BusinessModelCanvas } from '@/components/product/business-model-canvas'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export default async function ProductPage() {
-    const products = await getProducts();
-    const ideas = await getIdeas();
-    const users = await getUsers();
-    const productsList = await getProductsList();
+    const [products, ideas, users, productsList] = await Promise.all([
+        getProducts(),
+        getIdeas(),
+        getUsers(),
+        getProductsList()
+    ]);
 
     return (
         <div className="flex flex-col h-screen p-6 bg-background">
@@ -36,7 +38,7 @@ export default async function ProductPage() {
                     </TabsList>
 
                     <TabsContent value="roadmap" className="flex-1 overflow-auto">
-                        <RoadmapView products={products} />
+                        <RoadmapView products={products} initialDate={new Date()} />
                     </TabsContent>
 
                     <TabsContent value="strategy" className="flex-1 overflow-auto">

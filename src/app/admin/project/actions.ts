@@ -5,18 +5,37 @@ import { revalidatePath } from 'next/cache';
 
 export async function getProjects() {
     try {
+        console.time('Action:getProjects');
         const projects = await prisma.project.findMany({
             include: {
-                account: true,
-                manager: true,
-                milestones: true,
+                account: {
+                    select: { id: true, name: true }
+                },
+                manager: {
+                    select: { id: true, name: true, avatarUrl: true }
+                },
+                milestones: {
+                    select: { id: true, amount: true }
+                },
                 tasks: {
-                    include: {
-                        timesheets: true
+                    select: {
+                        id: true,
+                        status: true,
+                        timesheets: {
+                            select: {
+                                hours: true,
+                                costRate: true,
+                                billableRate: true
+                            }
+                        }
                     }
                 },
-                expenses: true,
-                serviceArea: true,
+                expenses: {
+                    select: { id: true, amount: true }
+                },
+                serviceArea: {
+                    select: { id: true, name: true }
+                },
             },
             orderBy: {
                 updatedAt: 'desc',
@@ -45,6 +64,8 @@ export async function getProjects() {
                 }))
             }))
         }));
+        console.timeEnd('Action:getProjects');
+        return projects;
     } catch (error) {
         console.error("Error fetching projects:", error);
         return [];

@@ -75,7 +75,7 @@ function SortableItem({ id, task }: { id: string; task: Task }) {
                             {task.priority}
                         </Badge>
                         {task.dueDate && (
-                            <span className="text-[10px] text-muted-foreground">
+                            <span className="text-[10px] text-muted-foreground" suppressHydrationWarning>
                                 Due {new Date(task.dueDate).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
                             </span>
                         )}
