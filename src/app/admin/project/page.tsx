@@ -9,7 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter }
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
-import { CalendarDays, Users, CheckSquare, ArrowRight, LayoutGrid, List } from 'lucide-react';
+import { CalendarDays, Users, CheckSquare, ArrowRight, LayoutGrid, List, Plus } from 'lucide-react';
 import { ProjectDialog } from '@/components/project/project-dialog';
 import { ProjectTableView } from '@/components/project/project-table-view';
 export const dynamic = 'force-dynamic';
@@ -50,7 +50,17 @@ export default async function ProjectsPage({ searchParams }: { searchParams: Pro
                             </Button>
                         </Link>
                     </div>
-                    <ProjectDialog accounts={accounts} users={users} serviceAreas={serviceAreas} trigger={<Button>New Project</Button>} />
+                    <ProjectDialog
+                        accounts={accounts}
+                        users={users}
+                        serviceAreas={serviceAreas}
+                        trigger={
+                            <Button>
+                                <Plus className="mr-2 h-4 w-4" />
+                                Create Project
+                            </Button>
+                        }
+                    />
                 </div>
             </div>
 
