@@ -39,27 +39,21 @@ export default async function ProjectsPage({ searchParams }: { searchParams: Pro
                 </div>
                 <div className="flex items-center gap-2">
                     <div className="bg-muted p-1 rounded-md flex">
-                        <Link href="/admin/project?view=gallery">
-                            <Button variant={!isTableView ? "secondary" : "ghost"} size="sm" className="h-8 px-2">
+                        <Button variant={!isTableView ? "secondary" : "ghost"} size="sm" className="h-8 px-2" asChild>
+                            <Link href="/admin/project?view=gallery">
                                 <LayoutGrid className="h-4 w-4" />
-                            </Button>
-                        </Link>
-                        <Link href="/admin/project?view=table">
-                            <Button variant={isTableView ? "secondary" : "ghost"} size="sm" className="h-8 px-2">
+                            </Link>
+                        </Button>
+                        <Button variant={isTableView ? "secondary" : "ghost"} size="sm" className="h-8 px-2" asChild>
+                            <Link href="/admin/project?view=table">
                                 <List className="h-4 w-4" />
-                            </Button>
-                        </Link>
+                            </Link>
+                        </Button>
                     </div>
                     <ProjectDialog
                         accounts={accounts}
                         users={users}
                         serviceAreas={serviceAreas}
-                        trigger={
-                            <Button>
-                                <Plus className="mr-2 h-4 w-4" />
-                                Create Project
-                            </Button>
-                        }
                     />
                 </div>
             </div>
