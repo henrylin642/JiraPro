@@ -32,7 +32,7 @@ export default async function ProjectsPage({ searchParams }: { searchParams: Pro
     return (
         <div className="p-6 space-y-6">
 
-            <div className="flex justify-between items-center">
+            <div className="flex justify-between items-center relative z-10">
                 <div>
                     <h2 className="text-3xl font-bold tracking-tight">Projects</h2>
                     <p className="text-muted-foreground">Manage ongoing projects, milestones, and resources.</p>
