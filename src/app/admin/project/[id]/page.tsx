@@ -149,7 +149,7 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
 
                 <TabsContent value="board">
                     <div className="h-[calc(100vh-300px)]">
-                        <TaskBoard initialTasks={project.tasks} />
+                        <TaskBoard initialTasks={project.tasks} projectId={project.id} />
                     </div>
                 </TabsContent>
             </Tabs>

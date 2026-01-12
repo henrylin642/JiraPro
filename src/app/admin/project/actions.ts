@@ -5,7 +5,6 @@ import { revalidatePath } from 'next/cache';
 
 export async function getProjects() {
     try {
-        console.time('Action:getProjects');
         const projects = await prisma.project.findMany({
             include: {
                 account: {
@@ -64,7 +63,6 @@ export async function getProjects() {
                 }))
             }))
         }));
-        console.timeEnd('Action:getProjects');
         return projects;
     } catch (error) {
         console.error("Error fetching projects:", error);
@@ -115,12 +113,13 @@ export async function getProjectById(id: string) {
     }
 }
 
-export async function updateTaskStatus(taskId: string, status: string) {
+export async function updateTaskStatus(taskId: string, projectId: string, status: string) {
     try {
         await prisma.task.update({
             where: { id: taskId },
             data: { status },
         });
+        revalidatePath(`/admin/project/${projectId}`);
     } catch (error) {
         console.error("Error updating task status:", error);
         throw error;
