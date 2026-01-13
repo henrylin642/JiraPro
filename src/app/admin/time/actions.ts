@@ -13,7 +13,8 @@ export async function getUserTasks(userId: string) {
             },
             include: {
                 project: true,
-                milestone: true
+                milestone: true,
+                opportunity: true
             }
         });
         return tasks;

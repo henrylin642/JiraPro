@@ -13,7 +13,8 @@ import { useRouter } from 'next/navigation';
 type Task = {
     id: string;
     title: string;
-    project: { name: string; code: string | null };
+    project: { name: string; code: string | null } | null;
+    opportunity: { title: string } | null;
 };
 
 type TimesheetEntry = {
@@ -109,7 +110,14 @@ export function TimesheetGrid({ userId, initialTasks, initialEntries, currentDat
 
     const getTaskName = (id: string) => {
         const t = initialTasks.find(t => t.id === id);
-        return t ? `${t.project.code || ''} - ${t.title}` : 'Unknown Task';
+        if (!t) return 'Unknown Task';
+
+        if (t.project) {
+            return `${t.project.code || ''} - ${t.title}`;
+        } else if (t.opportunity) {
+            return `IPP - ${t.title} (${t.opportunity.title})`;
+        }
+        return t.title;
     };
 
     // Calculate Totals
