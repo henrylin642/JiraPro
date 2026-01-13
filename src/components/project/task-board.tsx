@@ -302,7 +302,7 @@ export function TaskBoard({ initialTasks, projectId, opportunityId }: { initialT
                 </DragOverlay>
             </DndContext>
 
-            {projectId && (
+            {(projectId || opportunityId) && (
                 <TaskDialog
                     projectId={projectId}
                     opportunityId={opportunityId}
