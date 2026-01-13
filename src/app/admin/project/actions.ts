@@ -14,7 +14,7 @@ export async function getProjects() {
                     select: { id: true, name: true, avatarUrl: true }
                 },
                 milestones: {
-                    select: { id: true, amount: true }
+                    select: { id: true, amount: true, name: true, dueDate: true, isPaid: true }
                 },
                 tasks: {
                     select: {
@@ -47,7 +47,8 @@ export async function getProjects() {
             budget: Number(project.budget),
             milestones: project.milestones.map(m => ({
                 ...m,
-                amount: Number(m.amount)
+                amount: Number(m.amount),
+                dueDate: m.dueDate ? m.dueDate.toISOString() : null
             })),
             expenses: project.expenses.map(e => ({
                 ...e,

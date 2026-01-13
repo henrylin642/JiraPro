@@ -20,7 +20,7 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
-import { ArrowRight, MoreHorizontal, Archive, LayoutDashboard, Trash } from 'lucide-react';
+import { ArrowRight, MoreHorizontal, Archive, LayoutDashboard, Trash, ChevronRight, ChevronDown, Check, X } from 'lucide-react';
 import { getProjects, archiveProject, deleteProject } from '@/app/admin/project/actions';
 import { useRouter } from 'next/navigation';
 import { ProjectDialog } from '@/components/project/project-dialog';
@@ -40,6 +40,17 @@ export function ProjectTableView({ projects, accounts = [], users = [], serviceA
     const router = useRouter();
     const [editingProject, setEditingProject] = React.useState<Project | null>(null);
     const [isEditOpen, setIsEditOpen] = React.useState(false);
+    const [expandedProjects, setExpandedProjects] = React.useState<Set<string>>(new Set());
+
+    const toggleExpand = (projectId: string) => {
+        const newExpanded = new Set(expandedProjects);
+        if (newExpanded.has(projectId)) {
+            newExpanded.delete(projectId);
+        } else {
+            newExpanded.add(projectId);
+        }
+        setExpandedProjects(newExpanded);
+    };
 
     const formatCurrency = (amount: number) => {
         return new Intl.NumberFormat('en-US', {
@@ -82,6 +93,7 @@ export function ProjectTableView({ projects, accounts = [], users = [], serviceA
             <Table>
                 <TableHeader>
                     <TableRow>
+                        <TableHead className="w-[50px]"></TableHead>
                         <TableHead>Code</TableHead>
                         <TableHead>Project Name</TableHead>
                         <TableHead>Client</TableHead>
@@ -117,54 +129,111 @@ export function ProjectTableView({ projects, accounts = [], users = [], serviceA
                         const totalCost = personalCost + expenseTotal;
                         const margin = totalRevenue - totalCost;
 
+                        const isExpanded = expandedProjects.has(project.id);
+
                         return (
-                            <TableRow key={project.id} className={project.status === 'ARCHIVED' ? 'opacity-50 bg-muted/50' : ''}>
-                                <TableCell className="font-medium font-mono text-xs">{project.code || '-'}</TableCell>
-                                <TableCell>
-                                    <span className="font-medium">{project.name}</span>
-                                </TableCell>
-                                <TableCell>{project.account?.name || 'Internal'}</TableCell>
-                                <TableCell>{project.serviceArea?.name || '-'}</TableCell>
-                                <TableCell>
-                                    <Badge variant={project.status === 'ACTIVE' ? 'default' : (project.status === 'ARCHIVED' ? 'outline' : 'secondary')}>
-                                        {project.status}
-                                    </Badge>
-                                </TableCell>
-                                <TableCell>{project.manager?.name || '-'}</TableCell>
-                                <TableCell className="text-right">{formatCurrency(Number(project.budget))}</TableCell>
-                                <TableCell className="text-right font-mono text-xs">{formatCurrency(personalCost)}</TableCell>
-                                <TableCell className="text-right font-mono text-xs">{formatCurrency(expenseTotal)}</TableCell>
-                                <TableCell className="text-right font-mono text-xs text-green-600">{formatCurrency(totalRevenue)}</TableCell>
-                                <TableCell className={`text-right font-bold ${margin >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                                    {formatCurrency(margin)}
-                                </TableCell>
-                                <TableCell className="text-right">
-                                    <DropdownMenu>
-                                        <DropdownMenuTrigger asChild>
-                                            <Button variant="ghost" className="h-8 w-8 p-0">
-                                                <span className="sr-only">Open menu</span>
-                                                <MoreHorizontal className="h-4 w-4" />
-                                            </Button>
-                                        </DropdownMenuTrigger>
-                                        <DropdownMenuContent align="end">
-                                            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                                            <DropdownMenuItem onClick={() => router.push(`/admin/project/${project.id}`)}>
-                                                <LayoutDashboard className="mr-2 h-4 w-4" /> View Dashboard
-                                            </DropdownMenuItem>
-                                            <DropdownMenuItem onClick={() => handleEditClick(project)}>
-                                                <MoreHorizontal className="mr-2 h-4 w-4" /> Edit Details
-                                            </DropdownMenuItem>
-                                            <DropdownMenuItem onClick={() => handleArchive(project.id)} className="text-orange-600">
-                                                <Archive className="mr-2 h-4 w-4" /> Archive Project
-                                            </DropdownMenuItem>
-                                            <DropdownMenuSeparator />
-                                            <DropdownMenuItem onClick={() => handleDelete(project.id, project.name)} className="text-red-600">
-                                                <Trash className="mr-2 h-4 w-4" /> Delete Project
-                                            </DropdownMenuItem>
-                                        </DropdownMenuContent>
-                                    </DropdownMenu>
-                                </TableCell>
-                            </TableRow>
+                            <React.Fragment key={project.id}>
+                                <TableRow className={project.status === 'ARCHIVED' ? 'opacity-50 bg-muted/50' : ''}>
+                                    <TableCell>
+                                        <Button variant="ghost" size="sm" className="h-8 w-8 p-0" onClick={() => toggleExpand(project.id)}>
+                                            {isExpanded ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
+                                        </Button>
+                                    </TableCell>
+                                    <TableCell className="font-medium font-mono text-xs">{project.code || '-'}</TableCell>
+                                    <TableCell>
+                                        <span className="font-medium">{project.name}</span>
+                                    </TableCell>
+                                    <TableCell>{project.account?.name || 'Internal'}</TableCell>
+                                    <TableCell>{project.serviceArea?.name || '-'}</TableCell>
+                                    <TableCell>
+                                        <Badge variant={project.status === 'ACTIVE' ? 'default' : (project.status === 'ARCHIVED' ? 'outline' : 'secondary')}>
+                                            {project.status}
+                                        </Badge>
+                                    </TableCell>
+                                    <TableCell>{project.manager?.name || '-'}</TableCell>
+                                    <TableCell className="text-right">{formatCurrency(Number(project.budget))}</TableCell>
+                                    <TableCell className="text-right font-mono text-xs">{formatCurrency(personalCost)}</TableCell>
+                                    <TableCell className="text-right font-mono text-xs">{formatCurrency(expenseTotal)}</TableCell>
+                                    <TableCell className="text-right font-mono text-xs text-green-600">{formatCurrency(totalRevenue)}</TableCell>
+                                    <TableCell className={`text-right font-bold ${margin >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                                        {formatCurrency(margin)}
+                                    </TableCell>
+                                    <TableCell className="text-right">
+                                        <DropdownMenu>
+                                            <DropdownMenuTrigger asChild>
+                                                <Button variant="ghost" className="h-8 w-8 p-0">
+                                                    <span className="sr-only">Open menu</span>
+                                                    <MoreHorizontal className="h-4 w-4" />
+                                                </Button>
+                                            </DropdownMenuTrigger>
+                                            <DropdownMenuContent align="end">
+                                                <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                                                <DropdownMenuItem onClick={() => router.push(`/admin/project/${project.id}`)}>
+                                                    <LayoutDashboard className="mr-2 h-4 w-4" /> View Dashboard
+                                                </DropdownMenuItem>
+                                                <DropdownMenuItem onClick={() => handleEditClick(project)}>
+                                                    <MoreHorizontal className="mr-2 h-4 w-4" /> Edit Details
+                                                </DropdownMenuItem>
+                                                <DropdownMenuItem onClick={() => handleArchive(project.id)} className="text-orange-600">
+                                                    <Archive className="mr-2 h-4 w-4" /> Archive Project
+                                                </DropdownMenuItem>
+                                                <DropdownMenuSeparator />
+                                                <DropdownMenuItem onClick={() => handleDelete(project.id, project.name)} className="text-red-600">
+                                                    <Trash className="mr-2 h-4 w-4" /> Delete Project
+                                                </DropdownMenuItem>
+                                            </DropdownMenuContent>
+                                        </DropdownMenu>
+                                    </TableCell>
+                                </TableRow>
+                                {isExpanded && (
+                                    <TableRow className="bg-muted/30 hover:bg-muted/30">
+                                        <TableCell colSpan={13} className="p-4">
+                                            <div className="pl-12">
+                                                <h4 className="font-semibold mb-2 flex items-center gap-2">
+                                                    Milestones
+                                                    <Badge variant="outline" className="text-xs">{project.milestones.length}</Badge>
+                                                </h4>
+                                                {project.milestones.length > 0 ? (
+                                                    <div className="border rounded-md bg-background overflow-hidden">
+                                                        <Table>
+                                                            <TableHeader>
+                                                                <TableRow className="bg-muted/50">
+                                                                    <TableHead>Milestone Name</TableHead>
+                                                                    <TableHead>Due Date</TableHead>
+                                                                    <TableHead>Status</TableHead>
+                                                                    <TableHead className="text-right">Amount</TableHead>
+                                                                </TableRow>
+                                                            </TableHeader>
+                                                            <TableBody>
+                                                                {project.milestones.map(milestone => (
+                                                                    <TableRow key={milestone.id}>
+                                                                        <TableCell className="font-medium">{milestone.name}</TableCell>
+                                                                        <TableCell>
+                                                                            {milestone.dueDate ? new Date(milestone.dueDate).toLocaleDateString() : '-'}
+                                                                        </TableCell>
+                                                                        <TableCell>
+                                                                            <Badge variant={milestone.isPaid ? 'secondary' : 'outline'} className={milestone.isPaid ? 'bg-green-100 text-green-800' : ''}>
+                                                                                {milestone.isPaid ? <><Check className="w-3 h-3 mr-1" /> Paid</> : 'Pending'}
+                                                                            </Badge>
+                                                                        </TableCell>
+                                                                        <TableCell className="text-right font-mono">
+                                                                            {formatCurrency(Number(milestone.amount))}
+                                                                        </TableCell>
+                                                                    </TableRow>
+                                                                ))}
+                                                            </TableBody>
+                                                        </Table>
+                                                    </div>
+                                                ) : (
+                                                    <div className="text-sm text-muted-foreground italic p-4 border rounded-md bg-background/50 border-dashed text-center">
+                                                        No milestones defined for this project.
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </TableCell>
+                                    </TableRow>
+                                )}
+                            </React.Fragment>
                         );
                     })}
                 </TableBody>
