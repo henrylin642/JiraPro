@@ -112,6 +112,7 @@ export async function getProjectById(id: string) {
         return null;
     }
 }
+
 export async function getAllTasks() {
     try {
         const tasks = await prisma.task.findMany({
@@ -121,6 +122,9 @@ export async function getAllTasks() {
                 },
                 project: {
                     select: { id: true, name: true }
+                },
+                opportunity: {
+                    select: { id: true, title: true }
                 }
             },
             orderBy: { createdAt: 'desc' }
@@ -130,6 +134,7 @@ export async function getAllTasks() {
         // but to be safe and match patterns:
         return tasks.map(task => ({
             ...task,
+            opportunityId: task.opportunityId,
             // Ensure no huge objects if not needed
         }));
     } catch (error) {
@@ -137,20 +142,30 @@ export async function getAllTasks() {
         return [];
     }
 }
-export async function updateTaskStatus(taskId: string, projectId: string, status: string) {
+
+export async function updateTaskStatus(taskId: string, projectId: string | null | undefined, status: string, opportunityId?: string | null) {
     try {
         await prisma.task.update({
             where: { id: taskId },
             data: { status },
         });
-        revalidatePath(`/admin/project/${projectId}`);
+        if (projectId) revalidatePath(`/admin/project/${projectId}`);
+        if (opportunityId) revalidatePath(`/admin/crm/${opportunityId}`);
+        revalidatePath('/admin/crm'); // For global board
+        revalidatePath('/admin/project'); // For global board
     } catch (error) {
         console.error("Error updating task status:", error);
         throw error;
     }
 }
 
-export async function createProjectFromOpportunity(opportunityId: string, name: string, code: string, managerId: string, startDate: Date, endDate: Date) {
+// ... existing createProjectFromOpportunity ...
+
+// ... existing Milestone Actions ...
+
+// Task actions moved to bottom
+
+export async function createProjectFromOpportunity(opportunityId: string, name: string, code: string, managerId: string, startDate?: Date, endDate?: Date) {
     try {
         const opportunity = await prisma.opportunity.findUnique({
             where: { id: opportunityId },
@@ -383,8 +398,7 @@ export async function getTaskFormData(projectId?: string) {
     }
 }
 
-// ... existing updateTask ...
-export async function updateTask(id: string, projectId: string, data: {
+export async function updateTask(id: string, projectId: string | null | undefined, data: {
     title: string;
     description?: string;
     status: string;
@@ -394,6 +408,7 @@ export async function updateTask(id: string, projectId: string, data: {
     dueDate?: Date;
     estimatedHours?: number;
     parentId?: string;
+    opportunityId?: string;
 }) {
     try {
         console.log("Updating task:", id, data);
@@ -411,7 +426,8 @@ export async function updateTask(id: string, projectId: string, data: {
                 parentId: data.parentId || null,
             }
         });
-        revalidatePath(`/admin/project/${projectId}`);
+        if (projectId) revalidatePath(`/admin/project/${projectId}`);
+        if (data.opportunityId) revalidatePath(`/admin/crm/${data.opportunityId}`);
         return { success: true };
     } catch (error) {
         console.error("Error updating task:", error);
@@ -419,7 +435,7 @@ export async function updateTask(id: string, projectId: string, data: {
     }
 }
 
-export async function createTask(projectId: string, data: {
+export async function createTask(projectId: string | undefined, data: {
     title: string;
     description?: string;
     status: string;
@@ -429,12 +445,15 @@ export async function createTask(projectId: string, data: {
     dueDate?: Date;
     estimatedHours?: number;
     parentId?: string;
+    opportunityId?: string;
 }) {
     try {
         console.log("Creating task:", projectId, data);
         await prisma.task.create({
             data: {
-                projectId,
+                projectId: projectId ?? undefined,
+                // courseId removed
+                opportunityId: data.opportunityId || undefined,
                 title: data.title,
                 description: data.description,
                 status: data.status,
@@ -446,7 +465,8 @@ export async function createTask(projectId: string, data: {
                 parentId: data.parentId || null,
             }
         });
-        revalidatePath(`/admin/project/${projectId}`);
+        if (projectId) revalidatePath(`/admin/project/${projectId}`);
+        if (data.opportunityId) revalidatePath(`/admin/crm/${data.opportunityId}`);
         return { success: true };
     } catch (error) {
         console.error("Error creating task:", error);

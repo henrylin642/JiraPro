@@ -2,6 +2,7 @@ import React from 'react';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { ArrowLeft, Building2, Calendar, DollarSign, Percent } from 'lucide-react';
+import { TaskBoard } from '@/components/project/task-board';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -16,6 +17,7 @@ import { DeleteOpportunityButton } from '@/components/crm/delete-opportunity-but
 import { StageChecklist } from '@/components/crm/stage-checklist';
 import { ActivityTimeline } from '@/components/crm/activity-timeline';
 import { OpportunityDialog } from '@/components/crm/opportunity-dialog';
+
 
 export const dynamic = 'force-dynamic';
 
@@ -89,48 +91,51 @@ export default async function OpportunityDetailPage({ params }: { params: Promis
 
             {/* Main Content */}
             <div className="flex-1 overflow-auto p-6">
-                <Tabs defaultValue="resources" className="space-y-4">
-                    <TabsList>
-                        <TabsTrigger value="details">Details</TabsTrigger>
-                        <TabsTrigger value="resources">Resource Planning</TabsTrigger>
-                        <TabsTrigger value="activity">Activity</TabsTrigger>
-                    </TabsList>
+                <TabsContent value="details">
+                    {/* ... existing details ... */}
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Opportunity Details</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <StageChecklist
+                                opportunityId={opportunity.id}
+                                stage={opportunity.stage}
+                                initialChecklist={opportunity.checklist ? JSON.parse(opportunity.checklist) : []}
+                            />
+                            <p className="text-muted-foreground">Basic details form would go here...</p>
+                        </CardContent>
+                    </Card>
+                </TabsContent>
 
-                    <TabsContent value="details" className="space-y-4">
-                        <Card>
-                            <CardHeader>
-                                <CardTitle>Opportunity Details</CardTitle>
-                            </CardHeader>
-                            <CardContent>
-                                <StageChecklist
-                                    opportunityId={opportunity.id}
-                                    stage={opportunity.stage}
-                                    initialChecklist={opportunity.checklist ? JSON.parse(opportunity.checklist) : []}
-                                />
-                                <p className="text-muted-foreground">Basic details form would go here...</p>
-                            </CardContent>
-                        </Card>
-                    </TabsContent>
-
-                    <TabsContent value="resources">
-                        <ResourceBooking
-                            opportunityId={opportunity.id}
-                            allocations={opportunity.allocations}
-                            resources={resources}
-                        />
-                    </TabsContent>
+                <TabsContent value="tasks" className="h-[calc(100vh-250px)]">
+                    <TaskBoard
+                        initialTasks={opportunity.tasks as any[]}
+                        opportunityId={opportunity.id}
+                    />
+                </TabsContent>
 
 
-                    <TabsContent value="activity">
-                        <ActivityTimeline
-                            opportunityId={opportunity.id}
-                            accountId={opportunity.accountId}
-                            interactions={interactions}
-                            users={users}
-                        />
-                    </TabsContent>
-                </Tabs>
-            </div>
+
+                <TabsContent value="resources">
+                    <ResourceBooking
+                        opportunityId={opportunity.id}
+                        allocations={opportunity.allocations}
+                        resources={resources}
+                    />
+                </TabsContent>
+
+
+                <TabsContent value="activity">
+                    <ActivityTimeline
+                        opportunityId={opportunity.id}
+                        accountId={opportunity.accountId}
+                        interactions={interactions}
+                        users={users}
+                    />
+                </TabsContent>
+            </Tabs>
         </div>
+
     );
 }

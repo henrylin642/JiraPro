@@ -124,6 +124,7 @@ model Opportunity {
   // Pre-sales
   allocations    Allocation[]     // Soft bookings
   interactions   Interaction[]    // Activity Log
+  tasks          Task[]           // Project tasks linked to this opportunity
     
   // Conversion
   convertedProjectId String?
@@ -281,8 +282,11 @@ model Milestone {
 
 model Task {
   id          String    @id @default(uuid())
-  projectId   String
-  project     Project   @relation(fields: [projectId], references: [id])
+  projectId   String?
+  project     Project?   @relation(fields: [projectId], references: [id])
+  
+  opportunityId String?
+  opportunity Opportunity? @relation(fields: [opportunityId], references: [id])
   
   milestoneId String?
   milestone   Milestone? @relation(fields: [milestoneId], references: [id])

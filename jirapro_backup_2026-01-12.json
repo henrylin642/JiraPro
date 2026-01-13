@@ -1,0 +1,1192 @@
+{
+  "timestamp": "2026-01-12T23:59:15.415Z",
+  "version": "1.0",
+  "users": [
+    {
+      "id": "7ecb5cf6-cccb-47d0-ad39-63b92bcc3086",
+      "email": "henry.lin@lig.com.tw",
+      "password": "123456",
+      "name": "Henry Lin",
+      "role": "ADMIN",
+      "avatarUrl": null,
+      "createdAt": "2026-01-07T17:58:50.552Z",
+      "updatedAt": "2026-01-07T19:19:00.770Z"
+    },
+    {
+      "id": "c2eaefda-0ee6-4740-ba66-b4924cbc17e5",
+      "email": "mika.chen@lig.com.tw",
+      "password": "password123",
+      "name": "Mike Cheng",
+      "role": "MANAGER",
+      "avatarUrl": null,
+      "createdAt": "2026-01-07T18:36:09.827Z",
+      "updatedAt": "2026-01-07T19:19:09.900Z"
+    },
+    {
+      "id": "dbcc3a6e-8bd1-4609-bc4b-3201c5a2aed8",
+      "email": "yvonne.tsai@lig.com.tw",
+      "password": "password123",
+      "name": "Yvonne",
+      "role": "MANAGER",
+      "avatarUrl": null,
+      "createdAt": "2026-01-07T19:20:04.631Z",
+      "updatedAt": "2026-01-07T19:20:04.631Z"
+    },
+    {
+      "id": "19acfb81-4109-4ba0-83cb-6e0369733155",
+      "email": "plain.wu@lig.com.tw",
+      "password": "password123",
+      "name": "Plain Wu",
+      "role": "MANAGER",
+      "avatarUrl": null,
+      "createdAt": "2026-01-07T19:42:16.846Z",
+      "updatedAt": "2026-01-07T19:42:16.846Z"
+    },
+    {
+      "id": "f3c1fcd2-be3d-40cf-a7c3-93c601ade92c",
+      "email": "eddie.yang@lig.com.tw",
+      "password": "password123",
+      "name": "Eddie Yang",
+      "role": "MANAGER",
+      "avatarUrl": null,
+      "createdAt": "2026-01-12T23:09:38.411Z",
+      "updatedAt": "2026-01-12T23:09:38.411Z"
+    }
+  ],
+  "accounts": [
+    {
+      "id": "351ba9b7-de0f-4dcf-b3cf-b36966f2d446",
+      "name": "亞旭電腦股份有限公司",
+      "industry": "通訊系統",
+      "website": "https://www.askey.com.tw/tw/",
+      "phone": "0222287588",
+      "address": "(23585) 新北市中和區建康路119號10樓",
+      "taxId": "",
+      "createdAt": "2026-01-07T18:21:32.594Z",
+      "updatedAt": "2026-01-07T18:22:08.856Z"
+    },
+    {
+      "id": "31483729-6648-4978-8399-8c33f6410a68",
+      "name": "台灣車輛股份有限公司",
+      "industry": null,
+      "website": null,
+      "phone": null,
+      "address": null,
+      "taxId": null,
+      "createdAt": "2026-01-07T20:31:43.009Z",
+      "updatedAt": "2026-01-07T20:31:43.009Z"
+    },
+    {
+      "id": "200ac3b5-9041-4362-b23a-8a1151cce60a",
+      "name": "城市車旅",
+      "industry": null,
+      "website": null,
+      "phone": null,
+      "address": null,
+      "taxId": null,
+      "createdAt": "2026-01-07T20:53:45.758Z",
+      "updatedAt": "2026-01-07T20:53:45.758Z"
+    },
+    {
+      "id": "29d36e75-c076-4be2-ae8f-b166fecefaef",
+      "name": "圓山大飯店",
+      "industry": null,
+      "website": null,
+      "phone": null,
+      "address": null,
+      "taxId": null,
+      "createdAt": "2026-01-07T21:02:10.786Z",
+      "updatedAt": "2026-01-07T21:02:10.786Z"
+    },
+    {
+      "id": "77b1ee75-a603-49da-9e14-22c1bd6fed67",
+      "name": "中華電信股份有限公司",
+      "industry": null,
+      "website": null,
+      "phone": null,
+      "address": null,
+      "taxId": null,
+      "createdAt": "2026-01-07T21:03:39.344Z",
+      "updatedAt": "2026-01-07T21:03:39.344Z"
+    },
+    {
+      "id": "78984964-2a9c-409c-8d39-86e801b6c83d",
+      "name": "SpaceV",
+      "industry": null,
+      "website": null,
+      "phone": null,
+      "address": null,
+      "taxId": null,
+      "createdAt": "2026-01-08T02:36:26.224Z",
+      "updatedAt": "2026-01-08T02:36:26.224Z"
+    },
+    {
+      "id": "a76c76f1-65fd-4ce9-bf0f-b9b378f7aafa",
+      "name": "嘉義縣政府",
+      "industry": null,
+      "website": null,
+      "phone": null,
+      "address": null,
+      "taxId": null,
+      "createdAt": "2026-01-08T04:34:40.425Z",
+      "updatedAt": "2026-01-08T04:34:40.425Z"
+    },
+    {
+      "id": "abf5686e-b4e7-4a49-a77a-7c9b454c6d33",
+      "name": "茂林國家風景管理處",
+      "industry": null,
+      "website": null,
+      "phone": null,
+      "address": null,
+      "taxId": null,
+      "createdAt": "2026-01-08T04:34:50.252Z",
+      "updatedAt": "2026-01-08T04:34:50.252Z"
+    },
+    {
+      "id": "90ef1429-2a71-408f-8d0d-3d540a82d695",
+      "name": "景文科大",
+      "industry": null,
+      "website": null,
+      "phone": null,
+      "address": null,
+      "taxId": null,
+      "createdAt": "2026-01-08T04:35:01.113Z",
+      "updatedAt": "2026-01-08T04:35:01.113Z"
+    },
+    {
+      "id": "583761c9-83a9-4fc5-8b96-fcb591a1b670",
+      "name": "華電聯網",
+      "industry": null,
+      "website": null,
+      "phone": null,
+      "address": null,
+      "taxId": null,
+      "createdAt": "2026-01-08T04:35:11.965Z",
+      "updatedAt": "2026-01-08T04:35:11.965Z"
+    },
+    {
+      "id": "62f429bf-7906-4377-b2a9-aaf5e04876c2",
+      "name": "欣欣水泥",
+      "industry": null,
+      "website": null,
+      "phone": null,
+      "address": null,
+      "taxId": null,
+      "createdAt": "2026-01-08T04:35:22.919Z",
+      "updatedAt": "2026-01-08T04:35:22.919Z"
+    },
+    {
+      "id": "15cb625c-278c-4d6c-b5f2-21738b312b12",
+      "name": "嘉義糖廠",
+      "industry": null,
+      "website": null,
+      "phone": null,
+      "address": null,
+      "taxId": null,
+      "createdAt": "2026-01-08T04:35:30.751Z",
+      "updatedAt": "2026-01-08T04:35:30.751Z"
+    },
+    {
+      "id": "a2143304-62c8-4947-9cc7-26b8c788f9cb",
+      "name": "遵宇科技",
+      "industry": null,
+      "website": null,
+      "phone": null,
+      "address": null,
+      "taxId": null,
+      "createdAt": "2026-01-08T04:35:37.370Z",
+      "updatedAt": "2026-01-08T04:35:37.370Z"
+    },
+    {
+      "id": "5756ded2-fb43-4590-8905-754f5c8fb27d",
+      "name": "北回歸線",
+      "industry": null,
+      "website": null,
+      "phone": null,
+      "address": null,
+      "taxId": null,
+      "createdAt": "2026-01-08T04:35:50.513Z",
+      "updatedAt": "2026-01-08T04:35:50.513Z"
+    }
+  ],
+  "products": [],
+  "resourceProfiles": [
+    {
+      "id": "4ab55814-9eda-46bb-8fc6-dcc77f35593b",
+      "userId": "7ecb5cf6-cccb-47d0-ad39-63b92bcc3086",
+      "title": "System Administrator",
+      "skills": "Full Stack, DevOps",
+      "costRate": "312.5",
+      "billableRate": "625",
+      "monthlySalary": "75000",
+      "capacityHours": 40
+    },
+    {
+      "id": "a434e968-15af-4dc5-921c-b75a9dbd8cc3",
+      "userId": "c2eaefda-0ee6-4740-ba66-b4924cbc17e5",
+      "title": "BD",
+      "skills": "business development",
+      "costRate": "187.5",
+      "billableRate": "375",
+      "monthlySalary": "45000",
+      "capacityHours": 40
+    },
+    {
+      "id": "f0243786-b944-409e-ac2d-d21c4f7b5fbf",
+      "userId": "dbcc3a6e-8bd1-4609-bc4b-3201c5a2aed8",
+      "title": "COO",
+      "skills": "運營、行銷",
+      "costRate": "312.5",
+      "billableRate": "500",
+      "monthlySalary": "75000",
+      "capacityHours": 40
+    },
+    {
+      "id": "71a5f7ae-ad60-4d39-a523-933d0bb31898",
+      "userId": "19acfb81-4109-4ba0-83cb-6e0369733155",
+      "title": "CTO",
+      "skills": "技術開發",
+      "costRate": "357.15",
+      "billableRate": "714.3",
+      "monthlySalary": "85715",
+      "capacityHours": 40
+    },
+    {
+      "id": "e56bcc3c-9241-43e0-95eb-b12d52b2cba5",
+      "userId": "f3c1fcd2-be3d-40cf-a7c3-93c601ade92c",
+      "title": "PM",
+      "skills": "",
+      "costRate": "270.83",
+      "billableRate": "541.66",
+      "monthlySalary": "65000",
+      "capacityHours": 40
+    }
+  ],
+  "contacts": [],
+  "interactions": [],
+  "features": [],
+  "roadmapItems": [],
+  "opportunities": [
+    {
+      "id": "5592b10f-e382-4470-98ca-76e54f48dc0f",
+      "title": "衛福部桃園醫院",
+      "accountId": "200ac3b5-9041-4362-b23a-8a1151cce60a",
+      "stage": "LEAD",
+      "probability": 20,
+      "estimatedValue": "800000",
+      "expectedCloseDate": "2026-03-31T00:00:00.000Z",
+      "checklist": "[\"LEAD_BG_CHECK\",\"LEAD_CONTACT\"]",
+      "lossReason": null,
+      "ownerId": "7ecb5cf6-cccb-47d0-ad39-63b92bcc3086",
+      "convertedProjectId": null,
+      "serviceAreaId": "b8167dce-be14-4f4a-becc-00ef9800e91e",
+      "createdAt": "2026-01-07T20:54:30.878Z",
+      "updatedAt": "2026-01-08T04:50:22.234Z",
+      "features": []
+    },
+    {
+      "id": "346a03bf-394e-4df4-8237-90cecf1b23b5",
+      "title": "台中國立美術館",
+      "accountId": "200ac3b5-9041-4362-b23a-8a1151cce60a",
+      "stage": "LEAD",
+      "probability": 10,
+      "estimatedValue": "1600000",
+      "expectedCloseDate": "2026-05-30T00:00:00.000Z",
+      "checklist": null,
+      "lossReason": null,
+      "ownerId": "7ecb5cf6-cccb-47d0-ad39-63b92bcc3086",
+      "convertedProjectId": null,
+      "serviceAreaId": "a0950219-bddb-4a53-b245-879251c10d90",
+      "createdAt": "2026-01-07T21:01:40.804Z",
+      "updatedAt": "2026-01-08T04:51:31.821Z",
+      "features": []
+    },
+    {
+      "id": "b7c387bb-170d-4f57-a1c0-70db13de5db6",
+      "title": "新竹南寮漁港",
+      "accountId": "200ac3b5-9041-4362-b23a-8a1151cce60a",
+      "stage": "LEAD",
+      "probability": 10,
+      "estimatedValue": "800000",
+      "expectedCloseDate": "2026-04-30T00:00:00.000Z",
+      "checklist": null,
+      "lossReason": null,
+      "ownerId": "7ecb5cf6-cccb-47d0-ad39-63b92bcc3086",
+      "convertedProjectId": null,
+      "serviceAreaId": "33953d19-7741-4a27-a829-b72aca16a0a7",
+      "createdAt": "2026-01-07T21:01:04.977Z",
+      "updatedAt": "2026-01-08T04:52:01.821Z",
+      "features": []
+    },
+    {
+      "id": "ec85cb3d-59b5-43de-8b4d-609bf977555f",
+      "title": "圓山大飯店AR導覽系統",
+      "accountId": "29d36e75-c076-4be2-ae8f-b166fecefaef",
+      "stage": "LEAD",
+      "probability": 10,
+      "estimatedValue": "1000000",
+      "expectedCloseDate": "2026-07-31T00:00:00.000Z",
+      "checklist": null,
+      "lossReason": null,
+      "ownerId": "7ecb5cf6-cccb-47d0-ad39-63b92bcc3086",
+      "convertedProjectId": null,
+      "serviceAreaId": "223ccf4f-809e-47d2-89ab-d92a27422c07",
+      "createdAt": "2026-01-07T21:02:35.063Z",
+      "updatedAt": "2026-01-08T04:52:41.682Z",
+      "features": []
+    },
+    {
+      "id": "a733d3b0-8bde-4c23-8275-e4d95417a61c",
+      "title": "中華電信BIM",
+      "accountId": "77b1ee75-a603-49da-9e14-22c1bd6fed67",
+      "stage": "PROPOSAL",
+      "probability": 10,
+      "estimatedValue": "2000000",
+      "expectedCloseDate": "2026-02-01T00:00:00.000Z",
+      "checklist": null,
+      "lossReason": null,
+      "ownerId": "c2eaefda-0ee6-4740-ba66-b4924cbc17e5",
+      "convertedProjectId": null,
+      "serviceAreaId": "223ccf4f-809e-47d2-89ab-d92a27422c07",
+      "createdAt": "2026-01-07T21:04:16.347Z",
+      "updatedAt": "2026-01-08T04:53:05.764Z",
+      "features": []
+    },
+    {
+      "id": "b1781aa8-209a-452f-ab41-84c424b9111a",
+      "title": "SpaceV光標籤服務租賃",
+      "accountId": "78984964-2a9c-409c-8d39-86e801b6c83d",
+      "stage": "LEAD",
+      "probability": 10,
+      "estimatedValue": "300000",
+      "expectedCloseDate": "2026-06-01T00:00:00.000Z",
+      "checklist": null,
+      "lossReason": null,
+      "ownerId": "dbcc3a6e-8bd1-4609-bc4b-3201c5a2aed8",
+      "convertedProjectId": null,
+      "serviceAreaId": "acb903fd-82aa-44a3-96f2-3d75ffc552d7",
+      "createdAt": "2026-01-08T02:37:06.741Z",
+      "updatedAt": "2026-01-08T04:54:23.940Z",
+      "features": []
+    },
+    {
+      "id": "49a5e516-c3ba-4070-a9ea-4b2b43bf5faf",
+      "title": "2026嘉義燈會",
+      "accountId": "a76c76f1-65fd-4ce9-bf0f-b9b378f7aafa",
+      "stage": "LEAD",
+      "probability": 10,
+      "estimatedValue": "200000",
+      "expectedCloseDate": "2026-02-28T00:00:00.000Z",
+      "checklist": null,
+      "lossReason": null,
+      "ownerId": "c2eaefda-0ee6-4740-ba66-b4924cbc17e5",
+      "convertedProjectId": null,
+      "serviceAreaId": "52c236c9-3e29-4b9f-81d9-8828ce309b1f",
+      "createdAt": "2026-01-08T04:36:26.406Z",
+      "updatedAt": "2026-01-08T05:03:22.910Z",
+      "features": []
+    },
+    {
+      "id": "e449e02a-25e7-49c1-90df-df45d07591e1",
+      "title": "景文科大招生工具",
+      "accountId": "90ef1429-2a71-408f-8d0d-3d540a82d695",
+      "stage": "LEAD",
+      "probability": 10,
+      "estimatedValue": "700000",
+      "expectedCloseDate": "2026-05-30T00:00:00.000Z",
+      "checklist": null,
+      "lossReason": null,
+      "ownerId": "c2eaefda-0ee6-4740-ba66-b4924cbc17e5",
+      "convertedProjectId": null,
+      "serviceAreaId": "c1c14a82-8dcf-437c-907c-8937abee7987",
+      "createdAt": "2026-01-08T05:04:08.477Z",
+      "updatedAt": "2026-01-08T05:04:08.477Z",
+      "features": []
+    },
+    {
+      "id": "25f9a5c0-545f-4397-840f-d0f5027c5501",
+      "title": "茂林內容優化",
+      "accountId": "abf5686e-b4e7-4a49-a77a-7c9b454c6d33",
+      "stage": "LEAD",
+      "probability": 10,
+      "estimatedValue": "150000",
+      "expectedCloseDate": "2026-04-30T00:00:00.000Z",
+      "checklist": null,
+      "lossReason": null,
+      "ownerId": "c2eaefda-0ee6-4740-ba66-b4924cbc17e5",
+      "convertedProjectId": null,
+      "serviceAreaId": "c1c14a82-8dcf-437c-907c-8937abee7987",
+      "createdAt": "2026-01-08T05:04:50.811Z",
+      "updatedAt": "2026-01-08T05:04:50.811Z",
+      "features": []
+    },
+    {
+      "id": "44c80c02-2efc-4efe-9dc8-57760c54dc9b",
+      "title": "智慧樞紐",
+      "accountId": "583761c9-83a9-4fc5-8b96-fcb591a1b670",
+      "stage": "LEAD",
+      "probability": 10,
+      "estimatedValue": "4000000",
+      "expectedCloseDate": "2026-12-31T00:00:00.000Z",
+      "checklist": null,
+      "lossReason": null,
+      "ownerId": "c2eaefda-0ee6-4740-ba66-b4924cbc17e5",
+      "convertedProjectId": null,
+      "serviceAreaId": "52c236c9-3e29-4b9f-81d9-8828ce309b1f",
+      "createdAt": "2026-01-08T05:05:29.345Z",
+      "updatedAt": "2026-01-08T05:05:29.345Z",
+      "features": []
+    },
+    {
+      "id": "fc43d59b-1da2-4216-a7af-eeb281d3d874",
+      "title": "欣欣水泥射擊遊戲",
+      "accountId": "62f429bf-7906-4377-b2a9-aaf5e04876c2",
+      "stage": "LEAD",
+      "probability": 10,
+      "estimatedValue": "500000",
+      "expectedCloseDate": "2026-06-30T00:00:00.000Z",
+      "checklist": null,
+      "lossReason": null,
+      "ownerId": "c2eaefda-0ee6-4740-ba66-b4924cbc17e5",
+      "convertedProjectId": null,
+      "serviceAreaId": "52c236c9-3e29-4b9f-81d9-8828ce309b1f",
+      "createdAt": "2026-01-08T05:06:06.706Z",
+      "updatedAt": "2026-01-08T08:10:21.175Z",
+      "features": []
+    },
+    {
+      "id": "17a0f680-4796-4da5-96d2-fc9ba1785d91",
+      "title": "潤泰建設-南港之心",
+      "accountId": "a2143304-62c8-4947-9cc7-26b8c788f9cb",
+      "stage": "LEAD",
+      "probability": 10,
+      "estimatedValue": "6000000",
+      "expectedCloseDate": "2026-09-30T00:00:00.000Z",
+      "checklist": null,
+      "lossReason": null,
+      "ownerId": "c2eaefda-0ee6-4740-ba66-b4924cbc17e5",
+      "convertedProjectId": null,
+      "serviceAreaId": "223ccf4f-809e-47d2-89ab-d92a27422c07",
+      "createdAt": "2026-01-08T08:12:08.553Z",
+      "updatedAt": "2026-01-08T08:12:08.553Z",
+      "features": []
+    },
+    {
+      "id": "3af07ce7-75dc-404b-9c60-1b2c0e9ca9a5",
+      "title": "北回歸線AR體驗",
+      "accountId": "5756ded2-fb43-4590-8905-754f5c8fb27d",
+      "stage": "LEAD",
+      "probability": 10,
+      "estimatedValue": "2300000",
+      "expectedCloseDate": "2026-08-31T00:00:00.000Z",
+      "checklist": null,
+      "lossReason": null,
+      "ownerId": "c2eaefda-0ee6-4740-ba66-b4924cbc17e5",
+      "convertedProjectId": null,
+      "serviceAreaId": "52c236c9-3e29-4b9f-81d9-8828ce309b1f",
+      "createdAt": "2026-01-08T08:13:04.643Z",
+      "updatedAt": "2026-01-08T08:13:34.317Z",
+      "features": []
+    }
+  ],
+  "projects": [
+    {
+      "id": "1d50c18f-09f4-43a5-94ef-245f22894ace",
+      "name": "信義區廣告業務",
+      "code": "PRJ-20260108-2910",
+      "description": "",
+      "status": "ACTIVE",
+      "accountId": null,
+      "managerId": "dbcc3a6e-8bd1-4609-bc4b-3201c5a2aed8",
+      "startDate": "2026-01-01T00:00:00.000Z",
+      "endDate": "2026-12-31T00:00:00.000Z",
+      "budget": "720000",
+      "createdAt": "2026-01-08T02:02:17.502Z",
+      "updatedAt": "2026-01-08T04:48:55.824Z",
+      "serviceAreaId": "223ccf4f-809e-47d2-89ab-d92a27422c07"
+    },
+    {
+      "id": "a0cd95db-b881-49c4-b3b4-b6f9ca83b807",
+      "name": "兒樂遊戲收入",
+      "code": "PRJ-20260108-2757",
+      "description": "",
+      "status": "ACTIVE",
+      "accountId": null,
+      "managerId": "dbcc3a6e-8bd1-4609-bc4b-3201c5a2aed8",
+      "startDate": "2026-01-01T00:00:00.000Z",
+      "endDate": "2026-12-31T00:00:00.000Z",
+      "budget": "5600000",
+      "createdAt": "2026-01-08T01:56:10.696Z",
+      "updatedAt": "2026-01-08T04:49:34.267Z",
+      "serviceAreaId": "223ccf4f-809e-47d2-89ab-d92a27422c07"
+    },
+    {
+      "id": "4cbefb8e-eef6-4cd7-8a42-344674e00675",
+      "name": "阿里山小火車車端服務",
+      "code": "PRJ-20260107-4138",
+      "description": "",
+      "status": "PLANNING",
+      "accountId": "31483729-6648-4978-8399-8c33f6410a68",
+      "managerId": "7ecb5cf6-cccb-47d0-ad39-63b92bcc3086",
+      "startDate": "2026-02-01T00:00:00.000Z",
+      "endDate": "2026-06-30T00:00:00.000Z",
+      "budget": "9000000",
+      "createdAt": "2026-01-07T20:32:35.649Z",
+      "updatedAt": "2026-01-08T04:49:42.797Z",
+      "serviceAreaId": "52c236c9-3e29-4b9f-81d9-8828ce309b1f"
+    },
+    {
+      "id": "14e2b0ee-8a0b-41ce-8eca-d5804ee69cfb",
+      "name": "114年度臺北市立動物園智慧化AI+AR導覽建置案",
+      "code": "aiarzoo",
+      "description": "",
+      "status": "ACTIVE",
+      "accountId": "351ba9b7-de0f-4dcf-b3cf-b36966f2d446",
+      "managerId": "7ecb5cf6-cccb-47d0-ad39-63b92bcc3086",
+      "startDate": "2025-04-22T00:00:00.000Z",
+      "endDate": "2026-12-31T00:00:00.000Z",
+      "budget": "2400000",
+      "createdAt": "2025-12-09T14:28:00.269Z",
+      "updatedAt": "2026-01-08T04:49:51.801Z",
+      "serviceAreaId": "223ccf4f-809e-47d2-89ab-d92a27422c07"
+    },
+    {
+      "id": "9549703c-a5b5-4684-914d-9b550c9ea464",
+      "name": "士芃BIM產品線",
+      "code": "PRJ-20260112-6678",
+      "description": "",
+      "status": "ACTIVE",
+      "accountId": "77b1ee75-a603-49da-9e14-22c1bd6fed67",
+      "managerId": "c2eaefda-0ee6-4740-ba66-b4924cbc17e5",
+      "startDate": "2026-01-13T00:00:00.000Z",
+      "endDate": null,
+      "budget": "2000000",
+      "createdAt": "2026-01-12T23:06:14.642Z",
+      "updatedAt": "2026-01-12T23:06:14.642Z",
+      "serviceAreaId": "223ccf4f-809e-47d2-89ab-d92a27422c07"
+    },
+    {
+      "id": "22c3682d-a327-451d-8d25-5a5ef3de6d32",
+      "name": "2026新教育產品線",
+      "code": "PRJ-20260112-2165",
+      "description": "",
+      "status": "ACTIVE",
+      "accountId": null,
+      "managerId": "f3c1fcd2-be3d-40cf-a7c3-93c601ade92c",
+      "startDate": "2026-01-01T00:00:00.000Z",
+      "endDate": "2026-12-31T00:00:00.000Z",
+      "budget": "0",
+      "createdAt": "2026-01-12T23:43:36.273Z",
+      "updatedAt": "2026-01-12T23:43:36.273Z",
+      "serviceAreaId": "223ccf4f-809e-47d2-89ab-d92a27422c07"
+    }
+  ],
+  "milestones": [
+    {
+      "id": "d8cad41f-3e94-41ff-9ec8-f076d0282b2d",
+      "projectId": "14e2b0ee-8a0b-41ce-8eca-d5804ee69cfb",
+      "name": "提交工作計劃書",
+      "dueDate": "2025-06-17T00:00:00.000Z",
+      "amount": "484000",
+      "isPaid": true
+    },
+    {
+      "id": "e8e06c29-8476-404f-891a-43fdfff64717",
+      "projectId": "14e2b0ee-8a0b-41ce-8eca-d5804ee69cfb",
+      "name": "雛形驗收",
+      "dueDate": "2025-09-30T00:00:00.000Z",
+      "amount": "605000",
+      "isPaid": true
+    },
+    {
+      "id": "26b1d348-b3cb-499b-8199-249c121b18e0",
+      "projectId": "14e2b0ee-8a0b-41ce-8eca-d5804ee69cfb",
+      "name": "竣工",
+      "dueDate": "2025-11-30T00:00:00.000Z",
+      "amount": "1258400",
+      "isPaid": false
+    },
+    {
+      "id": "b9f1bc02-c8cd-49cc-b11e-4351975a8e85",
+      "projectId": "14e2b0ee-8a0b-41ce-8eca-d5804ee69cfb",
+      "name": "保固期",
+      "dueDate": "2026-12-31T00:00:00.000Z",
+      "amount": "70422",
+      "isPaid": false
+    },
+    {
+      "id": "dc040d4f-c12e-4eea-9c26-a36298dcbfbc",
+      "projectId": "4cbefb8e-eef6-4cd7-8a42-344674e00675",
+      "name": "簽約",
+      "dueDate": "2026-02-01T00:00:00.000Z",
+      "amount": "2700000",
+      "isPaid": false
+    },
+    {
+      "id": "84baeef6-373d-420a-86b4-41454430c6ad",
+      "projectId": "4cbefb8e-eef6-4cd7-8a42-344674e00675",
+      "name": "初步驗收",
+      "dueDate": "2026-04-01T00:00:00.000Z",
+      "amount": "2700000",
+      "isPaid": false
+    },
+    {
+      "id": "ad7f5d92-95cf-410f-8c4d-7dbe92ddcee0",
+      "projectId": "4cbefb8e-eef6-4cd7-8a42-344674e00675",
+      "name": "驗收完成",
+      "dueDate": "2026-06-01T00:00:00.000Z",
+      "amount": "3600000",
+      "isPaid": false
+    },
+    {
+      "id": "adf2279c-7382-4014-a7a1-896810a80d06",
+      "projectId": "a0cd95db-b881-49c4-b3b4-b6f9ca83b807",
+      "name": "1月",
+      "dueDate": "2026-01-31T00:00:00.000Z",
+      "amount": "470000",
+      "isPaid": false
+    },
+    {
+      "id": "75df418e-aa48-4012-9a3b-972d2fe90e26",
+      "projectId": "a0cd95db-b881-49c4-b3b4-b6f9ca83b807",
+      "name": "2月",
+      "dueDate": "2026-02-28T00:00:00.000Z",
+      "amount": "470000",
+      "isPaid": false
+    },
+    {
+      "id": "c33640c0-8694-48e2-ac16-969105ad6842",
+      "projectId": "a0cd95db-b881-49c4-b3b4-b6f9ca83b807",
+      "name": "3月",
+      "dueDate": "2026-03-31T00:00:00.000Z",
+      "amount": "470000",
+      "isPaid": false
+    },
+    {
+      "id": "fe67393f-86bb-4321-94d2-1080f99c58b8",
+      "projectId": "a0cd95db-b881-49c4-b3b4-b6f9ca83b807",
+      "name": "4月",
+      "dueDate": "2026-04-30T00:00:00.000Z",
+      "amount": "470000",
+      "isPaid": false
+    },
+    {
+      "id": "bf9bf8f0-9bef-4c0b-915c-093ea83e70d4",
+      "projectId": "a0cd95db-b881-49c4-b3b4-b6f9ca83b807",
+      "name": "5月",
+      "dueDate": "2026-05-31T00:00:00.000Z",
+      "amount": "470000",
+      "isPaid": false
+    },
+    {
+      "id": "5bc69c40-5f03-4837-9a02-f1a5fd058af8",
+      "projectId": "a0cd95db-b881-49c4-b3b4-b6f9ca83b807",
+      "name": "6月",
+      "dueDate": "2026-06-30T00:00:00.000Z",
+      "amount": "470000",
+      "isPaid": false
+    },
+    {
+      "id": "a5fc4d32-f6ae-4e4d-a5b0-9c067017f147",
+      "projectId": "a0cd95db-b881-49c4-b3b4-b6f9ca83b807",
+      "name": "7月",
+      "dueDate": "2026-07-31T00:00:00.000Z",
+      "amount": "600000",
+      "isPaid": false
+    },
+    {
+      "id": "b874f2dd-fdb5-4d43-a6b3-cb00821de265",
+      "projectId": "a0cd95db-b881-49c4-b3b4-b6f9ca83b807",
+      "name": "8月",
+      "dueDate": "2026-08-31T00:00:00.000Z",
+      "amount": "600000",
+      "isPaid": false
+    },
+    {
+      "id": "11498071-ae96-4682-aa54-a74b640d05b8",
+      "projectId": "a0cd95db-b881-49c4-b3b4-b6f9ca83b807",
+      "name": "9月",
+      "dueDate": "2026-09-30T00:00:00.000Z",
+      "amount": "470000",
+      "isPaid": false
+    },
+    {
+      "id": "f544c7cf-dc7d-4144-ade8-3b214e3303ad",
+      "projectId": "a0cd95db-b881-49c4-b3b4-b6f9ca83b807",
+      "name": "10月",
+      "dueDate": "2026-10-31T00:00:00.000Z",
+      "amount": "470000",
+      "isPaid": false
+    },
+    {
+      "id": "21e01d22-2ad5-4518-8ac3-410c24d783c5",
+      "projectId": "a0cd95db-b881-49c4-b3b4-b6f9ca83b807",
+      "name": "11月",
+      "dueDate": "2026-11-30T00:00:00.000Z",
+      "amount": "470000",
+      "isPaid": false
+    },
+    {
+      "id": "c7ea0363-7f22-42c2-b57c-b5eddbcae01e",
+      "projectId": "a0cd95db-b881-49c4-b3b4-b6f9ca83b807",
+      "name": "12月",
+      "dueDate": "2026-12-31T00:00:00.000Z",
+      "amount": "470000",
+      "isPaid": false
+    },
+    {
+      "id": "e312d9f6-4956-4f5b-8a4f-4492618f536c",
+      "projectId": "1d50c18f-09f4-43a5-94ef-245f22894ace",
+      "name": "3月廣告收入",
+      "dueDate": "2026-03-31T00:00:00.000Z",
+      "amount": "40000",
+      "isPaid": false
+    },
+    {
+      "id": "5c17347e-be0d-49a1-903c-5f402bd7b88f",
+      "projectId": "1d50c18f-09f4-43a5-94ef-245f22894ace",
+      "name": "4月廣告收入",
+      "dueDate": "2026-04-30T00:00:00.000Z",
+      "amount": "60000",
+      "isPaid": false
+    },
+    {
+      "id": "06f5f08d-7d71-46f9-a00b-533343e0f4f4",
+      "projectId": "1d50c18f-09f4-43a5-94ef-245f22894ace",
+      "name": "5月廣告收入",
+      "dueDate": "2026-05-31T00:00:00.000Z",
+      "amount": "60000",
+      "isPaid": false
+    },
+    {
+      "id": "d22a9378-fa77-414b-8c98-fab26446cb99",
+      "projectId": "1d50c18f-09f4-43a5-94ef-245f22894ace",
+      "name": "6月廣告收入",
+      "dueDate": "2026-06-30T00:00:00.000Z",
+      "amount": "80000",
+      "isPaid": false
+    },
+    {
+      "id": "354b6958-bcbb-4a69-a555-397704e93816",
+      "projectId": "1d50c18f-09f4-43a5-94ef-245f22894ace",
+      "name": "7月廣告收入",
+      "dueDate": "2026-07-31T00:00:00.000Z",
+      "amount": "100000",
+      "isPaid": false
+    },
+    {
+      "id": "e7cd7134-876e-48df-bd0c-ae2a3a337b12",
+      "projectId": "1d50c18f-09f4-43a5-94ef-245f22894ace",
+      "name": "8月廣告收入",
+      "dueDate": "2026-08-31T00:00:00.000Z",
+      "amount": "100000",
+      "isPaid": false
+    },
+    {
+      "id": "b86225b4-0ac8-479b-ba8c-a8d861450000",
+      "projectId": "1d50c18f-09f4-43a5-94ef-245f22894ace",
+      "name": "9月廣告收入",
+      "dueDate": "2026-09-30T00:00:00.000Z",
+      "amount": "80000",
+      "isPaid": false
+    },
+    {
+      "id": "a91014f0-4d32-49a8-b0b7-ac51146a15be",
+      "projectId": "1d50c18f-09f4-43a5-94ef-245f22894ace",
+      "name": "10月廣告收入",
+      "dueDate": "2026-10-31T00:00:00.000Z",
+      "amount": "80000",
+      "isPaid": false
+    },
+    {
+      "id": "3df8ad67-f3de-4a52-8ded-fcdbc8dc3567",
+      "projectId": "1d50c18f-09f4-43a5-94ef-245f22894ace",
+      "name": "11月廣告收入",
+      "dueDate": "2026-11-30T00:00:00.000Z",
+      "amount": "100000",
+      "isPaid": false
+    },
+    {
+      "id": "ff641726-a38b-4f5d-a470-fd1c86e046bb",
+      "projectId": "1d50c18f-09f4-43a5-94ef-245f22894ace",
+      "name": "12月廣告收入",
+      "dueDate": "2026-12-31T00:00:00.000Z",
+      "amount": "100000",
+      "isPaid": false
+    }
+  ],
+  "tasks": [
+    {
+      "id": "5f581347-c3b6-4c90-82b7-c64da47f6c99",
+      "projectId": "14e2b0ee-8a0b-41ce-8eca-d5804ee69cfb",
+      "milestoneId": null,
+      "title": "提交工作計畫書",
+      "description": null,
+      "status": "DONE",
+      "priority": "MEDIUM",
+      "assigneeId": null,
+      "startDate": "2025-04-22T00:00:00.000Z",
+      "dueDate": "2025-06-18T00:00:00.000Z",
+      "estimatedHours": null,
+      "createdAt": "2025-12-09T14:42:04.331Z",
+      "updatedAt": "2025-12-11T05:33:41.644Z",
+      "parentId": null
+    },
+    {
+      "id": "327e5c24-94dc-4351-b750-2b384fc3f9cb",
+      "projectId": "14e2b0ee-8a0b-41ce-8eca-d5804ee69cfb",
+      "milestoneId": null,
+      "title": "硬體設備施工測試",
+      "description": null,
+      "status": "DONE",
+      "priority": "MEDIUM",
+      "assigneeId": null,
+      "startDate": "2025-05-27T00:00:00.000Z",
+      "dueDate": "2025-08-15T00:00:00.000Z",
+      "estimatedHours": null,
+      "createdAt": "2025-12-09T15:58:46.259Z",
+      "updatedAt": "2026-01-07T18:14:41.963Z",
+      "parentId": null
+    },
+    {
+      "id": "7250d0e9-5d6f-4fc8-a302-2f9ed8d32665",
+      "projectId": "14e2b0ee-8a0b-41ce-8eca-d5804ee69cfb",
+      "milestoneId": null,
+      "title": "啟動需求會議",
+      "description": null,
+      "status": "DONE",
+      "priority": "MEDIUM",
+      "assigneeId": null,
+      "startDate": "2025-06-04T00:00:00.000Z",
+      "dueDate": "2025-06-04T00:00:00.000Z",
+      "estimatedHours": null,
+      "createdAt": "2025-12-09T14:42:27.796Z",
+      "updatedAt": "2026-01-08T04:25:00.506Z",
+      "parentId": "5f581347-c3b6-4c90-82b7-c64da47f6c99"
+    },
+    {
+      "id": "b9d4d0d3-924e-4446-8104-ace1fd0b7e51",
+      "projectId": "14e2b0ee-8a0b-41ce-8eca-d5804ee69cfb",
+      "milestoneId": null,
+      "title": "撰寫工作計畫書",
+      "description": null,
+      "status": "DONE",
+      "priority": "MEDIUM",
+      "assigneeId": null,
+      "startDate": "2025-06-01T00:00:00.000Z",
+      "dueDate": "2025-06-17T00:00:00.000Z",
+      "estimatedHours": null,
+      "createdAt": "2025-12-09T14:54:19.289Z",
+      "updatedAt": "2026-01-08T04:25:00.639Z",
+      "parentId": "5f581347-c3b6-4c90-82b7-c64da47f6c99"
+    },
+    {
+      "id": "f339814d-f6ef-439a-bbfd-4ca39308ea39",
+      "projectId": "14e2b0ee-8a0b-41ce-8eca-d5804ee69cfb",
+      "milestoneId": null,
+      "title": "場勘及園方溝通施作方式",
+      "description": null,
+      "status": "DONE",
+      "priority": "MEDIUM",
+      "assigneeId": null,
+      "startDate": "2025-05-27T00:00:00.000Z",
+      "dueDate": "2025-06-16T00:00:00.000Z",
+      "estimatedHours": null,
+      "createdAt": "2025-12-11T05:32:46.558Z",
+      "updatedAt": "2026-01-08T04:25:00.773Z",
+      "parentId": "327e5c24-94dc-4351-b750-2b384fc3f9cb"
+    },
+    {
+      "id": "a1c7819c-a2db-437d-953e-87c55bc0b5a8",
+      "projectId": "14e2b0ee-8a0b-41ce-8eca-d5804ee69cfb",
+      "milestoneId": null,
+      "title": "中華電信5G設備安裝",
+      "description": null,
+      "status": "DONE",
+      "priority": "MEDIUM",
+      "assigneeId": null,
+      "startDate": "2025-06-09T00:00:00.000Z",
+      "dueDate": "2025-06-27T00:00:00.000Z",
+      "estimatedHours": null,
+      "createdAt": "2025-12-11T05:33:33.876Z",
+      "updatedAt": "2026-01-08T04:25:00.906Z",
+      "parentId": "327e5c24-94dc-4351-b750-2b384fc3f9cb"
+    },
+    {
+      "id": "fbf1e760-fcbf-4040-9625-fac104b8d52b",
+      "projectId": "4cbefb8e-eef6-4cd7-8a42-344674e00675",
+      "milestoneId": null,
+      "title": "報價",
+      "description": null,
+      "status": "TODO",
+      "priority": "MEDIUM",
+      "assigneeId": null,
+      "startDate": "2026-01-12T00:00:00.000Z",
+      "dueDate": null,
+      "estimatedHours": null,
+      "createdAt": "2026-01-12T22:12:55.595Z",
+      "updatedAt": "2026-01-12T22:13:00.844Z",
+      "parentId": null
+    },
+    {
+      "id": "75b06f90-4481-4bbc-8cb8-f6177200c13b",
+      "projectId": "9549703c-a5b5-4684-914d-9b550c9ea464",
+      "milestoneId": null,
+      "title": "梳理功能表",
+      "description": null,
+      "status": "TODO",
+      "priority": "MEDIUM",
+      "assigneeId": null,
+      "startDate": "2026-01-12T00:00:00.000Z",
+      "dueDate": null,
+      "estimatedHours": null,
+      "createdAt": "2026-01-12T23:07:50.809Z",
+      "updatedAt": "2026-01-12T23:07:50.809Z",
+      "parentId": null
+    },
+    {
+      "id": "46decc09-212d-4f70-a4a6-9e0a92b5f4fc",
+      "projectId": "a0cd95db-b881-49c4-b3b4-b6f9ca83b807",
+      "milestoneId": null,
+      "title": "拍攝極光影片",
+      "description": null,
+      "status": "TODO",
+      "priority": "MEDIUM",
+      "assigneeId": "dbcc3a6e-8bd1-4609-bc4b-3201c5a2aed8",
+      "startDate": "2026-01-12T00:00:00.000Z",
+      "dueDate": null,
+      "estimatedHours": null,
+      "createdAt": "2026-01-12T23:38:09.007Z",
+      "updatedAt": "2026-01-12T23:38:09.007Z",
+      "parentId": null
+    },
+    {
+      "id": "5260270b-fde7-4139-80e1-a350b75907f9",
+      "projectId": "a0cd95db-b881-49c4-b3b4-b6f9ca83b807",
+      "milestoneId": null,
+      "title": "自動化統計金流及人流",
+      "description": null,
+      "status": "TODO",
+      "priority": "MEDIUM",
+      "assigneeId": null,
+      "startDate": "2026-01-12T00:00:00.000Z",
+      "dueDate": null,
+      "estimatedHours": null,
+      "createdAt": "2026-01-12T23:38:25.068Z",
+      "updatedAt": "2026-01-12T23:38:25.068Z",
+      "parentId": null
+    },
+    {
+      "id": "574b2398-e149-4d86-b364-8bd5fedf5abc",
+      "projectId": "a0cd95db-b881-49c4-b3b4-b6f9ca83b807",
+      "milestoneId": null,
+      "title": "極光開賣計劃",
+      "description": null,
+      "status": "TODO",
+      "priority": "MEDIUM",
+      "assigneeId": "dbcc3a6e-8bd1-4609-bc4b-3201c5a2aed8",
+      "startDate": "2026-01-12T00:00:00.000Z",
+      "dueDate": null,
+      "estimatedHours": null,
+      "createdAt": "2026-01-12T23:38:53.334Z",
+      "updatedAt": "2026-01-12T23:38:53.334Z",
+      "parentId": null
+    },
+    {
+      "id": "0b42770b-3c8f-467b-b93e-7a4fb73232e3",
+      "projectId": "a0cd95db-b881-49c4-b3b4-b6f9ca83b807",
+      "milestoneId": null,
+      "title": "極光募資計劃",
+      "description": null,
+      "status": "TODO",
+      "priority": "MEDIUM",
+      "assigneeId": "7ecb5cf6-cccb-47d0-ad39-63b92bcc3086",
+      "startDate": "2026-01-12T00:00:00.000Z",
+      "dueDate": null,
+      "estimatedHours": null,
+      "createdAt": "2026-01-12T23:39:13.973Z",
+      "updatedAt": "2026-01-12T23:39:13.973Z",
+      "parentId": null
+    },
+    {
+      "id": "7a1e93c1-1a08-449a-834a-77db5b02be41",
+      "projectId": "a0cd95db-b881-49c4-b3b4-b6f9ca83b807",
+      "milestoneId": null,
+      "title": "北捷人流換金流計劃",
+      "description": null,
+      "status": "TODO",
+      "priority": "MEDIUM",
+      "assigneeId": null,
+      "startDate": "2026-01-12T00:00:00.000Z",
+      "dueDate": null,
+      "estimatedHours": null,
+      "createdAt": "2026-01-12T23:39:31.201Z",
+      "updatedAt": "2026-01-12T23:39:31.201Z",
+      "parentId": null
+    },
+    {
+      "id": "0dfd82f1-0b85-49ba-8d17-0b73859a1d1a",
+      "projectId": "22c3682d-a327-451d-8d25-5a5ef3de6d32",
+      "milestoneId": null,
+      "title": "商業計劃書",
+      "description": null,
+      "status": "TODO",
+      "priority": "MEDIUM",
+      "assigneeId": "7ecb5cf6-cccb-47d0-ad39-63b92bcc3086",
+      "startDate": "2026-01-12T00:00:00.000Z",
+      "dueDate": null,
+      "estimatedHours": null,
+      "createdAt": "2026-01-12T23:44:58.261Z",
+      "updatedAt": "2026-01-12T23:44:58.261Z",
+      "parentId": null
+    },
+    {
+      "id": "de3ac62e-7923-4dd8-a940-d57943740e04",
+      "projectId": "22c3682d-a327-451d-8d25-5a5ef3de6d32",
+      "milestoneId": null,
+      "title": "盤點資源",
+      "description": null,
+      "status": "TODO",
+      "priority": "MEDIUM",
+      "assigneeId": "7ecb5cf6-cccb-47d0-ad39-63b92bcc3086",
+      "startDate": "2026-01-12T00:00:00.000Z",
+      "dueDate": null,
+      "estimatedHours": null,
+      "createdAt": "2026-01-12T23:45:12.635Z",
+      "updatedAt": "2026-01-12T23:45:12.635Z",
+      "parentId": null
+    },
+    {
+      "id": "8d438d88-94d2-4e13-9c29-44d0550c14ed",
+      "projectId": "22c3682d-a327-451d-8d25-5a5ef3de6d32",
+      "milestoneId": null,
+      "title": "梳理產品",
+      "description": null,
+      "status": "TODO",
+      "priority": "MEDIUM",
+      "assigneeId": "7ecb5cf6-cccb-47d0-ad39-63b92bcc3086",
+      "startDate": "2026-01-12T00:00:00.000Z",
+      "dueDate": null,
+      "estimatedHours": null,
+      "createdAt": "2026-01-12T23:45:29.803Z",
+      "updatedAt": "2026-01-12T23:46:06.738Z",
+      "parentId": null
+    }
+  ],
+  "allocations": [],
+  "ideas": [],
+  "timesheetEntries": [],
+  "expenseCategories": [],
+  "serviceAreas": [
+    {
+      "id": "223ccf4f-809e-47d2-89ab-d92a27422c07",
+      "name": "台北市",
+      "createdAt": "2026-01-08T04:38:04.336Z"
+    },
+    {
+      "id": "6346bb4e-3ee6-4e56-b2a2-1354e42a2ff3",
+      "name": "新北市",
+      "createdAt": "2026-01-08T04:38:13.175Z"
+    },
+    {
+      "id": "b8167dce-be14-4f4a-becc-00ef9800e91e",
+      "name": "桃園市",
+      "createdAt": "2026-01-08T04:38:19.855Z"
+    },
+    {
+      "id": "0bd9ad91-ec3d-456b-b908-c24851209d66",
+      "name": "新竹縣",
+      "createdAt": "2026-01-08T04:38:32.409Z"
+    },
+    {
+      "id": "33953d19-7741-4a27-a829-b72aca16a0a7",
+      "name": "新竹市",
+      "createdAt": "2026-01-08T04:38:38.806Z"
+    },
+    {
+      "id": "f499d364-e12d-4258-907f-100e5012a4c1",
+      "name": "苗栗縣",
+      "createdAt": "2026-01-08T04:38:50.855Z"
+    },
+    {
+      "id": "c1e4d0f9-adbd-4c3a-8944-eb6e95c7b2d7",
+      "name": "彰化縣",
+      "createdAt": "2026-01-08T04:38:59.520Z"
+    },
+    {
+      "id": "52c236c9-3e29-4b9f-81d9-8828ce309b1f",
+      "name": "嘉義縣",
+      "createdAt": "2026-01-08T04:39:08.653Z"
+    },
+    {
+      "id": "1523322d-07b4-4a98-a10a-17cc500f90f5",
+      "name": "嘉義市",
+      "createdAt": "2026-01-08T04:39:14.053Z"
+    },
+    {
+      "id": "9c00bfb8-8e71-4f5a-be8e-cbcc12f58164",
+      "name": "雲林縣",
+      "createdAt": "2026-01-08T04:39:27.271Z"
+    },
+    {
+      "id": "97df5f70-b31f-430b-aecf-e182f2306047",
+      "name": "台南市",
+      "createdAt": "2026-01-08T04:39:32.036Z"
+    },
+    {
+      "id": "c1c14a82-8dcf-437c-907c-8937abee7987",
+      "name": "高雄市",
+      "createdAt": "2026-01-08T04:39:37.161Z"
+    },
+    {
+      "id": "4367602d-0a16-466a-b3c1-00259a0c2009",
+      "name": "屏東縣",
+      "createdAt": "2026-01-08T04:39:44.144Z"
+    },
+    {
+      "id": "bf6fe90c-e27f-4734-a39d-3b9fbca9bbe0",
+      "name": "花蓮縣",
+      "createdAt": "2026-01-08T04:39:49.915Z"
+    },
+    {
+      "id": "9c0177e9-bee3-4bdc-bd83-c86da4204e9d",
+      "name": "台東縣",
+      "createdAt": "2026-01-08T04:39:56.971Z"
+    },
+    {
+      "id": "8635ebec-3b01-49c2-bd9d-4088e5c330be",
+      "name": "宜蘭縣",
+      "createdAt": "2026-01-08T04:40:02.467Z"
+    },
+    {
+      "id": "592f719a-e318-44cb-a470-d4638883b669",
+      "name": "基隆市",
+      "createdAt": "2026-01-08T04:40:34.282Z"
+    },
+    {
+      "id": "e513162b-bc85-43ad-a276-4acbe501f347",
+      "name": "澎湖縣",
+      "createdAt": "2026-01-08T04:41:47.182Z"
+    },
+    {
+      "id": "f716279d-5053-427c-b914-a9ad2e786e6a",
+      "name": "金門縣",
+      "createdAt": "2026-01-08T04:41:56.329Z"
+    },
+    {
+      "id": "8031d9df-009c-41f5-a493-403a6cdd4d69",
+      "name": "連江縣",
+      "createdAt": "2026-01-08T04:42:02.711Z"
+    },
+    {
+      "id": "a0950219-bddb-4a53-b245-879251c10d90",
+      "name": "台中市",
+      "createdAt": "2026-01-08T04:51:02.054Z"
+    },
+    {
+      "id": "acb903fd-82aa-44a3-96f2-3d75ffc552d7",
+      "name": "韓國首爾",
+      "createdAt": "2026-01-08T04:53:57.167Z"
+    }
+  ]
+}

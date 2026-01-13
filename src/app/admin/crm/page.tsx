@@ -1,5 +1,6 @@
 import React from 'react';
 import { getOpportunities, getUsers } from '@/app/admin/crm/actions';
+import { getAllTasks } from '@/app/admin/project/actions';
 import { getSalesStats } from '@/app/admin/crm/dashboard-actions';
 import { getAccounts } from '@/app/admin/crm/account-actions';
 import { KanbanBoard } from '@/components/crm/kanban-board';
@@ -9,16 +10,20 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { PipelineTable } from '@/components/crm/pipeline-table';
 import { OpportunityDialog } from '@/components/crm/opportunity-dialog';
 import { CrmAnalytics } from '@/components/crm/crm-analytics';
+import { GlobalOpportunityTaskBoard } from '@/components/crm/global-opportunity-task-board';
 import { getServiceAreas } from '@/app/admin/settings/actions';
 
 export default async function CRMPage() {
-    const [opportunities, stats, accounts, users, serviceAreas] = await Promise.all([
+    const [opportunities, stats, accounts, users, serviceAreas, allTasks] = await Promise.all([
         getOpportunities(),
         getSalesStats(),
         getAccounts(),
         getUsers(),
-        getServiceAreas()
+        getServiceAreas(),
+        getAllTasks()
     ]);
+
+    const opportunityTasks = allTasks.filter(t => t.opportunityId);
 
     return (
         <div className="flex flex-col h-screen p-6 bg-background">
@@ -34,6 +39,7 @@ export default async function CRMPage() {
                 <TabsList className="w-[600px]">
                     <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
                     <TabsTrigger value="pipeline">Pipeline (Kanban)</TabsTrigger>
+                    <TabsTrigger value="tasks">Tasks (Global)</TabsTrigger>
                     <TabsTrigger value="table">Pipeline (Table)</TabsTrigger>
                     <TabsTrigger value="accounts">Accounts</TabsTrigger>
                     <TabsTrigger value="reports">Reports</TabsTrigger>
@@ -46,6 +52,10 @@ export default async function CRMPage() {
 
                     <TabsContent value="pipeline" className="m-0 h-full">
                         <KanbanBoard initialOpportunities={opportunities} users={users} />
+                    </TabsContent>
+
+                    <TabsContent value="tasks" className="m-0 h-full">
+                        <GlobalOpportunityTaskBoard tasks={opportunityTasks} opportunities={opportunities} />
                     </TabsContent>
 
                     <TabsContent value="table" className="m-0 h-full">

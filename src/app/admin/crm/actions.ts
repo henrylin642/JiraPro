@@ -57,6 +57,20 @@ export async function getOpportunityById(id: string) {
                     },
                 },
             },
+            tasks: {
+                include: {
+                    assignee: {
+                        select: { id: true, name: true, avatarUrl: true }
+                    },
+                    project: {
+                        select: { id: true, name: true }
+                    },
+                    opportunity: {
+                        select: { id: true, title: true }
+                    }
+                },
+                orderBy: { createdAt: 'desc' }
+            }
         },
     });
 
@@ -73,6 +87,7 @@ export async function getOpportunityById(id: string) {
                 billableRate: Number(alloc.resource.billableRate),
             },
         })),
+        tasks: (opportunity as any).tasks || []
     };
 }
 

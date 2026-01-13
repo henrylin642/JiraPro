@@ -41,6 +41,11 @@ type Task = {
         id: string;
         name: string;
     };
+    opportunityId?: string;
+    opportunity?: {
+        id: string;
+        title: string;
+    };
 };
 
 const STAGES = [
@@ -146,11 +151,27 @@ import { TaskDialog } from './task-dialog';
 
 // ... (Imports remain similar, added TaskDialog and Button)
 
-export function TaskBoard({ initialTasks, projectId }: { initialTasks: Task[]; projectId?: string }) {
+export function TaskBoard({ initialTasks, projectId, opportunityId }: { initialTasks: Task[]; projectId?: string; opportunityId?: string }) {
     const [tasks, setTasks] = useState<Task[]>(initialTasks);
     const [activeId, setActiveId] = useState<string | null>(null);
     const [editingTask, setEditingTask] = useState<Task | null>(null);
     const [isTaskDialogOpen, setIsTaskDialogOpen] = useState(false);
+
+    // ... existing hooks ...
+
+    // ... existing columns memo ...
+
+    // ... existing drag handlers ... (already updated handleDragEnd in previous tool call, so we just need to match the StartLine/EndLine for the component definition and return)
+    // Wait, I cannot edit non-contiguous lines easily with replace_file_content if I want to update function signature AND TaskDialog props at end.
+    // I will use multi_replace for this file or just do it in two steps.
+    // Let's check where the function definition starts. Line 149.
+    // And TaskDialog usage is at line 284.
+
+    // I will restart this specific tool call to better use multi_replace_file_content to cover both spots or just focus on one.
+    // I already did handleDragEnd.
+    // Let's update function signature first.
+
+
 
     // Sync state with props if revalidated (optional, but good practice if using optimistic UI heavily)
     React.useEffect(() => {
@@ -213,13 +234,14 @@ export function TaskBoard({ initialTasks, projectId }: { initialTasks: Task[]; p
             setTasks((prev) =>
                 prev.map((t) => (t.id === activeId ? { ...t, status: newStatus } : t))
             );
-            // Determine projectId: prefer task's own project, fallback to prop
+            // Determine context
             const targetProjectId = activeTask.projectId || activeTask.project?.id || projectId;
+            const targetOpportunityId = activeTask.opportunityId || opportunityId;
 
-            if (targetProjectId) {
-                await updateTaskStatus(activeId, targetProjectId, newStatus);
+            if (targetProjectId || targetOpportunityId) {
+                await updateTaskStatus(activeId, targetProjectId, newStatus, targetOpportunityId);
             } else {
-                console.error("Missing projectId for task update");
+                console.error("Missing context (projectId or opportunityId) for task update");
             }
         }
     }
@@ -241,7 +263,7 @@ export function TaskBoard({ initialTasks, projectId }: { initialTasks: Task[]; p
 
     return (
         <div className="h-full flex flex-col">
-            {projectId && (
+            {(projectId || opportunityId) && (
                 <div className="flex justify-end mb-4">
                     <Button onClick={openNewTaskDialog} size="sm">
                         <Plus className="mr-2 h-4 w-4" />
@@ -283,6 +305,7 @@ export function TaskBoard({ initialTasks, projectId }: { initialTasks: Task[]; p
             {projectId && (
                 <TaskDialog
                     projectId={projectId}
+                    opportunityId={opportunityId}
                     task={editingTask}
                     open={isTaskDialogOpen}
                     onOpenChange={setIsTaskDialogOpen}

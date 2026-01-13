@@ -11,14 +11,15 @@ import { updateTask, createTask, getTaskFormData } from '@/app/admin/project/act
 import { useRouter } from 'next/navigation';
 
 interface TaskDialogProps {
-    task?: any; // Made optional
-    projectId: string;
+    task?: any;
+    projectId?: string;
+    opportunityId?: string;
     trigger?: React.ReactNode;
     open?: boolean;
     onOpenChange?: (open: boolean) => void;
 }
 
-export function TaskDialog({ task, projectId, trigger, open, onOpenChange }: TaskDialogProps) {
+export function TaskDialog({ task, projectId, opportunityId, trigger, open, onOpenChange }: TaskDialogProps) {
     const [isOpen, setIsOpen] = useState(false);
     const router = useRouter();
     const [loading, setLoading] = useState(false);
@@ -104,9 +105,10 @@ export function TaskDialog({ task, projectId, trigger, open, onOpenChange }: Tas
         try {
             let result;
             if (task) {
-                result = await updateTask(task.id, projectId, payload);
+                // Pass opportunityId if creating/updating for an opportunity
+                result = await updateTask(task.id, projectId, { ...payload, opportunityId });
             } else {
-                result = await createTask(projectId, payload);
+                result = await createTask(projectId, { ...payload, opportunityId });
             }
 
             if (result.success) {
