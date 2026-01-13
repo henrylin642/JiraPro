@@ -40,12 +40,12 @@ type Task = {
     project?: {
         id: string;
         name: string;
-    };
-    opportunityId?: string;
+    } | null;
+    opportunityId?: string | null;
     opportunity?: {
         id: string;
         title: string;
-    };
+    } | null;
 };
 
 const STAGES = [

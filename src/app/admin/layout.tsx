@@ -56,13 +56,19 @@ export default async function AdminLayout({
                         <nav className="px-4 space-y-2">
                             <div className="mb-4">
                                 <h3 className="mb-2 px-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                                    Management
+                                    Master Portfolio
                                 </h3>
                                 <div className="space-y-1">
                                     <Link href="/admin">
                                         <Button variant="ghost" className="w-full justify-start">
                                             <LayoutDashboard className="mr-2 h-4 w-4" />
                                             Dashboard
+                                        </Button>
+                                    </Link>
+                                    <Link href="/admin/tasks">
+                                        <Button variant="ghost" className="w-full justify-start">
+                                            <Users className="mr-2 h-4 w-4" />
+                                            Global Tasks
                                         </Button>
                                     </Link>
                                     <Link href="/admin/project">
