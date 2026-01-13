@@ -117,11 +117,7 @@ export default async function ProjectsPage({ searchParams }: { searchParams: Pro
                 </div>
             )}
 
-            <GlobalTaskBoard
-                tasks={serializedTasks}
-                projects={serializedProjects}
-                users={users}
-            />
+
         </div>
     );
 }

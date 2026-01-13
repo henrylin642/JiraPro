@@ -177,15 +177,17 @@ export function GlobalTaskBoard({ initialTasks, projects, opportunities, users }
                     // For now, let's PASS project/opp ID if specifically filtered, otherwise undefined.
                     projectId={filterType === 'PROJECT' && filterEntityId !== 'all' ? filterEntityId : undefined}
                     opportunityId={filterType === 'OPPORTUNITY' && filterEntityId !== 'all' ? filterEntityId : undefined}
+                    projects={projects}
+                    opportunities={opportunities}
                 />
             </div>
 
-            {/* Hint if no context selected for creation */}
-            {filterType === 'ALL' && (
+            {/* Hint if no context selected for creation - REMOVED since we now support creation */}
+            {/* {filterType === 'ALL' && (
                 <div className="text-xs text-muted-foreground text-center">
                     To create a new task, please select a specific Project or Opportunity filter first, or go to the respective page.
                 </div>
-            )}
+            )} */}
         </div>
     );
 }

@@ -102,6 +102,13 @@ function SortableItem({ id, task, onClick }: { id: string; task: Task; onClick: 
                             </span>
                         )}
                     </div>
+                    {task.opportunity && (
+                        <div className="mb-2">
+                            <Badge variant="outline" className="text-[10px] px-1 py-0 border-orange-200 text-orange-700 bg-orange-50 max-w-full truncate">
+                                Opp: {task.opportunity.title}
+                            </Badge>
+                        </div>
+                    )}
                     <h4 className="font-medium text-sm mb-3 line-clamp-2">{task.title}</h4>
                     <div className="flex justify-between items-center">
                         <div className="flex items-center gap-1">
@@ -151,7 +158,19 @@ import { TaskDialog } from './task-dialog';
 
 // ... (Imports remain similar, added TaskDialog and Button)
 
-export function TaskBoard({ initialTasks, projectId, opportunityId }: { initialTasks: Task[]; projectId?: string; opportunityId?: string }) {
+export function TaskBoard({
+    initialTasks,
+    projectId,
+    opportunityId,
+    projects = [],
+    opportunities = []
+}: {
+    initialTasks: Task[];
+    projectId?: string;
+    opportunityId?: string;
+    projects?: { id: string; name: string }[];
+    opportunities?: { id: string; title: string }[];
+}) {
     const [tasks, setTasks] = useState<Task[]>(initialTasks);
     const [activeId, setActiveId] = useState<string | null>(null);
     const [editingTask, setEditingTask] = useState<Task | null>(null);
@@ -272,6 +291,16 @@ export function TaskBoard({ initialTasks, projectId, opportunityId }: { initialT
                 </div>
             )}
 
+            {/* Always show Add button if no specific context but lists are provided (Global view) */}
+            {(!projectId && !opportunityId && (projects.length > 0 || opportunities.length > 0)) && (
+                <div className="flex justify-end mb-4">
+                    <Button onClick={openNewTaskDialog} size="sm">
+                        <Plus className="mr-2 h-4 w-4" />
+                        New Task
+                    </Button>
+                </div>
+            )}
+
             <DndContext
                 sensors={sensors}
                 collisionDetection={closestCorners}
@@ -302,13 +331,17 @@ export function TaskBoard({ initialTasks, projectId, opportunityId }: { initialT
                 </DragOverlay>
             </DndContext>
 
-            {(projectId || opportunityId) && (
+
+            {/* Always render dialog for updates, but context handling is inside dialog now */}
+            {(projectId || opportunityId || projects.length > 0 || opportunities.length > 0) && (
                 <TaskDialog
                     projectId={projectId}
                     opportunityId={opportunityId}
                     task={editingTask}
                     open={isTaskDialogOpen}
                     onOpenChange={setIsTaskDialogOpen}
+                    projects={projects}
+                    opportunities={opportunities}
                 />
             )}
         </div>

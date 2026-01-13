@@ -39,7 +39,7 @@ export default async function CRMPage() {
                 <TabsList className="w-[600px]">
                     <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
                     <TabsTrigger value="pipeline">Pipeline (Kanban)</TabsTrigger>
-                    <TabsTrigger value="tasks">Tasks (Global)</TabsTrigger>
+
                     <TabsTrigger value="table">Pipeline (Table)</TabsTrigger>
                     <TabsTrigger value="accounts">Accounts</TabsTrigger>
                     <TabsTrigger value="reports">Reports</TabsTrigger>
@@ -54,9 +54,7 @@ export default async function CRMPage() {
                         <KanbanBoard initialOpportunities={opportunities} users={users} />
                     </TabsContent>
 
-                    <TabsContent value="tasks" className="m-0 h-full">
-                        <GlobalOpportunityTaskBoard tasks={opportunityTasks} opportunities={opportunities} />
-                    </TabsContent>
+
 
                     <TabsContent value="table" className="m-0 h-full">
                         <PipelineTable data={opportunities} />

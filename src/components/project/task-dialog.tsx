@@ -17,9 +17,11 @@ interface TaskDialogProps {
     trigger?: React.ReactNode;
     open?: boolean;
     onOpenChange?: (open: boolean) => void;
+    projects?: { id: string; name: string }[];
+    opportunities?: { id: string; title: string }[];
 }
 
-export function TaskDialog({ task, projectId, opportunityId, trigger, open, onOpenChange }: TaskDialogProps) {
+export function TaskDialog({ task, projectId, opportunityId, trigger, open, onOpenChange, projects = [], opportunities = [] }: TaskDialogProps) {
     const [isOpen, setIsOpen] = useState(false);
     const router = useRouter();
     const [loading, setLoading] = useState(false);
@@ -37,7 +39,9 @@ export function TaskDialog({ task, projectId, opportunityId, trigger, open, onOp
         startDate: '',
         dueDate: '',
         estimatedHours: '',
-        parentId: ''
+        parentId: '',
+        contextType: 'PROJECT', // 'PROJECT' | 'OPPORTUNITY'
+        contextId: '',
     });
 
     const [users, setUsers] = useState<{ id: string; name: string }[]>([]);
@@ -55,7 +59,9 @@ export function TaskDialog({ task, projectId, opportunityId, trigger, open, onOp
                     startDate: task.startDate ? new Date(task.startDate).toISOString().split('T')[0] : '',
                     dueDate: task.dueDate ? new Date(task.dueDate).toISOString().split('T')[0] : '',
                     estimatedHours: task.estimatedHours ? String(task.estimatedHours) : '',
-                    parentId: task.parentId || 'none'
+                    parentId: task.parentId || 'none',
+                    contextType: 'PROJECT',
+                    contextId: ''
                 });
             } else {
                 // Reset form for new task
@@ -68,7 +74,9 @@ export function TaskDialog({ task, projectId, opportunityId, trigger, open, onOp
                     startDate: new Date().toISOString().split('T')[0],
                     dueDate: '',
                     estimatedHours: '',
-                    parentId: 'none'
+                    parentId: 'none',
+                    contextType: 'PROJECT',
+                    contextId: ''
                 });
             }
             fetchOptions();
@@ -77,7 +85,10 @@ export function TaskDialog({ task, projectId, opportunityId, trigger, open, onOp
 
     const fetchOptions = async () => {
         // Fetch users and tasks
-        const data = await getTaskFormData(projectId);
+        // If we have direct props projectId or opportunityId, use them.
+        // Otherwise use form selection context id.
+        const activeProjectId = projectId || (formData.contextType === 'PROJECT' && formData.contextId ? formData.contextId : undefined);
+        const data = await getTaskFormData(activeProjectId);
         setUsers(data.users);
         setTasks(data.tasks.filter(t => !task || t.id !== task.id)); // Exclude self
     };
@@ -108,7 +119,17 @@ export function TaskDialog({ task, projectId, opportunityId, trigger, open, onOp
                 // Pass opportunityId if creating/updating for an opportunity
                 result = await updateTask(task.id, projectId, { ...payload, opportunityId });
             } else {
-                result = await createTask(projectId, { ...payload, opportunityId });
+                // Determine context from props OR form
+                const targetProjectId = projectId || (formData.contextType === 'PROJECT' ? formData.contextId : undefined);
+                const targetOpportunityId = opportunityId || (formData.contextType === 'OPPORTUNITY' ? formData.contextId : undefined);
+
+                if (!targetProjectId && !targetOpportunityId) {
+                    alert('Please select a Project or Opportunity');
+                    setLoading(false);
+                    return;
+                }
+
+                result = await createTask(targetProjectId, { ...payload, opportunityId: targetOpportunityId });
             }
 
             if (result.success) {
@@ -132,7 +153,49 @@ export function TaskDialog({ task, projectId, opportunityId, trigger, open, onOp
                 <DialogHeader>
                     <DialogTitle>{task ? 'Edit Task' : 'New Task'}</DialogTitle>
                 </DialogHeader>
+                <DialogHeader>
+                    <DialogTitle>{task ? 'Edit Task' : 'New Task'}</DialogTitle>
+                </DialogHeader>
                 <form onSubmit={handleSubmit} className="space-y-4 py-4">
+                    {/* Context Selection if global create */}
+                    {!task && !projectId && !opportunityId && (
+                        <div className="grid grid-cols-2 gap-4 p-3 bg-muted/30 rounded-md border border-dashed">
+                            <div className="space-y-2">
+                                <Label>Type</Label>
+                                <Select
+                                    value={formData.contextType}
+                                    onValueChange={v => {
+                                        handleChange('contextType', v);
+                                        handleChange('contextId', ''); // Reset ID
+                                    }}
+                                >
+                                    <SelectTrigger>
+                                        <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="PROJECT">Project</SelectItem>
+                                        <SelectItem value="OPPORTUNITY">Opportunity</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                            <div className="space-y-2">
+                                <Label>Select {formData.contextType === 'PROJECT' ? 'Project' : 'Opportunity'}</Label>
+                                <Select value={formData.contextId} onValueChange={v => handleChange('contextId', v)}>
+                                    <SelectTrigger>
+                                        <SelectValue placeholder="Select..." />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {formData.contextType === 'PROJECT' && projects.map(p => (
+                                            <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>
+                                        ))}
+                                        {formData.contextType === 'OPPORTUNITY' && opportunities.map(o => (
+                                            <SelectItem key={o.id} value={o.id}>{o.title}</SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                        </div>
+                    )}
                     <div className="space-y-2">
                         <Label>Title</Label>
                         <Input
