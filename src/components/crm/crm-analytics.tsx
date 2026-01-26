@@ -71,15 +71,15 @@ export function CrmAnalytics() {
                         <div className="flex items-center gap-4">
                             <div className="h-24 w-24 rounded-full border-8 border-muted flex items-center justify-center relative">
                                 <span className="text-xl font-bold">{winRate}%</span>
-                                <span className="text-[10px] absolute bottom-4 text-muted-foreground">WIN RATE</span>
+                                <span className="text-[10px] absolute bottom-4 text-muted-foreground">成交率</span>
                                 <svg className="absolute inset-0 -rotate-90 pointer-events-none" viewBox="0 0 100 100">
                                     <circle cx="50" cy="50" r="46" stroke="currentColor" strokeWidth="8" fill="none" className="text-primary"
                                         strokeDasharray={`${winRate * 2.89} 289`} strokeLinecap="round" />
                                 </svg>
                             </div>
                             <div className="space-y-1">
-                                <div className="text-sm font-medium">Closed Won: <span className="text-primary">{winLoss.won}</span></div>
-                                <div className="text-sm font-medium">Closed Lost: <span className="text-destructive">{winLoss.lost}</span></div>
+                                <div className="text-sm font-medium">成交 (Won): <span className="text-primary">{winLoss.won}</span></div>
+                                <div className="text-sm font-medium">結案 (Lost): <span className="text-destructive">{winLoss.lost}</span></div>
                             </div>
                         </div>
 

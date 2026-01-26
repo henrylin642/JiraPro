@@ -13,6 +13,7 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowUpDown } from 'lucide-react';
+import { STAGE_LABELS } from '@/lib/crm-constants';
 
 type Opportunity = {
     id: string;
@@ -155,7 +156,7 @@ export function PipelineTable({ data }: { data: Opportunity[] }) {
                                         )}
                                     </TableCell>
                                     <TableCell>
-                                        <Badge variant="secondary">{item.stage.replace('_', ' ')}</Badge>
+                                        <Badge variant="secondary">{STAGE_LABELS[item.stage] || item.stage}</Badge>
                                     </TableCell>
                                     <TableCell className="text-right font-medium text-green-600">
                                         {formatCurrency(item.estimatedValue)}

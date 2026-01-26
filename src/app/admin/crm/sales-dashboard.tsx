@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { SalesStats } from './dashboard-actions';
 import { DollarSign, TrendingUp, Filter, Percent } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { STAGE_LABELS } from '@/lib/crm-constants';
 
 export function SalesDashboard({ stats }: { stats: SalesStats }) {
     const formatCurrency = (val: number) => {
@@ -74,7 +75,7 @@ export function SalesDashboard({ stats }: { stats: SalesStats }) {
                         {stats.funnel.map((stage) => (
                             <div key={stage.stage} className="grid grid-cols-[150px_1fr_150px] gap-4 items-center">
                                 <div className="text-sm font-medium text-right capitalize">
-                                    {stage.stage.replace('_', ' ')}
+                                    {STAGE_LABELS[stage.stage] || stage.stage}
                                 </div>
                                 <div className="h-8 bg-muted rounded-full overflow-hidden relative">
                                     {stage.count > 0 && (
@@ -101,6 +102,6 @@ export function SalesDashboard({ stats }: { stats: SalesStats }) {
                     </div>
                 </CardContent>
             </Card>
-        </div>
+        </div >
     );
 }

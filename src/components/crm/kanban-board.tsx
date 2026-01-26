@@ -30,6 +30,7 @@ import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { STAGE_LABELS, STAGE_ORDER } from '@/lib/crm-constants';
 
 // --- Types ---
 type Opportunity = {
@@ -47,14 +48,7 @@ type User = {
     name: string;
 };
 
-const STAGES = [
-    'LEAD',
-    'QUALIFICATION',
-    'PROPOSAL',
-    'NEGOTIATION',
-    'CLOSED_WON',
-    'CLOSED_LOST',
-];
+// STAGES removed in favor of STAGE_ORDER from constants
 
 const LOSS_REASONS = [
     "Price too high",
@@ -176,7 +170,7 @@ export function KanbanBoard({ initialOpportunities, users = [] }: { initialOppor
 
     const columns = useMemo(() => {
         const cols: Record<string, Opportunity[]> = {};
-        STAGES.forEach((stage) => {
+        STAGE_ORDER.forEach((stage) => {
             cols[stage] = filteredOpportunities.filter((o) => o.stage === stage);
         });
         return cols;
@@ -204,7 +198,7 @@ export function KanbanBoard({ initialOpportunities, users = [] }: { initialOppor
 
         let newStage = activeOpp.stage;
 
-        if (STAGES.includes(overId)) {
+        if (STAGE_ORDER.includes(overId)) {
             newStage = overId;
         } else {
             const overOpp = opportunities.find((o) => o.id === overId);
@@ -272,11 +266,11 @@ export function KanbanBoard({ initialOpportunities, users = [] }: { initialOppor
                 onDragEnd={handleDragEnd}
             >
                 <div className="flex h-full overflow-x-auto pb-4">
-                    {STAGES.map((stage) => (
+                    {STAGE_ORDER.map((stage) => (
                         <Column
                             key={stage}
                             id={stage}
-                            title={stage.replace('_', ' ')}
+                            title={STAGE_LABELS[stage] || stage}
                             opportunities={columns[stage] || []}
                         />
                     ))}
