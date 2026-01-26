@@ -17,6 +17,7 @@ import { DeleteOpportunityButton } from '@/components/crm/delete-opportunity-but
 import { StageChecklist } from '@/components/crm/stage-checklist';
 import { ActivityTimeline } from '@/components/crm/activity-timeline';
 import { OpportunityDialog } from '@/components/crm/opportunity-dialog';
+import { STAGE_LABELS } from '@/lib/crm-constants';
 
 
 export const dynamic = 'force-dynamic';
@@ -63,7 +64,7 @@ export default async function OpportunityDetailPage({ params }: { params: Promis
                         <h1 className="text-2xl font-bold tracking-tight mb-2">{opportunity.title}</h1>
                         <div className="flex gap-2">
                             <ConvertToProjectDialog opportunityId={opportunity.id} opportunityTitle={opportunity.title} />
-                            <Badge>{opportunity.stage.replace('_', ' ')}</Badge>
+                            <Badge>{STAGE_LABELS[opportunity.stage] || opportunity.stage}</Badge>
                             {opportunity.expectedCloseDate && (
                                 <Badge variant="outline" className="flex gap-1">
                                     <Calendar className="h-3 w-3" />

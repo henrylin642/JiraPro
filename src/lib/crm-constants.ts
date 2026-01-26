@@ -1,3 +1,14 @@
+export const STAGE_LABELS: Record<string, string> = {
+    'LEAD': '潛在客戶',
+    'QUALIFICATION': '資格確認',
+    'PROPOSAL': '提案階段',
+    'NEGOTIATION': '議價談判',
+    'CLOSED_WON': '成交',
+    'CLOSED_LOST': '結案',
+};
+
+export const STAGE_ORDER = ['LEAD', 'QUALIFICATION', 'PROPOSAL', 'NEGOTIATION', 'CLOSED_WON', 'CLOSED_LOST'];
+
 export const STAGE_CHECKLISTS: Record<string, { id: string; label: string; weight: number }[]> = {
     'LEAD': [
         { id: 'LEAD_BG_CHECK', label: 'Company Background Check (公司背景調查)', weight: 5 },
@@ -19,13 +30,20 @@ export const STAGE_CHECKLISTS: Record<string, { id: string; label: string; weigh
         { id: 'NEG_PRICE', label: 'Price/Payment Terms Agreed (價格與付款條件確認)', weight: 10 },
         { id: 'NEG_CONTRACT', label: 'Contract Drafted (合約草稿擬定)', weight: 10 },
     ],
+    'CLOSED_WON': [
+        { id: 'WON_SIGNED', label: 'Contract Signed (合約已簽署)', weight: 10 },
+        { id: 'WON_PAYMENT', label: 'First Payment Received (收到首款)', weight: 10 },
+    ],
+    'CLOSED_LOST': [
+        { id: 'LOST_POST_MORTEM', label: 'Post-Mortem Completed (結案分析完成)', weight: 0 },
+    ],
 };
 
 export const BASE_PROBABILITIES: Record<string, number> = {
     'LEAD': 10,
-    'QUALIFICATION': 10, // Base 10 + Checklist items
-    'PROPOSAL': 40,      // Base 40 + Checklist items
-    'NEGOTIATION': 70,   // Base 70 + Checklist items
+    'QUALIFICATION': 10,
+    'PROPOSAL': 40,
+    'NEGOTIATION': 70,
     'CLOSED_WON': 100,
     'CLOSED_LOST': 0,
 };

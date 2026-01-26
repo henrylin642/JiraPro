@@ -1,12 +1,13 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { STAGE_CHECKLISTS } from '@/lib/crm-constants';
+import { STAGE_CHECKLISTS, STAGE_LABELS, STAGE_ORDER } from '@/lib/crm-constants';
 import { updateOpportunityChecklist } from '@/app/admin/crm/actions';
 import { Loader2 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import { cn } from '@/lib/utils';
 
 export function StageChecklist({
     opportunityId,
@@ -19,10 +20,6 @@ export function StageChecklist({
 }) {
     const [checklist, setChecklist] = useState<string[]>(initialChecklist);
     const [isUpdating, setIsUpdating] = useState(false);
-
-    // Get items for current stage. If none, show nothing or previous stages?
-    // User request implies "Show items for current stage".
-    const currentItems = STAGE_CHECKLISTS[stage];
 
     const handleCheck = async (itemId: string, checked: boolean) => {
         setIsUpdating(true);
@@ -38,45 +35,66 @@ export function StageChecklist({
         setIsUpdating(false);
     };
 
-    if (!currentItems || currentItems.length === 0) {
-        return null; // Don't show if no checklist for this stage (e.g. Lead or Closed)
-    }
-
     return (
-        <Card className="mb-6 border-l-4 border-l-primary/50">
-            <CardHeader className="py-3">
-                <CardTitle className="text-base flex justify-between items-center">
-                    <span>{stage.replace('_', ' ')} Checklist</span>
-                    {isUpdating && <Loader2 className="h-3 w-3 animate-spin text-muted-foreground" />}
-                </CardTitle>
-            </CardHeader>
-            <CardContent className="py-2 space-y-3">
-                {currentItems.map((item) => (
-                    <div key={item.id} className="flex items-start space-x-2">
-                        <Checkbox
-                            id={item.id}
-                            checked={checklist.includes(item.id)}
-                            onCheckedChange={(checked) => handleCheck(item.id, checked as boolean)}
-                        />
-                        <div className="grid gap-1.5 leading-none">
-                            <label
-                                htmlFor={item.id}
-                                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
-                            >
-                                {item.label}
-                            </label>
-                            <p className="text-[0.8rem] text-muted-foreground">
-                                +{item.weight}% Probability
-                            </p>
-                        </div>
-                    </div>
-                ))}
-                <div className="pt-2">
-                    <Badge variant="outline" className="text-xs font-normal bg-muted">
-                        Completing items automatically increases deal probability.
-                    </Badge>
-                </div>
-            </CardContent>
-        </Card>
+        <div className="space-y-6">
+            {STAGE_ORDER.map((stageKey) => {
+                const items = STAGE_CHECKLISTS[stageKey];
+                if (!items || items.length === 0) return null;
+
+                const isCurrentStage = stageKey === stage;
+                // Determine if this stage is "passed" (lower index than current)
+                const isPassed = STAGE_ORDER.indexOf(stageKey) < STAGE_ORDER.indexOf(stage);
+
+                return (
+                    <Card
+                        key={stageKey}
+                        className={cn(
+                            "transition-all duration-200",
+                            isCurrentStage ? "border-l-4 border-l-primary shadow-md" : "border-l-4 border-l-transparent opacity-80 hover:opacity-100"
+                        )}
+                    >
+                        <CardHeader className="py-3 bg-muted/20">
+                            <CardTitle className="text-base flex justify-between items-center">
+                                <div className="flex items-center gap-2">
+                                    <span>{STAGE_LABELS[stageKey]} ({stageKey})</span>
+                                    {isCurrentStage && <Badge variant="default" className="text-xs">Current Stage</Badge>}
+                                    {isPassed && <Badge variant="outline" className="text-xs text-muted-foreground">Completed</Badge>}
+                                </div>
+                                {isUpdating && isCurrentStage && <Loader2 className="h-3 w-3 animate-spin text-muted-foreground" />}
+                            </CardTitle>
+                        </CardHeader>
+                        <CardContent className="py-2 space-y-3 pt-4">
+                            {items.map((item) => (
+                                <div key={item.id} className="flex items-start space-x-2">
+                                    <Checkbox
+                                        id={item.id}
+                                        checked={checklist.includes(item.id)}
+                                        onCheckedChange={(checked) => handleCheck(item.id, checked as boolean)}
+                                        disabled={isUpdating}
+                                    />
+                                    <div className="grid gap-1.5 leading-none">
+                                        <label
+                                            htmlFor={item.id}
+                                            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+                                        >
+                                            {item.label}
+                                        </label>
+                                        <p className="text-[0.8rem] text-muted-foreground">
+                                            +{item.weight}% Probability
+                                        </p>
+                                    </div>
+                                </div>
+                            ))}
+                        </CardContent>
+                    </Card>
+                );
+            })}
+
+            <div className="pt-2">
+                <Badge variant="outline" className="text-xs font-normal bg-muted">
+                    Checking items updates the opportunity stage and probability automatically.
+                </Badge>
+            </div>
+        </div>
     );
 }

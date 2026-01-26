@@ -167,7 +167,7 @@ export async function updateOpportunity(id: string, data: {
 }
 
 
-import { STAGE_CHECKLISTS, BASE_PROBABILITIES } from '@/lib/crm-constants';
+import { STAGE_CHECKLISTS, BASE_PROBABILITIES, STAGE_ORDER } from '@/lib/crm-constants';
 
 export async function getSalesForecast() {
     try {
@@ -318,19 +318,35 @@ export async function deleteAllocation(id: string) {
 
 export async function updateOpportunityChecklist(id: string, checklist: string[]) {
     try {
-        // Fetch current opportunity to get the stage
-        const opportunity = await prisma.opportunity.findUnique({
-            where: { id },
-            select: { stage: true }
-        });
+        // Find the highest stage that has a checked item
+        // We iterate in reverse order of STAGE_ORDER (excluding CLOSED_LOST for auto-promotion, maybe?)
+        // Let's include all except maybe CLOSED_LOST which is usually manual, but let's follow the rule "Where the check is".
+        // If I check "Contract Signed", I am in CLOSED_WON.
 
-        if (!opportunity) throw new Error("Opportunity not found");
+        let newStage = 'LEAD'; // Default
+
+        // Check in reverse order (highest stage first)
+        // We only consider stages in STAGE_ORDER that are NOT CLOSED_LOST for auto-determination?
+        // Actually, if we want "Status is where check is", if I confirm "Post Mortem", am I in CLOSED_LOST?
+        // Maybe. Let's include all.
+
+        for (let i = STAGE_ORDER.length - 1; i >= 0; i--) {
+            const stage = STAGE_ORDER[i];
+            const items = STAGE_CHECKLISTS[stage];
+            if (!items) continue;
+
+            // If any item in this stage is checked
+            const hasCheckedItem = items.some(item => checklist.includes(item.id));
+            if (hasCheckedItem) {
+                newStage = stage;
+                break;
+            }
+        }
 
         // Calculate new probability
-        const stage = opportunity.stage;
-        let probability = BASE_PROBABILITIES[stage] || 0;
+        let probability = BASE_PROBABILITIES[newStage] || 0;
 
-        // Find all checked items configurations
+        // Find all checked items configurations to add weights
         let addedProb = 0;
         Object.values(STAGE_CHECKLISTS).forEach(list => {
             list.forEach(item => {
@@ -343,21 +359,22 @@ export async function updateOpportunityChecklist(id: string, checklist: string[]
         // Cap at 100
         probability = Math.min(100, probability + addedProb);
 
-        // Special case: If stage is CLOSED_WON, prob is always 100. CLOSED_LOST is 0.
-        if (stage === 'CLOSED_WON') probability = 100;
-        if (stage === 'CLOSED_LOST') probability = 0;
+        // Special case overrides
+        if (newStage === 'CLOSED_WON') probability = 100;
+        if (newStage === 'CLOSED_LOST') probability = 0;
 
         await prisma.opportunity.update({
             where: { id },
             data: {
                 checklist: JSON.stringify(checklist),
+                stage: newStage,
                 probability: probability
             },
         });
 
         revalidatePath('/admin/crm');
         revalidatePath(`/admin/crm/${id}`);
-        return { success: true, probability };
+        return { success: true, probability, stage: newStage };
     } catch (error) {
         console.error("Error updating checklist:", error);
         return { success: false, error: "Failed to update checklist" };

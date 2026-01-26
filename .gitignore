@@ -46,3 +46,4 @@ next-env.d.ts
 /backup_data
 dev.db
 *.sqlite
+jirapro_backup_*.json
