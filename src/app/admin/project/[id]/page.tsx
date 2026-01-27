@@ -3,7 +3,7 @@ import { getProjectById } from '../actions';
 import { getExpenseCategories, getServiceAreas } from '@/app/admin/settings/actions';
 import { getAccounts } from '@/app/admin/crm/account-actions';
 import { getUsers } from '@/app/admin/crm/actions';
-import { ProjectDialog } from '@/components/project/project-dialog';
+import { ProjectSheet } from '@/components/project/project-sheet';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -46,7 +46,7 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
                     </div>
                 </div>
                 <div className="flex gap-2">
-                    <ProjectDialog
+                    <ProjectSheet
                         project={project}
                         trigger={<Button>Edit Project</Button>}
                         accounts={accounts}

@@ -10,7 +10,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { CalendarDays, Users, CheckSquare, ArrowRight, LayoutGrid, List, Plus } from 'lucide-react';
-import { ProjectDialog } from '@/components/project/project-dialog';
+import { ProjectSheet } from '@/components/project/project-sheet';
 import { ProjectTableView } from '@/components/project/project-table-view';
 export const dynamic = 'force-dynamic';
 
@@ -50,7 +50,7 @@ export default async function ProjectsPage({ searchParams }: { searchParams: Pro
                             </Link>
                         </Button>
                     </div>
-                    <ProjectDialog
+                    <ProjectSheet
                         accounts={accounts}
                         users={users}
                         serviceAreas={serviceAreas}

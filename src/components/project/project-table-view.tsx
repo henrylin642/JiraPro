@@ -23,7 +23,7 @@ import {
 import { ArrowRight, MoreHorizontal, Archive, LayoutDashboard, Trash, ChevronRight, ChevronDown, Check, X } from 'lucide-react';
 import { getProjects, archiveProject, deleteProject } from '@/app/admin/project/actions';
 import { useRouter } from 'next/navigation';
-import { ProjectDialog } from '@/components/project/project-dialog';
+import { ProjectSheet } from '@/components/project/project-sheet';
 
 // Infer the type from the return value of getProjects
 type Projects = Awaited<ReturnType<typeof getProjects>>;
@@ -81,7 +81,7 @@ export function ProjectTableView({ projects, accounts = [], users = [], serviceA
     return (
         <div className="rounded-md border">
             {editingProject && (
-                <ProjectDialog
+                <ProjectSheet
                     project={editingProject}
                     open={isEditOpen}
                     onOpenChange={setIsEditOpen}
@@ -141,7 +141,12 @@ export function ProjectTableView({ projects, accounts = [], users = [], serviceA
                                     </TableCell>
                                     <TableCell className="font-medium font-mono text-xs">{project.code || '-'}</TableCell>
                                     <TableCell>
-                                        <span className="font-medium">{project.name}</span>
+                                        <span
+                                            className="font-medium cursor-pointer hover:underline text-primary"
+                                            onClick={() => handleEditClick(project)}
+                                        >
+                                            {project.name}
+                                        </span>
                                     </TableCell>
                                     <TableCell>{project.account?.name || 'Internal'}</TableCell>
                                     <TableCell>{project.serviceArea?.name || '-'}</TableCell>
