@@ -14,6 +14,7 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowUpDown } from 'lucide-react';
 import { STAGE_LABELS } from '@/lib/crm-constants';
+import { HealthBadge } from '@/components/crm/health-badge';
 
 type Opportunity = {
     id: string;
@@ -21,6 +22,7 @@ type Opportunity = {
     stage: string;
     probability: number;
     estimatedValue: number;
+    healthScore?: number;
     account: { name: string };
     owner?: { id: string; name: string } | null;
     serviceArea?: { name: string } | null;
@@ -119,6 +121,11 @@ export function PipelineTable({ data }: { data: Opportunity[] }) {
                                         Stage {sortConfig?.key === 'stage' && <ArrowUpDown className="ml-2 h-4 w-4" />}
                                     </div>
                                 </TableHead>
+                                <TableHead className="text-center cursor-pointer hover:bg-slate-50" onClick={() => handleSort('healthScore')}>
+                                    <div className="flex items-center justify-center">
+                                        Health {sortConfig?.key === 'healthScore' && <ArrowUpDown className="ml-2 h-4 w-4" />}
+                                    </div>
+                                </TableHead>
                                 <TableHead className="text-right cursor-pointer hover:bg-slate-50" onClick={() => handleSort('estimatedValue')}>
                                     <div className="flex items-center justify-end">
                                         Value {sortConfig?.key === 'estimatedValue' && <ArrowUpDown className="ml-2 h-4 w-4" />}
@@ -158,6 +165,13 @@ export function PipelineTable({ data }: { data: Opportunity[] }) {
                                     <TableCell>
                                         <Badge variant="secondary">{STAGE_LABELS[item.stage] || item.stage}</Badge>
                                     </TableCell>
+                                    <TableCell className="text-center">
+                                        {typeof item.healthScore === 'number' ? (
+                                            <HealthBadge score={item.healthScore} />
+                                        ) : (
+                                            <span className="text-muted-foreground text-sm">-</span>
+                                        )}
+                                    </TableCell>
                                     <TableCell className="text-right font-medium text-green-600">
                                         {formatCurrency(item.estimatedValue)}
                                     </TableCell>
@@ -171,7 +185,7 @@ export function PipelineTable({ data }: { data: Opportunity[] }) {
                             ))}
                             {sortedData.length === 0 && (
                                 <TableRow>
-                                    <TableCell colSpan={7} className="text-center h-24 text-muted-foreground">
+                                    <TableCell colSpan={8} className="text-center h-24 text-muted-foreground">
                                         No opportunities found.
                                     </TableCell>
                                 </TableRow>

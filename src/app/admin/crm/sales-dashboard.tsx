@@ -8,7 +8,19 @@ import { DollarSign, TrendingUp, Filter, Percent } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { STAGE_LABELS } from '@/lib/crm-constants';
 
-export function SalesDashboard({ stats }: { stats: SalesStats }) {
+type HealthSummary = {
+    totalActive: number;
+    healthy: number;
+    watch: number;
+    atRisk: number;
+    risks: {
+        noRecentActivity: number;
+        noNextStep: number;
+        closeDateOverdue: number;
+    };
+};
+
+export function SalesDashboard({ stats, healthSummary }: { stats: SalesStats; healthSummary: HealthSummary }) {
     const formatCurrency = (val: number) => {
         return new Intl.NumberFormat('en-US', {
             style: 'currency',
@@ -64,6 +76,45 @@ export function SalesDashboard({ stats }: { stats: SalesStats }) {
                     </CardContent>
                 </Card>
             </div>
+
+            <Card>
+                <CardHeader>
+                    <CardTitle>Deal Health Overview</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div className="rounded-lg border p-4">
+                            <div className="text-xs uppercase text-muted-foreground tracking-wide">Healthy</div>
+                            <div className="text-2xl font-bold text-emerald-600">{healthSummary.healthy}</div>
+                            <div className="text-xs text-muted-foreground">of {healthSummary.totalActive} active deals</div>
+                        </div>
+                        <div className="rounded-lg border p-4">
+                            <div className="text-xs uppercase text-muted-foreground tracking-wide">Watch</div>
+                            <div className="text-2xl font-bold text-amber-600">{healthSummary.watch}</div>
+                            <div className="text-xs text-muted-foreground">needs review</div>
+                        </div>
+                        <div className="rounded-lg border p-4">
+                            <div className="text-xs uppercase text-muted-foreground tracking-wide">At Risk</div>
+                            <div className="text-2xl font-bold text-rose-600">{healthSummary.atRisk}</div>
+                            <div className="text-xs text-muted-foreground">high attention</div>
+                        </div>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-sm">
+                        <div className="flex items-center justify-between rounded-md bg-muted/30 px-3 py-2">
+                            <span className="text-muted-foreground">No recent activity</span>
+                            <Badge variant="outline">{healthSummary.risks.noRecentActivity}</Badge>
+                        </div>
+                        <div className="flex items-center justify-between rounded-md bg-muted/30 px-3 py-2">
+                            <span className="text-muted-foreground">No next step</span>
+                            <Badge variant="outline">{healthSummary.risks.noNextStep}</Badge>
+                        </div>
+                        <div className="flex items-center justify-between rounded-md bg-muted/30 px-3 py-2">
+                            <span className="text-muted-foreground">Close date overdue</span>
+                            <Badge variant="outline">{healthSummary.risks.closeDateOverdue}</Badge>
+                        </div>
+                    </div>
+                </CardContent>
+            </Card>
 
             {/* Funnel Visualization */}
             <Card>

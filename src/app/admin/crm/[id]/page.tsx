@@ -18,6 +18,8 @@ import { StageChecklist } from '@/components/crm/stage-checklist';
 import { ActivityTimeline } from '@/components/crm/activity-timeline';
 import { OpportunityDialog } from '@/components/crm/opportunity-dialog';
 import { STAGE_LABELS } from '@/lib/crm-constants';
+import { calculateDealHealth } from '@/lib/deal-health';
+import { DealHealthCard } from '@/components/crm/deal-health-card';
 
 
 export const dynamic = 'force-dynamic';
@@ -34,6 +36,21 @@ export default async function OpportunityDetailPage({ params }: { params: Promis
     if (!opportunity) {
         notFound();
     }
+
+    const lastInteractionAt = interactions[0]?.date ?? null;
+    const openTasks = ((opportunity.tasks as any[]) || []).filter(task => task.status !== 'DONE');
+    const dealHealth = calculateDealHealth({
+        stage: opportunity.stage,
+        checklist: opportunity.checklist,
+        ownerId: opportunity.ownerId,
+        expectedCloseDate: opportunity.expectedCloseDate,
+        estimatedValue: opportunity.estimatedValue,
+        serviceAreaId: opportunity.serviceAreaId,
+        stageUpdatedAt: opportunity.stageUpdatedAt ?? opportunity.updatedAt,
+        lastInteractionAt,
+        openTasks: openTasks.map(task => ({ dueDate: task.dueDate })),
+        currentProbability: opportunity.probability,
+    });
 
     return (
         <div className="flex flex-col h-screen bg-background">
@@ -101,20 +118,23 @@ export default async function OpportunityDetailPage({ params }: { params: Promis
                     </TabsList>
 
                     <TabsContent value="details">
-                        {/* ... existing details ... */}
-                        <Card>
-                            <CardHeader>
-                                <CardTitle>Opportunity Details</CardTitle>
-                            </CardHeader>
-                            <CardContent>
-                                <StageChecklist
-                                    opportunityId={opportunity.id}
-                                    stage={opportunity.stage}
-                                    initialChecklist={opportunity.checklist ? JSON.parse(opportunity.checklist) : []}
-                                />
-                                <p className="text-muted-foreground">Basic details form would go here...</p>
-                            </CardContent>
-                        </Card>
+                        <div className="space-y-6">
+                            <DealHealthCard health={dealHealth} currentProbability={opportunity.probability} />
+                            {/* ... existing details ... */}
+                            <Card>
+                                <CardHeader>
+                                    <CardTitle>Opportunity Details</CardTitle>
+                                </CardHeader>
+                                <CardContent>
+                                    <StageChecklist
+                                        opportunityId={opportunity.id}
+                                        stage={opportunity.stage}
+                                        initialChecklist={opportunity.checklist ? JSON.parse(opportunity.checklist) : []}
+                                    />
+                                    <p className="text-muted-foreground">Basic details form would go here...</p>
+                                </CardContent>
+                            </Card>
+                        </div>
                     </TabsContent>
 
                     <TabsContent value="tasks" className="h-[calc(100vh-250px)]">

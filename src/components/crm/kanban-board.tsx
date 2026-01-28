@@ -31,6 +31,7 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { STAGE_LABELS, STAGE_ORDER } from '@/lib/crm-constants';
+import { HealthBadge } from '@/components/crm/health-badge';
 
 // --- Types ---
 type Opportunity = {
@@ -39,6 +40,7 @@ type Opportunity = {
     stage: string;
     probability: number;
     estimatedValue: number;
+    healthScore?: number;
     account: { name: string };
     owner?: { id: string; name: string } | null;
 };
@@ -91,6 +93,9 @@ function SortableItem({ id, opportunity }: { id: string; opportunity: Opportunit
                                     <span className="text-[10px] text-muted-foreground bg-secondary px-1.5 py-0.5 rounded-sm">
                                         {opportunity.owner.name}
                                     </span>
+                                )}
+                                {typeof opportunity.healthScore === 'number' && (
+                                    <HealthBadge score={opportunity.healthScore} compact />
                                 )}
                                 <span className={`text-[10px] font-mono ${opportunity.stage === 'CLOSED_LOST' ? 'text-destructive' : 'text-muted-foreground'}`}>
                                     {opportunity.probability}%
@@ -293,6 +298,9 @@ export function KanbanBoard({ initialOpportunities, users = [] }: { initialOppor
                                                     <span className="text-[10px] text-muted-foreground bg-secondary px-1.5 py-0.5 rounded-sm">
                                                         {activeOpportunity.owner.name}
                                                     </span>
+                                                )}
+                                                {typeof activeOpportunity.healthScore === 'number' && (
+                                                    <HealthBadge score={activeOpportunity.healthScore} compact />
                                                 )}
                                                 <span className="text-[10px] text-muted-foreground font-mono">
                                                     {activeOpportunity.probability}%

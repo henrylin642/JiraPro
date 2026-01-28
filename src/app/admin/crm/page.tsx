@@ -24,6 +24,18 @@ export default async function CRMPage() {
     ]);
 
     const opportunityTasks = allTasks.filter(t => t.opportunityId);
+    const activeOpportunities = opportunities.filter((opp) => opp.stage !== 'CLOSED_WON' && opp.stage !== 'CLOSED_LOST');
+    const healthSummary = {
+        totalActive: activeOpportunities.length,
+        healthy: activeOpportunities.filter((opp) => (opp.healthScore ?? 0) >= 70).length,
+        watch: activeOpportunities.filter((opp) => (opp.healthScore ?? 0) >= 40 && (opp.healthScore ?? 0) < 70).length,
+        atRisk: activeOpportunities.filter((opp) => (opp.healthScore ?? 0) < 40).length,
+        risks: {
+            noRecentActivity: activeOpportunities.filter((opp) => (opp.healthSignals || []).some((signal: { id: string }) => signal.id === 'no_recent_activity')).length,
+            noNextStep: activeOpportunities.filter((opp) => (opp.healthSignals || []).some((signal: { id: string }) => signal.id === 'no_next_step')).length,
+            closeDateOverdue: activeOpportunities.filter((opp) => (opp.healthSignals || []).some((signal: { id: string }) => signal.id === 'close_date_overdue')).length,
+        },
+    };
 
     return (
         <div className="flex flex-col h-screen p-6 bg-background">
@@ -46,9 +58,9 @@ export default async function CRMPage() {
                 </TabsList>
 
                 <div className="flex-1 overflow-auto mt-4">
-                    <TabsContent value="dashboard" className="m-0 h-full">
-                        <SalesDashboard stats={stats} />
-                    </TabsContent>
+                <TabsContent value="dashboard" className="m-0 h-full">
+                        <SalesDashboard stats={stats} healthSummary={healthSummary} />
+                </TabsContent>
 
                     <TabsContent value="pipeline" className="m-0 h-full">
                         <KanbanBoard initialOpportunities={opportunities} users={users} />

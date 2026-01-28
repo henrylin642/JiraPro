@@ -2,6 +2,7 @@
 
 import prisma from '@/lib/prisma';
 import { revalidatePath } from 'next/cache';
+import { calculateDealHealth } from '@/lib/deal-health';
 
 export type OpportunityWithAccount = {
     id: string;
@@ -12,6 +13,7 @@ export type OpportunityWithAccount = {
     account: {
         name: string;
     };
+    healthScore?: number;
 };
 
 export async function getOpportunities() {
@@ -25,14 +27,45 @@ export async function getOpportunities() {
                     select: { id: true, name: true },
                 },
                 serviceArea: true,
+                interactions: {
+                    select: { date: true },
+                    orderBy: { date: 'desc' },
+                    take: 1,
+                },
+                tasks: {
+                    where: { status: { not: 'DONE' } },
+                    select: { dueDate: true },
+                },
             },
         });
 
         // Serialize Decimal to number for client components
-        return opportunities.map((opp) => ({
-            ...opp,
-            estimatedValue: Number(opp.estimatedValue),
-        }));
+        return opportunities.map((opp) => {
+            const { interactions, tasks, ...rest } = opp;
+            const estimatedValue = Number(opp.estimatedValue);
+            const lastInteractionAt = interactions[0]?.date ?? null;
+            const health = calculateDealHealth({
+                stage: opp.stage,
+                checklist: opp.checklist,
+                ownerId: opp.ownerId,
+                expectedCloseDate: opp.expectedCloseDate,
+                estimatedValue,
+                serviceAreaId: opp.serviceAreaId,
+                stageUpdatedAt: opp.stageUpdatedAt ?? opp.updatedAt,
+                lastInteractionAt,
+                openTasks: tasks,
+                currentProbability: opp.probability,
+            });
+
+            return {
+                ...rest,
+                estimatedValue,
+                healthScore: health.score,
+                healthSignals: health.signals,
+                recommendedProbability: health.recommendedProbability,
+                probabilityDelta: health.probabilityDelta,
+            };
+        });
     } catch (error) {
         console.error("Error fetching opportunities:", error);
         return [];
@@ -143,6 +176,12 @@ export async function updateOpportunity(id: string, data: {
     serviceAreaId?: string | null;
 }) {
     try {
+        const current = await prisma.opportunity.findUnique({
+            where: { id },
+            select: { stage: true },
+        });
+        const stageChanged = current?.stage !== data.stage;
+
         const opportunity = await prisma.opportunity.update({
             where: { id },
             data: {
@@ -154,6 +193,7 @@ export async function updateOpportunity(id: string, data: {
                 expectedCloseDate: data.expectedCloseDate,
                 ownerId: data.ownerId,
                 serviceAreaId: data.serviceAreaId,
+                stageUpdatedAt: stageChanged ? new Date() : undefined,
             },
         });
         revalidatePath('/admin/crm');
@@ -243,12 +283,20 @@ export async function getWinLossStats() {
 }
 
 export async function updateOpportunityStage(id: string, newStage: string, lossReason?: string) {
+    const existing = await prisma.opportunity.findUnique({
+        where: { id },
+        select: { stage: true },
+    });
+
+    const stageChanged = existing?.stage !== newStage;
+
     await prisma.opportunity.update({
         where: { id },
         data: {
             stage: newStage,
             lossReason: newStage === 'CLOSED_LOST' ? lossReason : null,
-            probability: newStage === 'CLOSED_WON' ? 100 : newStage === 'CLOSED_LOST' ? 0 : undefined
+            probability: newStage === 'CLOSED_WON' ? 100 : newStage === 'CLOSED_LOST' ? 0 : undefined,
+            stageUpdatedAt: stageChanged ? new Date() : undefined,
         },
     });
     revalidatePath('/admin/crm');
@@ -318,6 +366,11 @@ export async function deleteAllocation(id: string) {
 
 export async function updateOpportunityChecklist(id: string, checklist: string[]) {
     try {
+        const current = await prisma.opportunity.findUnique({
+            where: { id },
+            select: { stage: true },
+        });
+
         // Find the highest stage that has a checked item
         // We iterate in reverse order of STAGE_ORDER (excluding CLOSED_LOST for auto-promotion, maybe?)
         // Let's include all except maybe CLOSED_LOST which is usually manual, but let's follow the rule "Where the check is".
@@ -363,12 +416,15 @@ export async function updateOpportunityChecklist(id: string, checklist: string[]
         if (newStage === 'CLOSED_WON') probability = 100;
         if (newStage === 'CLOSED_LOST') probability = 0;
 
+        const stageChanged = current?.stage !== newStage;
+
         await prisma.opportunity.update({
             where: { id },
             data: {
                 checklist: JSON.stringify(checklist),
                 stage: newStage,
-                probability: probability
+                probability: probability,
+                stageUpdatedAt: stageChanged ? new Date() : undefined,
             },
         });
 
