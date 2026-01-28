@@ -20,6 +20,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
 import { createOpportunity, updateOpportunity } from '@/app/admin/crm/actions';
 import { Plus, Edit } from 'lucide-react';
 import { useRouter } from 'next/navigation';
@@ -58,6 +59,7 @@ type OpportunityData = {
     expectedCloseDate: Date | null;
     ownerId: string | null;
     serviceAreaId?: string | null;
+    probabilityOverrideReason?: string | null;
 };
 
 interface OpportunityDialogProps {
@@ -71,6 +73,8 @@ interface OpportunityDialogProps {
 export function OpportunityDialog({ accounts = [], users = [], serviceAreas = [], opportunity, trigger }: OpportunityDialogProps) {
     const [open, setOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
+    const [reasonRequired, setReasonRequired] = useState(false);
+    const [reasonHint, setReasonHint] = useState('');
     const router = useRouter();
 
     const isEdit = !!opportunity;
@@ -84,10 +88,13 @@ export function OpportunityDialog({ accounts = [], users = [], serviceAreas = []
         expectedCloseDate: '',
         ownerId: 'unassigned',
         serviceAreaId: 'unassigned',
+        probabilityOverrideReason: '',
     });
 
     useEffect(() => {
         if (open) {
+            setReasonRequired(false);
+            setReasonHint('');
             if (opportunity) {
                 setFormData({
                     title: opportunity.title,
@@ -98,6 +105,7 @@ export function OpportunityDialog({ accounts = [], users = [], serviceAreas = []
                     expectedCloseDate: opportunity.expectedCloseDate ? new Date(opportunity.expectedCloseDate).toISOString().split('T')[0] : '',
                     ownerId: opportunity.ownerId || 'unassigned',
                     serviceAreaId: opportunity.serviceAreaId || 'unassigned',
+                    probabilityOverrideReason: opportunity.probabilityOverrideReason || '',
                 });
             } else {
                 // Reset for Create mode
@@ -110,6 +118,7 @@ export function OpportunityDialog({ accounts = [], users = [], serviceAreas = []
                     expectedCloseDate: '',
                     ownerId: 'unassigned',
                     serviceAreaId: 'unassigned',
+                    probabilityOverrideReason: '',
                 });
             }
         }
@@ -118,6 +127,8 @@ export function OpportunityDialog({ accounts = [], users = [], serviceAreas = []
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsLoading(true);
+        setReasonRequired(false);
+        setReasonHint('');
 
         const payload = {
             title: formData.title,
@@ -128,13 +139,22 @@ export function OpportunityDialog({ accounts = [], users = [], serviceAreas = []
             expectedCloseDate: formData.expectedCloseDate ? new Date(formData.expectedCloseDate) : undefined,
             ownerId: formData.ownerId === 'unassigned' ? undefined : (formData.ownerId || undefined),
             serviceAreaId: formData.serviceAreaId === 'unassigned' ? undefined : (formData.serviceAreaId || undefined),
+            probabilityOverrideReason: formData.probabilityOverrideReason,
         };
 
         try {
-            if (isEdit && opportunity) {
-                await updateOpportunity(opportunity.id, payload);
-            } else {
-                await createOpportunity(payload);
+            const result = isEdit && opportunity
+                ? await updateOpportunity(opportunity.id, payload)
+                : await createOpportunity(payload);
+
+            if (!result?.success) {
+                if (result?.error === 'PROBABILITY_REASON_REQUIRED') {
+                    setReasonRequired(true);
+                    setReasonHint('機率與建議差距 ≥ 20%，請填寫原因。');
+                    return;
+                }
+                alert(`Failed to ${isEdit ? 'update' : 'create'} opportunity`);
+                return;
             }
 
             setOpen(false);
@@ -281,6 +301,26 @@ export function OpportunityDialog({ accounts = [], users = [], serviceAreas = []
                                 className="col-span-3"
                             />
                         </div>
+                        {(reasonRequired || formData.probabilityOverrideReason) && (
+                            <div className="grid grid-cols-4 items-start gap-4">
+                                <Label htmlFor="probabilityOverrideReason" className="text-right">Reason</Label>
+                                <div className="col-span-3 space-y-2">
+                                    <Textarea
+                                        id="probabilityOverrideReason"
+                                        value={formData.probabilityOverrideReason}
+                                        onChange={(e) => setFormData({ ...formData, probabilityOverrideReason: e.target.value })}
+                                        placeholder="Explain why the probability deviates from the recommendation."
+                                        required={reasonRequired}
+                                    />
+                                    <p className="text-xs text-muted-foreground">
+                                        當機率與健康度建議差距 ≥ 20% 時必填。
+                                    </p>
+                                    {reasonHint && (
+                                        <p className="text-xs text-destructive">{reasonHint}</p>
+                                    )}
+                                </div>
+                            </div>
+                        )}
                         <div className="grid grid-cols-4 items-center gap-4">
                             <Label htmlFor="closeDate" className="text-right">Target Date</Label>
                             <Input

@@ -20,6 +20,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
 import { createOpportunity } from '@/app/admin/crm/actions';
 import { Plus } from 'lucide-react';
 import { useRouter } from 'next/navigation';
@@ -41,6 +42,8 @@ type Account = {
 export function AddOpportunityDialog({ accounts }: { accounts: Account[] }) {
     const [open, setOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
+    const [reasonRequired, setReasonRequired] = useState(false);
+    const [reasonHint, setReasonHint] = useState('');
     const router = useRouter();
 
     const [formData, setFormData] = useState({
@@ -50,21 +53,34 @@ export function AddOpportunityDialog({ accounts }: { accounts: Account[] }) {
         estimatedValue: 0,
         probability: 10,
         expectedCloseDate: '',
+        probabilityOverrideReason: '',
     });
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsLoading(true);
+        setReasonRequired(false);
+        setReasonHint('');
 
         try {
-            await createOpportunity({
+            const result = await createOpportunity({
                 title: formData.title,
                 accountId: formData.accountId,
                 stage: formData.stage,
                 estimatedValue: Number(formData.estimatedValue),
                 probability: Number(formData.probability),
                 expectedCloseDate: formData.expectedCloseDate ? new Date(formData.expectedCloseDate) : undefined,
+                probabilityOverrideReason: formData.probabilityOverrideReason,
             });
+            if (!result?.success) {
+                if (result?.error === 'PROBABILITY_REASON_REQUIRED') {
+                    setReasonRequired(true);
+                    setReasonHint('機率與建議差距 ≥ 20%，請填寫原因。');
+                    return;
+                }
+                alert('Failed to create opportunity');
+                return;
+            }
             setOpen(false);
             setFormData({
                 title: '',
@@ -73,6 +89,7 @@ export function AddOpportunityDialog({ accounts }: { accounts: Account[] }) {
                 estimatedValue: 0,
                 probability: 10,
                 expectedCloseDate: '',
+                probabilityOverrideReason: '',
             });
             router.refresh();
         } catch (error) {
@@ -179,6 +196,28 @@ export function AddOpportunityDialog({ accounts }: { accounts: Account[] }) {
                                 className="col-span-3"
                             />
                         </div>
+                        {(reasonRequired || formData.probabilityOverrideReason) && (
+                            <div className="grid grid-cols-4 items-start gap-4">
+                                <Label htmlFor="probabilityOverrideReason" className="text-right">
+                                    Reason
+                                </Label>
+                                <div className="col-span-3 space-y-2">
+                                    <Textarea
+                                        id="probabilityOverrideReason"
+                                        value={formData.probabilityOverrideReason}
+                                        onChange={(e) => setFormData({ ...formData, probabilityOverrideReason: e.target.value })}
+                                        placeholder="Explain why the probability deviates from the recommendation."
+                                        required={reasonRequired}
+                                    />
+                                    <p className="text-xs text-muted-foreground">
+                                        當機率與健康度建議差距 ≥ 20% 時必填。
+                                    </p>
+                                    {reasonHint && (
+                                        <p className="text-xs text-destructive">{reasonHint}</p>
+                                    )}
+                                </div>
+                            </div>
+                        )}
                         <div className="grid grid-cols-4 items-center gap-4">
                             <Label htmlFor="closeDate" className="text-right">
                                 Target Date

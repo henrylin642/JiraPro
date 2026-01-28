@@ -113,6 +113,7 @@ model Opportunity {
   probability    Int              @default(0) // 0-100%
   estimatedValue Decimal          @default(0)
   expectedCloseDate DateTime?
+  probabilityOverrideReason String?
   
   checklist      String?          // Stores checked items as JSON string e.g. "[\"BANT_Budget\"]"
   lossReason     String?          // Reason for closing as lost

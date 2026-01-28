@@ -135,8 +135,28 @@ export async function createOpportunity(data: {
     expectedCloseDate?: Date;
     ownerId?: string;
     serviceAreaId?: string;
+    probabilityOverrideReason?: string;
 }) {
     try {
+        const trimmedReason = data.probabilityOverrideReason?.trim() || '';
+        const health = calculateDealHealth({
+            stage: data.stage,
+            checklist: [],
+            ownerId: data.ownerId,
+            expectedCloseDate: data.expectedCloseDate,
+            estimatedValue: data.estimatedValue,
+            serviceAreaId: data.serviceAreaId,
+            stageUpdatedAt: new Date(),
+            lastInteractionAt: null,
+            openTasks: [],
+            currentProbability: data.probability,
+        });
+        const probabilityGap = Math.abs(health.recommendedProbability - data.probability);
+
+        if (probabilityGap >= 20 && !trimmedReason) {
+            return { success: false, error: 'PROBABILITY_REASON_REQUIRED' };
+        }
+
         const opportunity = await prisma.opportunity.create({
             data: {
                 title: data.title,
@@ -147,6 +167,7 @@ export async function createOpportunity(data: {
                 expectedCloseDate: data.expectedCloseDate,
                 ownerId: data.ownerId,
                 serviceAreaId: data.serviceAreaId,
+                probabilityOverrideReason: trimmedReason || null,
             },
         });
         revalidatePath('/admin/crm');
@@ -174,13 +195,52 @@ export async function updateOpportunity(id: string, data: {
     expectedCloseDate?: Date | null;
     ownerId?: string | null;
     serviceAreaId?: string | null;
+    probabilityOverrideReason?: string;
 }) {
     try {
         const current = await prisma.opportunity.findUnique({
             where: { id },
-            select: { stage: true },
+            include: {
+                interactions: {
+                    select: { date: true },
+                    orderBy: { date: 'desc' },
+                    take: 1,
+                },
+                tasks: {
+                    where: { status: { not: 'DONE' } },
+                    select: { dueDate: true },
+                },
+            },
         });
-        const stageChanged = current?.stage !== data.stage;
+        if (!current) {
+            return { success: false, error: 'NOT_FOUND' };
+        }
+
+        const stageChanged = current.stage !== data.stage;
+        const nextOwnerId = data.ownerId ?? current.ownerId ?? null;
+        const nextExpectedCloseDate = data.expectedCloseDate !== undefined ? data.expectedCloseDate : current.expectedCloseDate;
+        const nextServiceAreaId = data.serviceAreaId !== undefined ? data.serviceAreaId : current.serviceAreaId;
+        const nextStageUpdatedAt = stageChanged ? new Date() : (current.stageUpdatedAt ?? current.updatedAt);
+        const trimmedReason = data.probabilityOverrideReason?.trim() || '';
+
+        const health = calculateDealHealth({
+            stage: data.stage,
+            checklist: current.checklist,
+            ownerId: nextOwnerId || undefined,
+            expectedCloseDate: nextExpectedCloseDate,
+            estimatedValue: data.estimatedValue,
+            serviceAreaId: nextServiceAreaId || undefined,
+            stageUpdatedAt: nextStageUpdatedAt,
+            lastInteractionAt: current.interactions[0]?.date ?? null,
+            openTasks: current.tasks,
+            currentProbability: data.probability,
+        });
+        const probabilityGap = Math.abs(health.recommendedProbability - data.probability);
+        const reasonToStore = trimmedReason || current.probabilityOverrideReason || null;
+
+        if (probabilityGap >= 20 && !reasonToStore) {
+            return { success: false, error: 'PROBABILITY_REASON_REQUIRED' };
+        }
 
         const opportunity = await prisma.opportunity.update({
             where: { id },
@@ -194,6 +254,7 @@ export async function updateOpportunity(id: string, data: {
                 ownerId: data.ownerId,
                 serviceAreaId: data.serviceAreaId,
                 stageUpdatedAt: stageChanged ? new Date() : undefined,
+                probabilityOverrideReason: trimmedReason ? trimmedReason : (data.probabilityOverrideReason !== undefined ? null : current.probabilityOverrideReason),
             },
         });
         revalidatePath('/admin/crm');
