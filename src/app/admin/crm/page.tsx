@@ -25,6 +25,26 @@ export default async function CRMPage() {
 
     const opportunityTasks = allTasks.filter(t => t.opportunityId);
     const activeOpportunities = opportunities.filter((opp) => opp.stage !== 'CLOSED_WON' && opp.stage !== 'CLOSED_LOST');
+    const sortedValues = activeOpportunities
+        .map((opp) => opp.estimatedValue)
+        .filter((value) => typeof value === 'number' && value > 0)
+        .sort((a, b) => a - b);
+    const highValueThreshold = sortedValues.length > 0
+        ? sortedValues[Math.floor(sortedValues.length * 0.8)]
+        : 0;
+    const highRiskDeals = activeOpportunities
+        .filter((opp) => (opp.healthScore ?? 0) < 40 && opp.estimatedValue >= highValueThreshold)
+        .sort((a, b) => b.estimatedValue - a.estimatedValue)
+        .slice(0, 5)
+        .map((opp) => ({
+            id: opp.id,
+            title: opp.title,
+            accountName: opp.account?.name || '-',
+            ownerName: opp.owner?.name || 'Unassigned',
+            stage: opp.stage,
+            estimatedValue: opp.estimatedValue,
+            healthScore: opp.healthScore ?? 0,
+        }));
     const healthSummary = {
         totalActive: activeOpportunities.length,
         healthy: activeOpportunities.filter((opp) => (opp.healthScore ?? 0) >= 70).length,
@@ -59,7 +79,7 @@ export default async function CRMPage() {
 
                 <div className="flex-1 overflow-auto mt-4">
                 <TabsContent value="dashboard" className="m-0 h-full">
-                        <SalesDashboard stats={stats} healthSummary={healthSummary} />
+                        <SalesDashboard stats={stats} healthSummary={healthSummary} highRiskDeals={highRiskDeals} />
                 </TabsContent>
 
                     <TabsContent value="pipeline" className="m-0 h-full">

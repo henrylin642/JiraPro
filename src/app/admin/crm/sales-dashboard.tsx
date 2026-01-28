@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import Link from 'next/link';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { SalesStats } from './dashboard-actions';
@@ -20,7 +21,25 @@ type HealthSummary = {
     };
 };
 
-export function SalesDashboard({ stats, healthSummary }: { stats: SalesStats; healthSummary: HealthSummary }) {
+type HighRiskDeal = {
+    id: string;
+    title: string;
+    accountName: string;
+    ownerName: string;
+    stage: string;
+    estimatedValue: number;
+    healthScore: number;
+};
+
+export function SalesDashboard({
+    stats,
+    healthSummary,
+    highRiskDeals,
+}: {
+    stats: SalesStats;
+    healthSummary: HealthSummary;
+    highRiskDeals: HighRiskDeal[];
+}) {
     const formatCurrency = (val: number) => {
         return new Intl.NumberFormat('en-US', {
             style: 'currency',
@@ -113,6 +132,35 @@ export function SalesDashboard({ stats, healthSummary }: { stats: SalesStats; he
                             <Badge variant="outline">{healthSummary.risks.closeDateOverdue}</Badge>
                         </div>
                     </div>
+                </CardContent>
+            </Card>
+
+            <Card>
+                <CardHeader>
+                    <CardTitle>High Value, Low Health</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                    {highRiskDeals.length === 0 ? (
+                        <div className="text-sm text-muted-foreground">No high-risk, high-value deals.</div>
+                    ) : (
+                        highRiskDeals.map((deal) => (
+                            <div key={deal.id} className="flex flex-col gap-2 rounded-lg border p-3 md:flex-row md:items-center md:justify-between">
+                                <div className="space-y-1">
+                                    <Link href={`/admin/crm/${deal.id}`} className="font-semibold hover:underline">
+                                        {deal.title}
+                                    </Link>
+                                    <div className="text-xs text-muted-foreground">
+                                        {deal.accountName} · {deal.ownerName}
+                                    </div>
+                                </div>
+                                <div className="flex items-center gap-3 text-sm">
+                                    <Badge variant="outline" className="text-xs">{STAGE_LABELS[deal.stage] || deal.stage}</Badge>
+                                    <Badge variant="outline" className="text-xs">Health {deal.healthScore}</Badge>
+                                    <span className="font-mono text-green-600">{formatCurrency(deal.estimatedValue)}</span>
+                                </div>
+                            </div>
+                        ))
+                    )}
                 </CardContent>
             </Card>
 
