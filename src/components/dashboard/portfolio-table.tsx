@@ -43,6 +43,7 @@ export function PortfolioTable({ data }: { data: PortfolioItem[] }) {
     const [filterOwner, setFilterOwner] = useState('');
     const scrollRef = useRef<HTMLDivElement | null>(null);
     const [isPanning, setIsPanning] = useState(false);
+    const isPanningRef = useRef(false);
     const panStartX = useRef(0);
     const panScrollLeft = useRef(0);
 
@@ -103,24 +104,30 @@ export function PortfolioTable({ data }: { data: PortfolioItem[] }) {
         return item.owner?.toLowerCase().includes(filterOwner.toLowerCase());
     });
 
-    const handlePanStart = (event: React.MouseEvent<HTMLDivElement>) => {
+    const handlePanStart = (event: React.PointerEvent<HTMLDivElement>) => {
         if (event.button !== 1 && !event.altKey) return;
         if (!scrollRef.current) return;
         event.preventDefault();
+        scrollRef.current.setPointerCapture(event.pointerId);
+        isPanningRef.current = true;
         setIsPanning(true);
-        panStartX.current = event.pageX;
+        panStartX.current = event.clientX;
         panScrollLeft.current = scrollRef.current.scrollLeft;
     };
 
-    const handlePanMove = (event: React.MouseEvent<HTMLDivElement>) => {
-        if (!isPanning || !scrollRef.current) return;
-        const delta = event.pageX - panStartX.current;
+    const handlePanMove = (event: React.PointerEvent<HTMLDivElement>) => {
+        if (!isPanningRef.current || !scrollRef.current) return;
+        const delta = event.clientX - panStartX.current;
         scrollRef.current.scrollLeft = panScrollLeft.current - delta;
     };
 
-    const handlePanEnd = () => {
-        if (!isPanning) return;
+    const handlePanEnd = (event: React.PointerEvent<HTMLDivElement>) => {
+        if (!isPanningRef.current) return;
+        isPanningRef.current = false;
         setIsPanning(false);
+        if (scrollRef.current) {
+            scrollRef.current.releasePointerCapture(event.pointerId);
+        }
     };
 
     return (
@@ -142,11 +149,11 @@ export function PortfolioTable({ data }: { data: PortfolioItem[] }) {
             <CardContent>
                 <div
                     ref={scrollRef}
-                    className={`rounded-md border overflow-auto ${isPanning ? 'cursor-grabbing' : 'cursor-grab'}`}
-                    onMouseDown={handlePanStart}
-                    onMouseMove={handlePanMove}
-                    onMouseUp={handlePanEnd}
-                    onMouseLeave={handlePanEnd}
+                    className={`rounded-md border overflow-auto ${isPanning ? 'cursor-grabbing select-none' : 'cursor-grab'}`}
+                    onPointerDown={handlePanStart}
+                    onPointerMove={handlePanMove}
+                    onPointerUp={handlePanEnd}
+                    onPointerCancel={handlePanEnd}
                 >
                     <Table className="min-w-[1200px]">
                         <TableHeader>
