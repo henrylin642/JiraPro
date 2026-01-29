@@ -90,6 +90,57 @@ export function FinancialView({ project, expenseCategories }: FinancialViewProps
         }
     };
 
+    // Group expenses by category
+    const groupedExpenses = useMemo(() => {
+        if (!project.expenses) return {};
+
+        const groups: Record<string, { expenses: any[], total: number }> = {};
+
+        project.expenses.forEach((e: any) => {
+            const category = e.category || 'Uncategorized';
+            if (!groups[category]) {
+                groups[category] = { expenses: [], total: 0 };
+            }
+            groups[category].expenses.push(e);
+            groups[category].total += Number(e.amount);
+        });
+
+        // Sort categories if needed, or keep insertion order / alpha
+        return groups;
+    }, [project.expenses]);
+
+    // Group timesheets by user
+    const personnelCosts = useMemo(() => {
+        if (!project.tasks) return [];
+
+        const userCosts: Record<string, { name: string, hours: number, cost: number }> = {};
+
+        project.tasks.forEach((task: any) => {
+            task.timesheets?.forEach((ts: any) => {
+                const userId = ts.userId;
+                const userName = ts.user?.name || 'Unknown User';
+
+                if (!userCosts[userId]) {
+                    userCosts[userId] = { name: userName, hours: 0, cost: 0 };
+                }
+                userCosts[userId].hours += Number(ts.hours);
+                userCosts[userId].cost += (Number(ts.hours) * Number(ts.costRate));
+            });
+        });
+
+        return Object.values(userCosts).sort((a, b) => b.cost - a.cost);
+    }, [project.tasks]);
+
+    // Calculate Estimated Labor Cost (from Gantt)
+    const estimatedLaborCost = useMemo(() => {
+        if (!project.tasks) return 0;
+        return project.tasks.reduce((acc: number, task: any) => {
+            const hours = Number(task.estimatedHours) || 0;
+            const rate = Number(task.assignee?.resourceProfile?.costRate) || 0;
+            return acc + (hours * rate);
+        }, 0);
+    }, [project.tasks]);
+
     const metrics = useMemo(() => {
         const budget = Number(project.budget) || 0;
         const milestoneRevenue = project.milestones?.reduce((acc: number, m: any) => acc + Number(m.amount), 0) || 0;
@@ -150,57 +201,6 @@ export function FinancialView({ project, expenseCategories }: FinancialViewProps
             plannedMargin
         };
     }, [project, estimatedLaborCost]);
-
-    // Group expenses by category
-    const groupedExpenses = useMemo(() => {
-        if (!project.expenses) return {};
-
-        const groups: Record<string, { expenses: any[], total: number }> = {};
-
-        project.expenses.forEach((e: any) => {
-            const category = e.category || 'Uncategorized';
-            if (!groups[category]) {
-                groups[category] = { expenses: [], total: 0 };
-            }
-            groups[category].expenses.push(e);
-            groups[category].total += Number(e.amount);
-        });
-
-        // Sort categories if needed, or keep insertion order / alpha
-        return groups;
-    }, [project.expenses]);
-
-    // Group timesheets by user
-    const personnelCosts = useMemo(() => {
-        if (!project.tasks) return [];
-
-        const userCosts: Record<string, { name: string, hours: number, cost: number }> = {};
-
-        project.tasks.forEach((task: any) => {
-            task.timesheets?.forEach((ts: any) => {
-                const userId = ts.userId;
-                const userName = ts.user?.name || 'Unknown User';
-
-                if (!userCosts[userId]) {
-                    userCosts[userId] = { name: userName, hours: 0, cost: 0 };
-                }
-                userCosts[userId].hours += Number(ts.hours);
-                userCosts[userId].cost += (Number(ts.hours) * Number(ts.costRate));
-            });
-        });
-
-        return Object.values(userCosts).sort((a, b) => b.cost - a.cost);
-    }, [project.tasks]);
-
-    // Calculate Estimated Labor Cost (from Gantt)
-    const estimatedLaborCost = useMemo(() => {
-        if (!project.tasks) return 0;
-        return project.tasks.reduce((acc: number, task: any) => {
-            const hours = Number(task.estimatedHours) || 0;
-            const rate = Number(task.assignee?.resourceProfile?.costRate) || 0;
-            return acc + (hours * rate);
-        }, 0);
-    }, [project.tasks]);
 
     const formatCurrency = (val: number) => {
         return new Intl.NumberFormat('en-US', {
