@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
     Table,
     TableBody,
@@ -43,9 +43,11 @@ export function PortfolioTable({ data }: { data: PortfolioItem[] }) {
     const [filterOwner, setFilterOwner] = useState('');
     const scrollRef = useRef<HTMLDivElement | null>(null);
     const [isPanning, setIsPanning] = useState(false);
-    const isPanningRef = useRef(false);
-    const panStartX = useRef(0);
-    const panScrollLeft = useRef(0);
+    const panState = useRef({
+        active: false,
+        startX: 0,
+        scrollLeft: 0,
+    });
 
     const formatCurrency = (val: number) => {
         return new Intl.NumberFormat('en-US', {
@@ -104,31 +106,44 @@ export function PortfolioTable({ data }: { data: PortfolioItem[] }) {
         return item.owner?.toLowerCase().includes(filterOwner.toLowerCase());
     });
 
-    const handlePanStart = (event: React.PointerEvent<HTMLDivElement>) => {
-        if (event.button !== 1 && !event.altKey) return;
+    const handlePanStart = (event: React.MouseEvent<HTMLDivElement>) => {
+        const isMiddle = event.button === 1;
+        const isAltLeft = event.button === 0 && event.altKey;
+        if (!isMiddle && !isAltLeft) return;
         if (!scrollRef.current) return;
         event.preventDefault();
-        scrollRef.current.setPointerCapture(event.pointerId);
-        isPanningRef.current = true;
+        panState.current.active = true;
+        panState.current.startX = event.clientX;
+        panState.current.scrollLeft = scrollRef.current.scrollLeft;
         setIsPanning(true);
-        panStartX.current = event.clientX;
-        panScrollLeft.current = scrollRef.current.scrollLeft;
+        document.body.style.cursor = 'grabbing';
+        document.body.style.userSelect = 'none';
     };
 
-    const handlePanMove = (event: React.PointerEvent<HTMLDivElement>) => {
-        if (!isPanningRef.current || !scrollRef.current) return;
-        const delta = event.clientX - panStartX.current;
-        scrollRef.current.scrollLeft = panScrollLeft.current - delta;
-    };
+    useEffect(() => {
+        const handleMove = (event: MouseEvent) => {
+            if (!panState.current.active || !scrollRef.current) return;
+            const delta = event.clientX - panState.current.startX;
+            scrollRef.current.scrollLeft = panState.current.scrollLeft - delta;
+        };
 
-    const handlePanEnd = (event: React.PointerEvent<HTMLDivElement>) => {
-        if (!isPanningRef.current) return;
-        isPanningRef.current = false;
-        setIsPanning(false);
-        if (scrollRef.current) {
-            scrollRef.current.releasePointerCapture(event.pointerId);
-        }
-    };
+        const handleEnd = () => {
+            if (!panState.current.active) return;
+            panState.current.active = false;
+            setIsPanning(false);
+            document.body.style.cursor = '';
+            document.body.style.userSelect = '';
+        };
+
+        window.addEventListener('mousemove', handleMove);
+        window.addEventListener('mouseup', handleEnd);
+        window.addEventListener('blur', handleEnd);
+        return () => {
+            window.removeEventListener('mousemove', handleMove);
+            window.removeEventListener('mouseup', handleEnd);
+            window.removeEventListener('blur', handleEnd);
+        };
+    }, []);
 
     return (
         <Card>
@@ -150,10 +165,7 @@ export function PortfolioTable({ data }: { data: PortfolioItem[] }) {
                 <div
                     ref={scrollRef}
                     className={`rounded-md border overflow-auto ${isPanning ? 'cursor-grabbing select-none' : 'cursor-grab'}`}
-                    onPointerDown={handlePanStart}
-                    onPointerMove={handlePanMove}
-                    onPointerUp={handlePanEnd}
-                    onPointerCancel={handlePanEnd}
+                    onMouseDown={handlePanStart}
                 >
                     <Table className="min-w-[1200px]">
                         <TableHeader>
