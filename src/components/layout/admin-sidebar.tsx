@@ -5,15 +5,18 @@ import Link from 'next/link';
 import {
     LayoutDashboard,
     Briefcase,
-    Users,
     Settings,
     PieChart,
-    Box,
+    Package,
     LogOut,
     PanelLeft,
     ChevronLeft,
     ChevronRight,
-    Search
+    Search,
+    Users,
+    UsersRound,
+    ListChecks,
+    Handshake
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -100,9 +103,9 @@ export function AdminSidebar({ user }: AdminSidebarProps) {
                         )}
                         <div className="space-y-1">
                             <NavItem href="/admin" icon={LayoutDashboard} label="Dashboard" />
-                            <NavItem href="/admin/tasks" icon={Users} label="Global Tasks" />
+                            <NavItem href="/admin/tasks" icon={ListChecks} label="Global Tasks" />
                             <NavItem href="/admin/project" icon={Briefcase} label="Projects" />
-                            <NavItem href="/admin/resources" icon={Users} label="Resources" restrictedTo="ADMIN" />
+                            <NavItem href="/admin/resources" icon={UsersRound} label="Resources" restrictedTo="ADMIN" />
                         </div>
                     </div>
 
@@ -114,8 +117,8 @@ export function AdminSidebar({ user }: AdminSidebarProps) {
                             </h3>
                         )}
                         <div className="space-y-1">
-                            <NavItem href="/admin/crm" icon={Box} label="CRM" />
-                            <NavItem href="/admin/product" icon={Box} label="Product" />
+                            <NavItem href="/admin/crm" icon={Handshake} label="CRM" />
+                            <NavItem href="/admin/product" icon={Package} label="Product" />
                             <NavItem href="/admin/finance" icon={PieChart} label="Finance" />
                         </div>
                     </div>

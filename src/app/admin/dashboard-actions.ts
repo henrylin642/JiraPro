@@ -2,6 +2,7 @@
 
 import prisma from '@/lib/prisma';
 import { getFinancialSummary } from './finance/actions';
+import { calculateDealHealth } from '@/lib/deal-health';
 
 export async function getExecutiveStats() {
     try {
@@ -170,11 +171,25 @@ export async function getPortfolio() {
                     estimatedValue: true,
                     probability: true,
                     expectedCloseDate: true,
+                    checklist: true,
+                    ownerId: true,
+                    serviceAreaId: true,
+                    stageUpdatedAt: true,
+                    updatedAt: true,
                     owner: {
                         select: { name: true }
                     },
                     serviceArea: {
                         select: { name: true }
+                    },
+                    interactions: {
+                        select: { date: true },
+                        orderBy: { date: 'desc' },
+                        take: 1
+                    },
+                    tasks: {
+                        where: { status: { not: 'DONE' } },
+                        select: { dueDate: true }
                     }
                 }
             })
@@ -194,19 +209,37 @@ export async function getPortfolio() {
                 owner: p.manager?.name || null,
                 serviceArea: p.serviceArea?.name || null,
             })),
-            ...opportunities.map(o => ({
-                id: o.id,
-                type: 'OPPORTUNITY' as const,
-                name: o.title,
-                code: null,
-                status: o.stage,
-                value: Number(o.estimatedValue),
-                probability: o.probability,
-                weightedValue: Number(o.estimatedValue) * (o.probability / 100),
-                date: o.expectedCloseDate,
-                owner: o.owner?.name || null,
-                serviceArea: o.serviceArea?.name || null,
-            }))
+            ...opportunities.map(o => {
+                const estimatedValue = Number(o.estimatedValue);
+                const health = calculateDealHealth({
+                    stage: o.stage,
+                    checklist: o.checklist,
+                    ownerId: o.ownerId,
+                    expectedCloseDate: o.expectedCloseDate,
+                    estimatedValue,
+                    serviceAreaId: o.serviceAreaId,
+                    stageUpdatedAt: o.stageUpdatedAt ?? o.updatedAt,
+                    lastInteractionAt: o.interactions[0]?.date ?? null,
+                    openTasks: o.tasks,
+                    currentProbability: o.probability,
+                });
+
+                return {
+                    id: o.id,
+                    type: 'OPPORTUNITY' as const,
+                    name: o.title,
+                    code: null,
+                    status: o.stage,
+                    value: estimatedValue,
+                    probability: o.probability,
+                    weightedValue: estimatedValue * (o.probability / 100),
+                    date: o.expectedCloseDate,
+                    owner: o.owner?.name || null,
+                    serviceArea: o.serviceArea?.name || null,
+                    healthScore: health.score,
+                    riskScore: Math.max(0, 100 - health.score),
+                };
+            })
         ];
 
         // Sort by weighted value descending

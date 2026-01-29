@@ -23,14 +23,15 @@ interface ProjectSheetProps {
     project?: any; // If provided, edit mode
     trigger?: React.ReactNode;
     open?: boolean;
+    defaultOpen?: boolean;
     onOpenChange?: (open: boolean) => void;
     accounts?: { id: string, name: string }[];
     users?: { id: string, name: string }[];
     serviceAreas?: { id: string, name: string }[];
 }
 
-export function ProjectSheet({ project, trigger, open, onOpenChange, accounts = [], users = [], serviceAreas = [] }: ProjectSheetProps) {
-    const [isOpen, setIsOpen] = useState(false);
+export function ProjectSheet({ project, trigger, open, defaultOpen, onOpenChange, accounts = [], users = [], serviceAreas = [] }: ProjectSheetProps) {
+    const [isOpen, setIsOpen] = useState(Boolean(defaultOpen));
     const [isLoading, setIsLoading] = useState(false);
     const router = useRouter();
     const [formData, setFormData] = useState({
@@ -51,6 +52,12 @@ export function ProjectSheet({ project, trigger, open, onOpenChange, accounts = 
         setIsOpen(newOpen);
         if (onOpenChange) onOpenChange(newOpen);
     };
+
+    useEffect(() => {
+        if (defaultOpen && open === undefined) {
+            setIsOpen(true);
+        }
+    }, [defaultOpen, open]);
 
     useEffect(() => {
         const isSheetOpen = open !== undefined ? open : isOpen;

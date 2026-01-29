@@ -68,10 +68,11 @@ interface OpportunityDialogProps {
     serviceAreas?: ServiceArea[];
     opportunity?: OpportunityData; // If present, we are in Edit mode
     trigger?: React.ReactNode;
+    defaultOpen?: boolean;
 }
 
-export function OpportunityDialog({ accounts = [], users = [], serviceAreas = [], opportunity, trigger }: OpportunityDialogProps) {
-    const [open, setOpen] = useState(false);
+export function OpportunityDialog({ accounts = [], users = [], serviceAreas = [], opportunity, trigger, defaultOpen }: OpportunityDialogProps) {
+    const [open, setOpen] = useState(Boolean(defaultOpen));
     const [isLoading, setIsLoading] = useState(false);
     const [reasonRequired, setReasonRequired] = useState(false);
     const [reasonHint, setReasonHint] = useState('');
@@ -90,6 +91,12 @@ export function OpportunityDialog({ accounts = [], users = [], serviceAreas = []
         serviceAreaId: 'unassigned',
         probabilityOverrideReason: '',
     });
+
+    useEffect(() => {
+        if (defaultOpen) {
+            setOpen(true);
+        }
+    }, [defaultOpen]);
 
     useEffect(() => {
         if (open) {

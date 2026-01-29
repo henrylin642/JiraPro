@@ -16,8 +16,15 @@ import { FinancialView } from '@/components/project/financial-view';
 
 export const dynamic = 'force-dynamic';
 
-export default async function ProjectDetailPage({ params }: { params: Promise<{ id: string }> }) {
+export default async function ProjectDetailPage({
+    params,
+    searchParams
+}: {
+    params: Promise<{ id: string }>;
+    searchParams?: Promise<{ edit?: string }>;
+}) {
     const { id } = await params;
+    const { edit } = (await searchParams) || {};
 
     const [rawProject, expenseCategories, serviceAreas, accounts, users] = await Promise.all([
         getProjectById(id),
@@ -52,6 +59,7 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
                         accounts={accounts}
                         users={users}
                         serviceAreas={serviceAreas}
+                        defaultOpen={edit === '1'}
                     />
                     <Badge variant="outline" className="text-lg px-3 py-1">{project.status}</Badge>
                 </div>

@@ -11,10 +11,12 @@ import {
 } from "@/components/ui/table";
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowUpDown, Filter, Search, X, Briefcase, Target } from 'lucide-react';
+import Link from 'next/link';
+import { ArrowUpDown, Search, Briefcase, Target, ShieldAlert } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useState } from 'react';
+import { HealthBadge } from '@/components/crm/health-badge';
 
 type PortfolioItem = {
     id: string;
@@ -28,6 +30,8 @@ type PortfolioItem = {
     date: Date | null;
     owner: string | null;
     serviceArea: string | null;
+    healthScore?: number | null;
+    riskScore?: number | null;
 };
 
 type SortConfig = {
@@ -50,6 +54,18 @@ export function PortfolioTable({ data }: { data: PortfolioItem[] }) {
     const formatDate = (date: Date | null) => {
         if (!date) return '-';
         return new Date(date).toLocaleDateString();
+    };
+
+    const formatRisk = (risk?: number | null) => {
+        if (risk === null || risk === undefined) return '-';
+        return `${Math.round(risk)}%`;
+    };
+
+    const getRiskTone = (risk?: number | null) => {
+        if (risk === null || risk === undefined) return 'bg-muted text-muted-foreground border-muted';
+        if (risk >= 60) return 'bg-rose-100 text-rose-700 border-rose-200';
+        if (risk >= 40) return 'bg-amber-100 text-amber-700 border-amber-200';
+        return 'bg-emerald-100 text-emerald-700 border-emerald-200';
     };
 
     const handleSort = (key: keyof PortfolioItem) => {
@@ -119,6 +135,8 @@ export function PortfolioTable({ data }: { data: PortfolioItem[] }) {
                                         Value {sortConfig?.key === 'value' && <ArrowUpDown className="ml-2 h-4 w-4" />}
                                     </div>
                                 </TableHead>
+                                <TableHead className="text-center">Health</TableHead>
+                                <TableHead className="text-center">Risk</TableHead>
                                 <TableHead className="text-right">Probability</TableHead>
                                 <TableHead className="text-right cursor-pointer hover:bg-slate-50" onClick={() => handleSort('weightedValue')}>
                                     <div className="flex items-center justify-end">
@@ -126,6 +144,7 @@ export function PortfolioTable({ data }: { data: PortfolioItem[] }) {
                                     </div>
                                 </TableHead>
                                 <TableHead className="text-right">Est. End/Close</TableHead>
+                                <TableHead className="text-right">Edit</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
@@ -160,6 +179,23 @@ export function PortfolioTable({ data }: { data: PortfolioItem[] }) {
                                     <TableCell className="text-right">
                                         {formatCurrency(item.value)}
                                     </TableCell>
+                                    <TableCell className="text-center">
+                                        {item.type === 'OPPORTUNITY' && typeof item.healthScore === 'number' ? (
+                                            <HealthBadge score={item.healthScore} />
+                                        ) : (
+                                            <span className="text-muted-foreground text-sm">-</span>
+                                        )}
+                                    </TableCell>
+                                    <TableCell className="text-center">
+                                        {item.type === 'OPPORTUNITY' ? (
+                                            <Badge variant="outline" className={`text-xs ${getRiskTone(item.riskScore)}`}>
+                                                <ShieldAlert className="h-3 w-3 mr-1" />
+                                                {formatRisk(item.riskScore)}
+                                            </Badge>
+                                        ) : (
+                                            <span className="text-muted-foreground text-sm">-</span>
+                                        )}
+                                    </TableCell>
                                     <TableCell className="text-right">
                                         {item.probability}%
                                     </TableCell>
@@ -169,11 +205,16 @@ export function PortfolioTable({ data }: { data: PortfolioItem[] }) {
                                     <TableCell className="text-right text-muted-foreground text-sm">
                                         {formatDate(item.date)}
                                     </TableCell>
+                                    <TableCell className="text-right">
+                                        <Link href={item.type === 'PROJECT' ? `/admin/project/${item.id}?edit=1` : `/admin/crm/${item.id}?edit=1`}>
+                                            <Button variant="outline" size="sm">Edit</Button>
+                                        </Link>
+                                    </TableCell>
                                 </TableRow>
                             ))}
                             {filteredData.length === 0 && (
                                 <TableRow>
-                                    <TableCell colSpan={8} className="text-center h-24 text-muted-foreground">
+                                    <TableCell colSpan={12} className="text-center h-24 text-muted-foreground">
                                         No matching records found.
                                     </TableCell>
                                 </TableRow>

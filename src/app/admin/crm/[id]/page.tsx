@@ -24,8 +24,15 @@ import { DealHealthCard } from '@/components/crm/deal-health-card';
 
 export const dynamic = 'force-dynamic';
 
-export default async function OpportunityDetailPage({ params }: { params: Promise<{ id: string }> }) {
+export default async function OpportunityDetailPage({
+    params,
+    searchParams
+}: {
+    params: Promise<{ id: string }>;
+    searchParams?: Promise<{ edit?: string }>;
+}) {
     const { id } = await params;
+    const { edit } = (await searchParams) || {};
     const opportunity = await getOpportunityById(id);
     const resources = await getResources();
     const interactions = await getInteractions(id);
@@ -72,6 +79,7 @@ export default async function OpportunityDetailPage({ params }: { params: Promis
                             accounts={accounts}
                             users={users}
                             serviceAreas={serviceAreas}
+                            defaultOpen={edit === '1'}
                         />
                         <DeleteOpportunityButton id={opportunity.id} title={opportunity.title} />
                     </div>

@@ -9,7 +9,9 @@ import {
     Users,
     Activity,
     AlertTriangle,
-    Calendar
+    Calendar,
+    Target,
+    ShieldAlert
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
@@ -24,6 +26,9 @@ export default async function AdminDashboardPage() {
         getPortfolio()
     ]);
     const { finance, projectStats, resourceStats, recentMilestones, quarterlyBudgets2026 } = stats;
+    const opportunityItems = portfolio.filter((item: any) => item.type === 'OPPORTUNITY');
+    const opportunityCount = opportunityItems.length;
+    const opportunityAtRisk = opportunityItems.filter((item: any) => (item.healthScore ?? 100) < 40).length;
 
     const formatCurrency = (val: number) => {
         return new Intl.NumberFormat('en-US', {
@@ -38,7 +43,7 @@ export default async function AdminDashboardPage() {
             {/* ... Existing Headers and KPIS ... */}
 
             {/* Top KPI Cards (Keep existing) */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <CardTitle className="text-sm font-medium">Est. Revenue (Budget)</CardTitle>
@@ -86,6 +91,28 @@ export default async function AdminDashboardPage() {
                     <CardContent>
                         <div className="text-2xl font-bold text-orange-600">{projectStats.atRisk}</div>
                         <p className="text-xs text-muted-foreground">Low Margin ({'<'}20%)</p>
+                    </CardContent>
+                </Card>
+
+                <Card>
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                        <CardTitle className="text-sm font-medium">Active Opportunities</CardTitle>
+                        <Target className="h-4 w-4 text-muted-foreground" />
+                    </CardHeader>
+                    <CardContent>
+                        <div className="text-2xl font-bold">{opportunityCount}</div>
+                        <p className="text-xs text-muted-foreground">Open pipeline items</p>
+                    </CardContent>
+                </Card>
+
+                <Card>
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                        <CardTitle className="text-sm font-medium">Opportunities At Risk</CardTitle>
+                        <ShieldAlert className="h-4 w-4 text-rose-500" />
+                    </CardHeader>
+                    <CardContent>
+                        <div className="text-2xl font-bold text-rose-600">{opportunityAtRisk}</div>
+                        <p className="text-xs text-muted-foreground">Health Score {'<'} 40</p>
                     </CardContent>
                 </Card>
             </div>
