@@ -128,6 +128,10 @@ export function FinancialView({ project, expenseCategories }: FinancialViewProps
         const totalRevenue = milestoneRevenue > 0 ? milestoneRevenue : billableAmount;
         const profit = totalRevenue - actualCost;
         const margin = totalRevenue > 0 ? (profit / totalRevenue) * 100 : 0;
+        const plannedRevenue = budget > 0 ? budget : milestoneRevenue;
+        const plannedDirectCost = estimatedLaborCost;
+        const plannedProfit = plannedRevenue - plannedDirectCost;
+        const plannedMargin = plannedRevenue > 0 ? (plannedProfit / plannedRevenue) * 100 : 0;
 
         return {
             budget,
@@ -139,9 +143,13 @@ export function FinancialView({ project, expenseCategories }: FinancialViewProps
             expenseCost,
             profit,
             margin,
-            totalRevenue
+            totalRevenue,
+            plannedRevenue,
+            plannedDirectCost,
+            plannedProfit,
+            plannedMargin
         };
-    }, [project]);
+    }, [project, estimatedLaborCost]);
 
     // Group expenses by category
     const groupedExpenses = useMemo(() => {
@@ -194,6 +202,76 @@ export function FinancialView({ project, expenseCategories }: FinancialViewProps
         }, 0);
     }, [project.tasks]);
 
+    const formatCurrency = (val: number) => {
+        return new Intl.NumberFormat('en-US', {
+            style: 'currency',
+            currency: 'USD',
+            maximumFractionDigits: 0
+        }).format(val);
+    };
+
+    const monthlyBreakdown = useMemo(() => {
+        const months = Array.from({ length: 12 }).map((_, idx) => ({
+            month: idx + 1,
+            revenue: 0,
+            labor: 0,
+            expenses: 0,
+            totalCost: 0,
+            grossProfit: 0,
+            cumulativeRevenue: 0,
+            cumulativeCost: 0,
+            cumulativeProfit: 0
+        }));
+
+        const allDates = [
+            ...(project.milestones || []).map((m: any) => m.dueDate).filter(Boolean),
+            ...(project.expenses || []).map((e: any) => e.date).filter(Boolean),
+            ...(project.tasks || []).flatMap((t: any) => t.timesheets?.map((ts: any) => ts.date) || []).filter(Boolean)
+        ];
+
+        const baseDate = allDates.length > 0 ? new Date(allDates[0]) : new Date();
+        const year = baseDate.getFullYear();
+
+        (project.milestones || []).forEach((m: any) => {
+            if (!m.dueDate) return;
+            const date = new Date(m.dueDate);
+            if (date.getFullYear() !== year) return;
+            months[date.getMonth()].revenue += Number(m.amount);
+        });
+
+        (project.expenses || []).forEach((e: any) => {
+            if (!e.date) return;
+            const date = new Date(e.date);
+            if (date.getFullYear() !== year) return;
+            months[date.getMonth()].expenses += Number(e.amount);
+        });
+
+        (project.tasks || []).forEach((task: any) => {
+            task.timesheets?.forEach((ts: any) => {
+                if (!ts.date) return;
+                const date = new Date(ts.date);
+                if (date.getFullYear() !== year) return;
+                months[date.getMonth()].labor += Number(ts.hours) * Number(ts.costRate);
+            });
+        });
+
+        let cumulativeRevenue = 0;
+        let cumulativeCost = 0;
+        let cumulativeProfit = 0;
+        months.forEach((m) => {
+            m.totalCost = m.labor + m.expenses;
+            m.grossProfit = m.revenue - m.totalCost;
+            cumulativeRevenue += m.revenue;
+            cumulativeCost += m.totalCost;
+            cumulativeProfit += m.grossProfit;
+            m.cumulativeRevenue = cumulativeRevenue;
+            m.cumulativeCost = cumulativeCost;
+            m.cumulativeProfit = cumulativeProfit;
+        });
+
+        return { year, months };
+    }, [project]);
+
     const handleImportClick = () => {
         fileInputRef.current?.click();
     };
@@ -243,14 +321,14 @@ export function FinancialView({ project, expenseCategories }: FinancialViewProps
 
 
             {/* Top Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <CardTitle className="text-sm font-medium">Budget</CardTitle>
                         <DollarSign className="h-4 w-4 text-muted-foreground" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold">${metrics.budget.toLocaleString()}</div>
+                        <div className="text-2xl font-bold">{formatCurrency(metrics.budget)}</div>
                     </CardContent>
                 </Card>
                 <Card>
@@ -259,7 +337,7 @@ export function FinancialView({ project, expenseCategories }: FinancialViewProps
                         <TrendingUp className="h-4 w-4 text-muted-foreground" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold text-green-600">${metrics.totalRevenue.toLocaleString()}</div>
+                        <div className="text-2xl font-bold text-green-600">{formatCurrency(metrics.totalRevenue)}</div>
                     </CardContent>
                 </Card>
                 <Card>
@@ -268,7 +346,18 @@ export function FinancialView({ project, expenseCategories }: FinancialViewProps
                         <Calculator className="h-4 w-4 text-muted-foreground" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold text-red-600">${metrics.actualCost.toLocaleString()}</div>
+                        <div className="text-2xl font-bold text-red-600">{formatCurrency(metrics.actualCost)}</div>
+                    </CardContent>
+                </Card>
+                <Card>
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                        <CardTitle className="text-sm font-medium">Gross Profit</CardTitle>
+                        <TrendingUp className="h-4 w-4 text-muted-foreground" />
+                    </CardHeader>
+                    <CardContent>
+                        <div className={`text-2xl font-bold ${metrics.profit >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                            {formatCurrency(metrics.profit)}
+                        </div>
                     </CardContent>
                 </Card>
                 <Card>
@@ -285,6 +374,78 @@ export function FinancialView({ project, expenseCategories }: FinancialViewProps
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {/* Budget vs Actual */}
+                <Card>
+                    <CardHeader>
+                        <CardTitle>Budget vs Actual</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <div className="space-y-4">
+                            <div className="flex items-center justify-between text-sm">
+                                <span className="text-muted-foreground">Planned Revenue</span>
+                                <span className="font-medium">{formatCurrency(metrics.plannedRevenue)}</span>
+                            </div>
+                            <div className="flex items-center justify-between text-sm">
+                                <span className="text-muted-foreground">Actual Revenue</span>
+                                <span className="font-medium">{formatCurrency(metrics.totalRevenue)}</span>
+                            </div>
+                            <div className="flex items-center justify-between text-sm">
+                                <span className="text-muted-foreground">Planned Direct Cost</span>
+                                <span className="font-medium text-blue-600">{formatCurrency(metrics.plannedDirectCost)}</span>
+                            </div>
+                            <div className="flex items-center justify-between text-sm">
+                                <span className="text-muted-foreground">Actual Direct Cost</span>
+                                <span className="font-medium text-red-600">{formatCurrency(metrics.actualCost)}</span>
+                            </div>
+                            <div className="flex items-center justify-between text-sm">
+                                <span className="text-muted-foreground">Planned Gross Profit</span>
+                                <span className="font-medium">{formatCurrency(metrics.plannedProfit)}</span>
+                            </div>
+                            <div className="flex items-center justify-between text-sm">
+                                <span className="text-muted-foreground">Actual Gross Profit</span>
+                                <span className={`font-medium ${metrics.profit >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                                    {formatCurrency(metrics.profit)}
+                                </span>
+                            </div>
+                            <div className="flex items-center justify-between text-sm">
+                                <span className="text-muted-foreground">Planned Margin</span>
+                                <span className="font-medium">{metrics.plannedMargin.toFixed(1)}%</span>
+                            </div>
+                        </div>
+                    </CardContent>
+                </Card>
+
+                {/* Monthly Cashflow */}
+                <Card>
+                    <CardHeader>
+                        <CardTitle>Monthly Cashflow ({monthlyBreakdown.year})</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <div className="rounded-md border overflow-hidden">
+                            <div className="grid grid-cols-[80px_1fr_1fr_1fr_1fr] bg-muted/40 text-xs font-semibold text-muted-foreground px-3 py-2">
+                                <span>Month</span>
+                                <span className="text-right">Revenue</span>
+                                <span className="text-right">Cost</span>
+                                <span className="text-right">Gross Profit</span>
+                                <span className="text-right">Cumulative</span>
+                            </div>
+                            <div className="divide-y">
+                                {monthlyBreakdown.months.map((m) => (
+                                    <div key={m.month} className="grid grid-cols-[80px_1fr_1fr_1fr_1fr] px-3 py-2 text-sm">
+                                        <span>{m.month}月</span>
+                                        <span className="text-right">{formatCurrency(m.revenue)}</span>
+                                        <span className="text-right">{formatCurrency(m.totalCost)}</span>
+                                        <span className={`text-right ${m.grossProfit >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                                            {formatCurrency(m.grossProfit)}
+                                        </span>
+                                        <span className="text-right text-muted-foreground">{formatCurrency(m.cumulativeProfit)}</span>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </CardContent>
+                </Card>
+
                 {/* Personnel Costs (Timesheets) */}
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-between pb-2">
