@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useRef, useState } from 'react';
 import {
     Table,
     TableBody,
@@ -15,7 +15,6 @@ import Link from 'next/link';
 import { ArrowUpDown, Search, Briefcase, Target, ShieldAlert } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { useState } from 'react';
 import { HealthBadge } from '@/components/crm/health-badge';
 
 type PortfolioItem = {
@@ -42,6 +41,10 @@ type SortConfig = {
 export function PortfolioTable({ data }: { data: PortfolioItem[] }) {
     const [sortConfig, setSortConfig] = useState<SortConfig>(null);
     const [filterOwner, setFilterOwner] = useState('');
+    const scrollRef = useRef<HTMLDivElement | null>(null);
+    const [isPanning, setIsPanning] = useState(false);
+    const panStartX = useRef(0);
+    const panScrollLeft = useRef(0);
 
     const formatCurrency = (val: number) => {
         return new Intl.NumberFormat('en-US', {
@@ -100,6 +103,26 @@ export function PortfolioTable({ data }: { data: PortfolioItem[] }) {
         return item.owner?.toLowerCase().includes(filterOwner.toLowerCase());
     });
 
+    const handlePanStart = (event: React.MouseEvent<HTMLDivElement>) => {
+        if (event.button !== 1 && !event.altKey) return;
+        if (!scrollRef.current) return;
+        event.preventDefault();
+        setIsPanning(true);
+        panStartX.current = event.pageX;
+        panScrollLeft.current = scrollRef.current.scrollLeft;
+    };
+
+    const handlePanMove = (event: React.MouseEvent<HTMLDivElement>) => {
+        if (!isPanning || !scrollRef.current) return;
+        const delta = event.pageX - panStartX.current;
+        scrollRef.current.scrollLeft = panScrollLeft.current - delta;
+    };
+
+    const handlePanEnd = () => {
+        if (!isPanning) return;
+        setIsPanning(false);
+    };
+
     return (
         <Card>
             <CardHeader className="flex flex-row items-center justify-between">
@@ -117,11 +140,18 @@ export function PortfolioTable({ data }: { data: PortfolioItem[] }) {
                 </div>
             </CardHeader>
             <CardContent>
-                <div className="rounded-md border">
-                    <Table>
+                <div
+                    ref={scrollRef}
+                    className={`rounded-md border overflow-auto ${isPanning ? 'cursor-grabbing' : 'cursor-grab'}`}
+                    onMouseDown={handlePanStart}
+                    onMouseMove={handlePanMove}
+                    onMouseUp={handlePanEnd}
+                    onMouseLeave={handlePanEnd}
+                >
+                    <Table className="min-w-[1200px]">
                         <TableHeader>
                             <TableRow>
-                                <TableHead className="w-[300px] cursor-pointer hover:bg-slate-50" onClick={() => handleSort('name')}>
+                                <TableHead className="sticky left-0 z-20 w-[300px] bg-background cursor-pointer hover:bg-slate-50" onClick={() => handleSort('name')}>
                                     <div className="flex items-center">
                                         Name {sortConfig?.key === 'name' && <ArrowUpDown className="ml-2 h-4 w-4" />}
                                     </div>
@@ -149,8 +179,8 @@ export function PortfolioTable({ data }: { data: PortfolioItem[] }) {
                         </TableHeader>
                         <TableBody>
                             {filteredData.map((item) => (
-                                <TableRow key={item.id}>
-                                    <TableCell className="font-medium">
+                                <TableRow key={item.id} className="group">
+                                    <TableCell className="sticky left-0 z-10 bg-background font-medium group-hover:bg-muted/50">
                                         <div className="flex flex-col">
                                             <span>{item.name}</span>
                                             {item.code && <span className="text-xs text-muted-foreground">{item.code}</span>}
@@ -212,15 +242,18 @@ export function PortfolioTable({ data }: { data: PortfolioItem[] }) {
                                     </TableCell>
                                 </TableRow>
                             ))}
-                            {filteredData.length === 0 && (
-                                <TableRow>
-                                    <TableCell colSpan={12} className="text-center h-24 text-muted-foreground">
-                                        No matching records found.
-                                    </TableCell>
-                                </TableRow>
-                            )}
+                                    {filteredData.length === 0 && (
+                                        <TableRow>
+                                            <TableCell colSpan={12} className="text-center h-24 text-muted-foreground">
+                                                No matching records found.
+                                            </TableCell>
+                                        </TableRow>
+                                    )}
                         </TableBody>
                     </Table>
+                </div>
+                <div className="mt-2 text-xs text-muted-foreground">
+                    提示：按住中鍵或 Alt 再拖曳，可左右平移；Name 欄已固定方便對齊。
                 </div>
             </CardContent>
         </Card>
