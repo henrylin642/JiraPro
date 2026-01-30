@@ -15,6 +15,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { HelpCircle } from 'lucide-react';
 import { createProject, updateProject } from '@/app/admin/project/actions';
 import { useRouter } from 'next/navigation';
 import { Plus, Loader2 } from 'lucide-react';
@@ -259,7 +261,31 @@ export function ProjectSheet({ project, trigger, open, defaultOpen, onOpenChange
                                 />
                             </div>
                             <div className="space-y-2">
-                                <Label htmlFor="status">Status</Label>
+                                <div className="flex items-center gap-2">
+                                    <Label htmlFor="status">Status</Label>
+                                    <TooltipProvider>
+                                        <Tooltip>
+                                            <TooltipTrigger asChild>
+                                                <button
+                                                    type="button"
+                                                    className="text-muted-foreground hover:text-foreground"
+                                                    aria-label="Status help"
+                                                >
+                                                    <HelpCircle className="h-4 w-4" />
+                                                </button>
+                                            </TooltipTrigger>
+                                            <TooltipContent className="max-w-[280px] text-xs leading-relaxed">
+                                                <div className="space-y-1">
+                                                    <div><span className="font-semibold">Active</span>: 已開工進行中</div>
+                                                    <div><span className="font-semibold">Planning</span>: 規劃中尚未開工</div>
+                                                    <div><span className="font-semibold">On Hold</span>: 暫停待重啟</div>
+                                                    <div><span className="font-semibold">Completed</span>: 已交付完成</div>
+                                                    <div><span className="font-semibold">Cancelled</span>: 已取消不執行</div>
+                                                </div>
+                                            </TooltipContent>
+                                        </Tooltip>
+                                    </TooltipProvider>
+                                </div>
                                 <Select
                                     value={formData.status}
                                     onValueChange={v => setFormData({ ...formData, status: v })}
