@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { updateTask, createTask, getTaskFormData } from '@/app/admin/project/actions';
+import { updateTask, createTask, deleteTask, getTaskFormData } from '@/app/admin/project/actions';
 import { useRouter } from 'next/navigation';
 
 interface TaskDialogProps {
@@ -146,13 +146,27 @@ export function TaskDialog({ task, projectId, opportunityId, trigger, open, onOp
         }
     };
 
+    const handleDelete = async () => {
+        if (!task) return;
+        const confirmed = confirm('確定要刪除此任務？相關工時記錄也會一併刪除。');
+        if (!confirmed) return;
+        setLoading(true);
+        const targetProjectId = projectId || task.projectId;
+        const targetOpportunityId = opportunityId || task.opportunityId;
+        const result = await deleteTask(task.id, targetProjectId, targetOpportunityId);
+        if (result.success) {
+            setIsDialogOpen(false);
+            router.refresh();
+        } else {
+            alert(`Error: ${result.error}`);
+        }
+        setLoading(false);
+    };
+
     return (
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             {trigger && <DialogTrigger asChild>{trigger}</DialogTrigger>}
             <DialogContent className="sm:max-w-[500px]">
-                <DialogHeader>
-                    <DialogTitle>{task ? 'Edit Task' : 'New Task'}</DialogTitle>
-                </DialogHeader>
                 <DialogHeader>
                     <DialogTitle>{task ? 'Edit Task' : 'New Task'}</DialogTitle>
                 </DialogHeader>
@@ -303,9 +317,23 @@ export function TaskDialog({ task, projectId, opportunityId, trigger, open, onOp
                         </div>
                     </div>
 
-                    <div className="flex justify-end gap-2 pt-4">
-                        <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>Cancel</Button>
-                        <Button type="submit" disabled={loading}>{loading ? 'Saving...' : 'Save Changes'}</Button>
+                    <div className="flex justify-between gap-2 pt-4">
+                        {task ? (
+                            <Button
+                                type="button"
+                                variant="destructive"
+                                onClick={handleDelete}
+                                disabled={loading}
+                            >
+                                刪除任務
+                            </Button>
+                        ) : (
+                            <div />
+                        )}
+                        <div className="flex gap-2">
+                            <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>Cancel</Button>
+                            <Button type="submit" disabled={loading}>{loading ? 'Saving...' : 'Save Changes'}</Button>
+                        </div>
                     </div>
                 </form>
             </DialogContent>

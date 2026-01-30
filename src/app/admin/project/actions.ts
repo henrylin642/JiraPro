@@ -532,6 +532,27 @@ export async function createTask(projectId: string | undefined, data: {
     }
 }
 
+export async function deleteTask(id: string, projectId?: string | null, opportunityId?: string | null) {
+    try {
+        await prisma.task.updateMany({
+            where: { parentId: id },
+            data: { parentId: null }
+        });
+        await prisma.timesheetEntry.deleteMany({
+            where: { taskId: id }
+        });
+        await prisma.task.delete({
+            where: { id }
+        });
+        if (projectId) revalidatePath(`/admin/project/${projectId}`);
+        if (opportunityId) revalidatePath(`/admin/crm/${opportunityId}`);
+        return { success: true };
+    } catch (error) {
+        console.error("Error deleting task:", error);
+        return { success: false, error: "Failed to delete task" };
+    }
+}
+
 export async function archiveProject(id: string) {
     try {
         await prisma.project.update({
