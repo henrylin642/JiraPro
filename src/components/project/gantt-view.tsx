@@ -65,7 +65,7 @@ export function GanttView({ tasks, projectId, initialDate }: { tasks: Task[]; pr
     };
 
     // Flatten Tree Logic
-    const flattenedTasks = useMemo(() => {
+    const { displayTasks, rangeMap } = useMemo(() => {
         const buildTree = (tasks: Task[]): TaskNode[] => {
             const taskMap = new Map<string, TaskNode>();
 
@@ -91,6 +91,35 @@ export function GanttView({ tasks, projectId, initialDate }: { tasks: Task[]; pr
             return rootTasks; // This is a forest of trees
         };
 
+        const parseDate = (val?: string | Date | null) => {
+            if (!val) return null;
+            const date = new Date(val);
+            return Number.isNaN(date.getTime()) ? null : date;
+        };
+
+        const ranges = new Map<string, { start: Date; end: Date }>();
+
+        const computeRange = (node: TaskNode): { start: Date; end: Date } | null => {
+            let minDate = parseDate(node.startDate);
+            let maxDate = parseDate(node.dueDate);
+
+            node.children.forEach(child => {
+                const childRange = computeRange(child);
+                if (!childRange) return;
+                if (!minDate || childRange.start < minDate) minDate = childRange.start;
+                if (!maxDate || childRange.end > maxDate) maxDate = childRange.end;
+            });
+
+            if (minDate && maxDate) {
+                ranges.set(node.id, { start: minDate, end: maxDate });
+                return { start: minDate, end: maxDate };
+            }
+            return null;
+        };
+
+        const rootNodes = buildTree(tasks);
+        rootNodes.forEach(node => computeRange(node));
+
         // Flatten with visibility check
         const flatten = (nodes: TaskNode[], result: TaskNode[] = []) => {
             for (const node of nodes) {
@@ -106,12 +135,9 @@ export function GanttView({ tasks, projectId, initialDate }: { tasks: Task[]; pr
             return result;
         };
 
-        const rootNodes = buildTree(tasks);
-        return flatten(rootNodes);
+        return { displayTasks: flatten(rootNodes), rangeMap: ranges };
 
     }, [tasks, expandedTasks]);
-
-    const displayTasks = flattenedTasks; // Use this instead of props.tasks for rendering logic
 
     // 1. Calculate Timeline Range
     const { minDate, maxDate } = useMemo(() => {
@@ -302,6 +328,9 @@ export function GanttView({ tasks, projectId, initialDate }: { tasks: Task[]; pr
                             <SelectItem value="Quarter">Quarter</SelectItem>
                         </SelectContent>
                     </Select>
+                    <span className="text-xs text-muted-foreground hidden lg:inline">
+                        Tip: create a parent task, then assign child tasks via Parent Task to form groups.
+                    </span>
                 </div>
 
                 {projectId && (
@@ -385,8 +414,10 @@ export function GanttView({ tasks, projectId, initialDate }: { tasks: Task[]; pr
 
                             {/* Tasks */}
                             {displayTasks.map((task) => {
-                                const tStart = task.startDate ? new Date(task.startDate) : viewStart;
-                                const tEnd = task.dueDate ? new Date(task.dueDate) : tStart;
+                                const hasChildren = task.children.length > 0;
+                                const range = rangeMap.get(task.id);
+                                const tStart = range?.start || (task.startDate ? new Date(task.startDate) : viewStart);
+                                const tEnd = range?.end || (task.dueDate ? new Date(task.dueDate) : tStart);
 
                                 const offsetDays = differenceInDays(tStart, viewStart);
                                 const durationDays = differenceInDays(tEnd, tStart) + 1;
@@ -394,15 +425,19 @@ export function GanttView({ tasks, projectId, initialDate }: { tasks: Task[]; pr
                                 const left = SIDEBAR_WIDTH + (offsetDays * pxPerDay);
                                 const width = Math.max(durationDays * pxPerDay, 4); // Minimum width
 
-                                const hasChildren = tasks.some(t => t.parentId === task.id);
-
                                 return (
                                     <div
                                         key={task.id}
-                                        className="flex relative h-12 items-center border-b hover:bg-muted/10 transition-colors group"
+                                        className={cn(
+                                            "flex relative h-12 items-center border-b transition-colors group",
+                                            hasChildren ? "bg-muted/10" : "hover:bg-muted/10"
+                                        )}
                                     >
                                         <div
-                                            className="flex-none border-r px-4 text-sm font-medium sticky left-0 bg-background z-10 flex items-center justify-between truncate h-full group-hover:bg-muted/10 shadow-[1px_0_5px_rgba(0,0,0,0.05)]"
+                                            className={cn(
+                                                "flex-none border-r px-4 text-sm font-medium sticky left-0 bg-background z-10 flex items-center justify-between truncate h-full shadow-[1px_0_5px_rgba(0,0,0,0.05)]",
+                                                hasChildren ? "font-semibold bg-muted/40" : "group-hover:bg-muted/10"
+                                            )}
                                             style={{ width: `${SIDEBAR_WIDTH}px`, paddingLeft: `${16 + (task.depth * 20)}px` }}
                                         >
                                             <div className="flex items-center gap-2 truncate">
@@ -414,12 +449,15 @@ export function GanttView({ tasks, projectId, initialDate }: { tasks: Task[]; pr
                                                         {expandedTasks[task.id] !== false ? "v" : ">"}
                                                     </button>
                                                 )}
-                                                <span className="truncate cursor-pointer hover:underline" onClick={() => setSelectedTask(task)}>
+                                                <span className={cn("truncate cursor-pointer hover:underline", hasChildren && "text-slate-800")} onClick={() => setSelectedTask(task)}>
                                                     {task.title}
                                                 </span>
+                                                {hasChildren && (
+                                                    <span className="text-[10px] text-muted-foreground">Group</span>
+                                                )}
                                             </div>
 
-                                            {task.assignee && (
+                                            {!hasChildren && task.assignee && (
                                                 <Avatar className="h-6 w-6 ml-2">
                                                     <AvatarImage src={task.assignee.avatarUrl || undefined} />
                                                     <AvatarFallback>{task.assignee.name[0]}</AvatarFallback>
@@ -428,21 +466,25 @@ export function GanttView({ tasks, projectId, initialDate }: { tasks: Task[]; pr
                                         </div>
 
                                         {/* Bar */}
-                                        <div
-                                            className={cn(
-                                                "absolute h-6 rounded-sm text-xs flex items-center px-2 truncate shadow-sm border hover:ring-2 ring-primary/50 transition-all cursor-pointer",
-                                                task.status === 'DONE' ? "bg-green-100 text-green-700 border-green-200" :
-                                                    task.status === 'IN_PROGRESS' ? "bg-blue-100 text-blue-700 border-blue-200" :
-                                                        "bg-slate-100 text-slate-700 border-slate-200"
-                                            )}
-                                            style={{
-                                                left: `${left}px`,
-                                                width: `${width}px`
-                                            }}
-                                            onClick={() => setSelectedTask(task)}
-                                        >
-                                            {width > 60 && task.title}
-                                        </div>
+                                        {range && (
+                                            <div
+                                                className={cn(
+                                                    "absolute h-6 rounded-sm text-xs flex items-center px-2 truncate shadow-sm border transition-all cursor-pointer",
+                                                    hasChildren
+                                                        ? "bg-slate-200 text-slate-700 border-slate-300"
+                                                        : task.status === 'DONE' ? "bg-green-100 text-green-700 border-green-200" :
+                                                            task.status === 'IN_PROGRESS' ? "bg-blue-100 text-blue-700 border-blue-200" :
+                                                                "bg-slate-100 text-slate-700 border-slate-200"
+                                                )}
+                                                style={{
+                                                    left: `${left}px`,
+                                                    width: `${width}px`
+                                                }}
+                                                onClick={() => setSelectedTask(task)}
+                                            >
+                                                {width > 60 && task.title}
+                                            </div>
+                                        )}
                                     </div>
                                 );
                             })}
