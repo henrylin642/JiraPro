@@ -4,6 +4,7 @@ import { prisma } from '@/lib/prisma';
 import { revalidatePath } from 'next/cache';
 import { getCurrentUser } from '@/lib/auth';
 import { Prisma } from '@prisma/client';
+import * as XLSX from 'xlsx';
 
 export async function getBackupSettings() {
     try {
@@ -125,6 +126,7 @@ export async function backupSystem() {
         const ideas = await prisma.idea.findMany();
         const timesheetEntries = await prisma.timesheetEntry.findMany();
         const expenseCategories = await prisma.expenseCategory.findMany();
+        const projectBudgetLines = await prisma.projectBudgetLine.findMany();
         const serviceAreas = await prisma.serviceArea.findMany(); // Added Service Areas
 
         const data = {
@@ -147,6 +149,7 @@ export async function backupSystem() {
 
             timesheetEntries,
             expenseCategories,
+            projectBudgetLines,
             serviceAreas
         };
 
@@ -191,6 +194,7 @@ export async function restoreSystem(formData: FormData) {
             await tx.expenseCategory.deleteMany();
             await tx.serviceArea.deleteMany(); // Delete Service Areas
             await tx.timesheetEntry.deleteMany();
+            await tx.projectBudgetLine.deleteMany();
             await tx.allocation.deleteMany();
             await tx.idea.deleteMany();
             // Feature <-> Opportunity is implicit. Breaking relations usually fine if both deleted?
@@ -403,7 +407,9 @@ async function restoreSystemData(data: any) {
             if (data.timesheetEntries?.length) await tx.timesheetEntry.createMany({ data: data.timesheetEntries });
             // P. Expense Categories
             if (data.expenseCategories?.length) await tx.expenseCategory.createMany({ data: data.expenseCategories });
-            // Q. Service Areas
+            // Q. Project Budget Lines
+            if (data.projectBudgetLines?.length) await tx.projectBudgetLine.createMany({ data: data.projectBudgetLines });
+            // R. Service Areas
             if (data.serviceAreas?.length) await tx.serviceArea.createMany({ data: data.serviceAreas });
 
         }, { maxWait: 20000, timeout: 40000 });
@@ -428,8 +434,9 @@ export async function getExpenseCategories() {
     }
 }
 
-export async function addExpenseCategory(name: string) {
+export async function addExpenseCategory(name: string, code?: string) {
     try {
+        const trimmedCode = code?.trim() || null;
 
         // Check for duplicates
         const existing = await prisma.expenseCategory.findUnique({
@@ -440,8 +447,17 @@ export async function addExpenseCategory(name: string) {
             return { success: false, error: "Category already exists" };
         }
 
+        if (trimmedCode) {
+            const existingCode = await prisma.expenseCategory.findUnique({
+                where: { code: trimmedCode }
+            });
+            if (existingCode) {
+                return { success: false, error: "Category code already exists" };
+            }
+        }
+
         const category = await prisma.expenseCategory.create({
-            data: { name }
+            data: { name, code: trimmedCode }
         });
         revalidatePath('/admin/settings');
         revalidatePath('/admin/project');
@@ -449,6 +465,77 @@ export async function addExpenseCategory(name: string) {
     } catch (error) {
         console.error("Error adding expense category:", error);
         return { success: false, error: "Failed to add category: " + (error as Error).message };
+    }
+}
+
+export async function exportExpenseCategoriesCsv() {
+    try {
+        const categories = await prisma.expenseCategory.findMany({
+            orderBy: { name: 'asc' }
+        });
+        const header = ['code', 'name'];
+        const lines = [header.join(',')];
+        categories.forEach(cat => {
+            const code = cat.code ? String(cat.code).replace(/"/g, '""') : '';
+            const name = String(cat.name).replace(/"/g, '""');
+            lines.push(`"${code}","${name}"`);
+        });
+        return { success: true, csv: lines.join('\n') };
+    } catch (error) {
+        console.error("Error exporting expense categories:", error);
+        return { success: false, error: "Failed to export categories" };
+    }
+}
+
+export async function importExpenseCategories(formData: FormData) {
+    try {
+        const file = formData.get('file') as File;
+        if (!file) {
+            return { success: false, error: 'No file provided' };
+        }
+
+        const buffer = await file.arrayBuffer();
+        const workbook = XLSX.read(buffer, { type: 'buffer' });
+        const sheetName = workbook.SheetNames[0];
+        const sheet = workbook.Sheets[sheetName];
+        const rows = XLSX.utils.sheet_to_json(sheet) as Record<string, any>[];
+
+        let created = 0;
+        let updated = 0;
+
+        for (const row of rows) {
+            const rawCode = row['code'] || row['Code'] || row['科目代碼'] || row['Account Code'] || row['Subject Code'] || '';
+            const rawName = row['name'] || row['Name'] || row['科目名稱'] || row['Subject'] || row['Category'] || '';
+            const name = String(rawName || '').trim();
+            const code = String(rawCode || '').trim() || null;
+            if (!name) continue;
+
+            if (code) {
+                const exists = await prisma.expenseCategory.findUnique({ where: { code } });
+                if (exists) {
+                    await prisma.expenseCategory.update({ where: { code }, data: { name } });
+                    updated++;
+                } else {
+                    await prisma.expenseCategory.create({ data: { name, code } });
+                    created++;
+                }
+            } else {
+                const exists = await prisma.expenseCategory.findUnique({ where: { name } });
+                if (exists) {
+                    updated++;
+                } else {
+                    await prisma.expenseCategory.create({ data: { name } });
+                    created++;
+                }
+            }
+        }
+
+        revalidatePath('/admin/settings');
+        revalidatePath('/admin/project');
+        return { success: true, created, updated };
+    } catch (error) {
+        console.error("Error importing expense categories:", error);
+        return { success: false, error: "Failed to import categories" };
     }
 }
 

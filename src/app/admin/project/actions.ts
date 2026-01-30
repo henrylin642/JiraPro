@@ -91,6 +91,7 @@ export async function getProjectById(id: string) {
                 expenses: {
                     orderBy: { date: 'desc' }
                 },
+                budgetLines: true,
                 // Include timesheets linked via Tasks to this project
                 tasks: {
                     include: {
@@ -157,6 +158,62 @@ export async function updateTaskStatus(taskId: string, projectId: string | null 
     } catch (error) {
         console.error("Error updating task status:", error);
         throw error;
+    }
+}
+
+export async function addProjectBudgetLine(projectId: string, data: {
+    category: string;
+    subCategory?: string | null;
+    plannedAmount: number;
+}) {
+    try {
+        const line = await prisma.projectBudgetLine.create({
+            data: {
+                projectId,
+                category: data.category,
+                subCategory: data.subCategory || null,
+                plannedAmount: data.plannedAmount
+            }
+        });
+        revalidatePath(`/admin/project/${projectId}`);
+        return { success: true, line };
+    } catch (error) {
+        console.error("Error adding budget line:", error);
+        return { success: false, error: "Failed to add budget line" };
+    }
+}
+
+export async function updateProjectBudgetLine(id: string, data: {
+    category: string;
+    subCategory?: string | null;
+    plannedAmount: number;
+    projectId: string;
+}) {
+    try {
+        const line = await prisma.projectBudgetLine.update({
+            where: { id },
+            data: {
+                category: data.category,
+                subCategory: data.subCategory || null,
+                plannedAmount: data.plannedAmount
+            }
+        });
+        revalidatePath(`/admin/project/${data.projectId}`);
+        return { success: true, line };
+    } catch (error) {
+        console.error("Error updating budget line:", error);
+        return { success: false, error: "Failed to update budget line" };
+    }
+}
+
+export async function deleteProjectBudgetLine(id: string, projectId: string) {
+    try {
+        await prisma.projectBudgetLine.delete({ where: { id } });
+        revalidatePath(`/admin/project/${projectId}`);
+        return { success: true };
+    } catch (error) {
+        console.error("Error deleting budget line:", error);
+        return { success: false, error: "Failed to delete budget line" };
     }
 }
 

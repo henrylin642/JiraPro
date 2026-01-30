@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { DollarSign, TrendingUp, TrendingDown, Calculator, Upload, Loader2, FileSpreadsheet } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { importExpenses, updateExpense, deleteExpense } from '@/app/admin/project/expense-actions';
+import { addProjectBudgetLine, updateProjectBudgetLine, deleteProjectBudgetLine } from '@/app/admin/project/actions';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
@@ -25,6 +26,17 @@ export function FinancialView({ project, expenseCategories }: FinancialViewProps
     const [editingExpense, setEditingExpense] = useState<any>(null);
     const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
     const [loadingAction, setLoadingAction] = useState(false);
+    const [budgetForm, setBudgetForm] = useState({
+        category: '',
+        subCategory: '',
+        plannedAmount: ''
+    });
+    const [editingBudgetId, setEditingBudgetId] = useState<string | null>(null);
+    const [editingBudgetForm, setEditingBudgetForm] = useState({
+        category: '',
+        subCategory: '',
+        plannedAmount: ''
+    });
 
     // Form states for editing
     const [editForm, setEditForm] = useState({
@@ -67,6 +79,73 @@ export function FinancialView({ project, expenseCategories }: FinancialViewProps
             }
         } catch (error) {
             setMessage({ type: 'error', text: 'An unexpected error occurred.' });
+        } finally {
+            setLoadingAction(false);
+        }
+    };
+
+    const handleAddBudgetLine = async () => {
+        if (!budgetForm.category.trim() || !budgetForm.plannedAmount) return;
+        setLoadingAction(true);
+        try {
+            const result = await addProjectBudgetLine(project.id, {
+                category: budgetForm.category.trim(),
+                subCategory: budgetForm.subCategory.trim() || undefined,
+                plannedAmount: Number(budgetForm.plannedAmount)
+            });
+            if (result.success) {
+                setBudgetForm({ category: '', subCategory: '', plannedAmount: '' });
+            } else {
+                setMessage({ type: 'error', text: result.error || 'Failed to add budget line.' });
+            }
+        } catch (error) {
+            setMessage({ type: 'error', text: 'Error adding budget line.' });
+        } finally {
+            setLoadingAction(false);
+        }
+    };
+
+    const handleStartEditBudget = (line: any) => {
+        setEditingBudgetId(line.id);
+        setEditingBudgetForm({
+            category: line.category,
+            subCategory: line.subCategory || '',
+            plannedAmount: String(line.plannedAmount ?? '')
+        });
+    };
+
+    const handleSaveBudgetEdit = async () => {
+        if (!editingBudgetId) return;
+        setLoadingAction(true);
+        try {
+            const result = await updateProjectBudgetLine(editingBudgetId, {
+                projectId: project.id,
+                category: editingBudgetForm.category.trim(),
+                subCategory: editingBudgetForm.subCategory.trim() || undefined,
+                plannedAmount: Number(editingBudgetForm.plannedAmount)
+            });
+            if (result.success) {
+                setEditingBudgetId(null);
+            } else {
+                setMessage({ type: 'error', text: result.error || 'Failed to update budget line.' });
+            }
+        } catch (error) {
+            setMessage({ type: 'error', text: 'Error updating budget line.' });
+        } finally {
+            setLoadingAction(false);
+        }
+    };
+
+    const handleDeleteBudgetLine = async (id: string) => {
+        if (!confirm('Delete this budget line?')) return;
+        setLoadingAction(true);
+        try {
+            const result = await deleteProjectBudgetLine(id, project.id);
+            if (!result.success) {
+                setMessage({ type: 'error', text: result.error || 'Failed to delete budget line.' });
+            }
+        } catch (error) {
+            setMessage({ type: 'error', text: 'Error deleting budget line.' });
         } finally {
             setLoadingAction(false);
         }
@@ -272,6 +351,35 @@ export function FinancialView({ project, expenseCategories }: FinancialViewProps
         return { year, months };
     }, [project]);
 
+    const budgetStatus = useMemo(() => {
+        const budgets = (project.budgetLines || []) as { id: string; category: string; subCategory?: string | null; plannedAmount: number }[];
+        const actualByCategory: Record<string, number> = {};
+
+        (project.expenses || []).forEach((e: any) => {
+            const key = e.category || 'General';
+            actualByCategory[key] = (actualByCategory[key] || 0) + Number(e.amount);
+        });
+
+        const items = budgets.map((line) => {
+            const label = line.subCategory || line.category;
+            const actual = actualByCategory[label] || 0;
+            const remaining = Number(line.plannedAmount) - actual;
+            const usage = Number(line.plannedAmount) > 0 ? (actual / Number(line.plannedAmount)) * 100 : 0;
+            return {
+                id: line.id,
+                category: line.subCategory || line.category,
+                baseCategory: line.category,
+                subCategory: line.subCategory,
+                planned: Number(line.plannedAmount),
+                actual,
+                remaining,
+                usage
+            };
+        });
+
+        return items.sort((a, b) => b.usage - a.usage);
+    }, [project]);
+
     const handleImportClick = () => {
         fileInputRef.current?.click();
     };
@@ -412,6 +520,82 @@ export function FinancialView({ project, expenseCategories }: FinancialViewProps
                                 <span className="font-medium">{metrics.plannedMargin.toFixed(1)}%</span>
                             </div>
                         </div>
+                    </CardContent>
+                </Card>
+
+                {/* Budget Setup */}
+                <Card>
+                    <CardHeader>
+                        <CardTitle>Cost Budget Setup</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                        <div className="grid grid-cols-1 gap-3 md:grid-cols-4">
+                            <Select
+                                value={budgetForm.category}
+                                onValueChange={(value) => setBudgetForm({ ...budgetForm, category: value })}
+                            >
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Category" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {expenseCategories.map((cat: any) => (
+                                        <SelectItem key={cat.id} value={cat.name}>
+                                            {cat.code ? `${cat.code} - ${cat.name}` : cat.name}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                            <Input
+                                placeholder="Sub Category (optional)"
+                                value={budgetForm.subCategory}
+                                onChange={(e) => setBudgetForm({ ...budgetForm, subCategory: e.target.value })}
+                            />
+                            <Input
+                                type="number"
+                                placeholder="Planned Amount"
+                                value={budgetForm.plannedAmount}
+                                onChange={(e) => setBudgetForm({ ...budgetForm, plannedAmount: e.target.value })}
+                            />
+                            <Button onClick={handleAddBudgetLine} disabled={loadingAction || !budgetForm.category || !budgetForm.plannedAmount}>
+                                Add Budget
+                            </Button>
+                        </div>
+
+                        {(project.budgetLines || []).length === 0 ? (
+                            <div className="text-sm text-muted-foreground">No budget lines defined yet.</div>
+                        ) : (
+                            <div className="rounded-md border">
+                                <div className="grid grid-cols-[1.2fr_1fr_1fr_1fr_1fr_120px] gap-2 px-3 py-2 text-xs font-semibold text-muted-foreground bg-muted/30">
+                                    <span>Category</span>
+                                    <span>Sub</span>
+                                    <span className="text-right">Planned</span>
+                                    <span className="text-right">Actual</span>
+                                    <span className="text-right">Remaining</span>
+                                    <span className="text-right">Actions</span>
+                                </div>
+                                <div className="divide-y">
+                                    {budgetStatus.map((line) => (
+                                        <div key={line.id} className="grid grid-cols-[1.2fr_1fr_1fr_1fr_1fr_120px] gap-2 px-3 py-2 text-sm items-center">
+                                            <span>{line.baseCategory}</span>
+                                            <span className="text-muted-foreground">{line.subCategory || '-'}</span>
+                                            <span className="text-right">{formatCurrency(line.planned)}</span>
+                                            <span className="text-right text-red-600">{formatCurrency(line.actual)}</span>
+                                            <span className={`text-right ${line.remaining >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                                                {formatCurrency(line.remaining)}
+                                            </span>
+                                            <div className="flex justify-end gap-2">
+                                                <Button variant="outline" size="sm" onClick={() => handleStartEditBudget({ id: line.id, category: line.baseCategory, subCategory: line.subCategory, plannedAmount: line.planned })}>
+                                                    Edit
+                                                </Button>
+                                                <Button variant="ghost" size="icon" className="text-red-500" onClick={() => handleDeleteBudgetLine(line.id)}>
+                                                    <Trash2 className="h-4 w-4" />
+                                                </Button>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
                     </CardContent>
                 </Card>
 
@@ -602,7 +786,9 @@ export function FinancialView({ project, expenseCategories }: FinancialViewProps
                                         <SelectContent>
                                             <SelectItem value="General">General</SelectItem>
                                             {expenseCategories && expenseCategories.map(cat => (
-                                                <SelectItem key={cat.id} value={cat.name}>{cat.name}</SelectItem>
+                                                <SelectItem key={cat.id} value={cat.name}>
+                                                    {cat.code ? `${cat.code} - ${cat.name}` : cat.name}
+                                                </SelectItem>
                                             ))}
                                             <SelectItem value="Travel">Travel</SelectItem>
                                             <SelectItem value="Software">Software</SelectItem>
@@ -612,6 +798,15 @@ export function FinancialView({ project, expenseCategories }: FinancialViewProps
                                             <SelectItem value="Other">Other</SelectItem>
                                         </SelectContent>
                                     </Select>
+                                    {(() => {
+                                        const match = budgetStatus.find((b) => b.category === editForm.category);
+                                        if (!match) return null;
+                                        return (
+                                            <div className="mt-2 text-xs text-muted-foreground">
+                                                剩餘預算：{formatCurrency(match.remaining)}（使用率 {match.usage.toFixed(1)}%）
+                                            </div>
+                                        );
+                                    })()}
                                 </div>
                             </div>
                             <div className="grid grid-cols-4 items-center gap-4">
@@ -630,6 +825,59 @@ export function FinancialView({ project, expenseCategories }: FinancialViewProps
                                 {loadingAction && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                                 Save Changes
                             </Button>
+                        </DialogFooter>
+                    </DialogContent>
+                </Dialog>
+
+                <Dialog open={!!editingBudgetId} onOpenChange={(open) => !open && setEditingBudgetId(null)}>
+                    <DialogContent>
+                        <DialogHeader>
+                            <DialogTitle>Edit Budget Line</DialogTitle>
+                            <DialogDescription>Update planned cost budget for this project.</DialogDescription>
+                        </DialogHeader>
+                        <div className="grid gap-4 py-4">
+                            <div className="grid grid-cols-4 items-center gap-4">
+                                <Label className="text-right">Category</Label>
+                                <div className="col-span-3">
+                                    <Select
+                                        value={editingBudgetForm.category}
+                                        onValueChange={(val) => setEditingBudgetForm({ ...editingBudgetForm, category: val })}
+                                    >
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="Select category" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            {expenseCategories.map((cat: any) => (
+                                                <SelectItem key={cat.id} value={cat.name}>
+                                                    {cat.code ? `${cat.code} - ${cat.name}` : cat.name}
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                            </div>
+                            <div className="grid grid-cols-4 items-center gap-4">
+                                <Label className="text-right">Sub Category</Label>
+                                <Input
+                                    className="col-span-3"
+                                    value={editingBudgetForm.subCategory}
+                                    onChange={(e) => setEditingBudgetForm({ ...editingBudgetForm, subCategory: e.target.value })}
+                                    placeholder="Optional"
+                                />
+                            </div>
+                            <div className="grid grid-cols-4 items-center gap-4">
+                                <Label className="text-right">Planned</Label>
+                                <Input
+                                    className="col-span-3"
+                                    type="number"
+                                    value={editingBudgetForm.plannedAmount}
+                                    onChange={(e) => setEditingBudgetForm({ ...editingBudgetForm, plannedAmount: e.target.value })}
+                                />
+                            </div>
+                        </div>
+                        <DialogFooter>
+                            <Button variant="outline" onClick={() => setEditingBudgetId(null)}>Cancel</Button>
+                            <Button onClick={handleSaveBudgetEdit} disabled={loadingAction}>Save</Button>
                         </DialogFooter>
                     </DialogContent>
                 </Dialog>

@@ -3,8 +3,8 @@
 import React, { useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Download, Upload, AlertTriangle, CheckCircle, Loader2 } from 'lucide-react';
-import { backupSystem, restoreSystem, getExpenseCategories, addExpenseCategory, deleteExpenseCategory, changePassword, getBackupSettings, updateBackupSettings, getBackups, restoreFromBackupId } from './actions';
+import { Download, Upload, AlertTriangle, CheckCircle, Loader2, FileDown, FileUp } from 'lucide-react';
+import { backupSystem, restoreSystem, getExpenseCategories, addExpenseCategory, deleteExpenseCategory, changePassword, getBackupSettings, updateBackupSettings, getBackups, restoreFromBackupId, exportExpenseCategoriesCsv, importExpenseCategories } from './actions';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
@@ -19,6 +19,7 @@ export default function SettingsPage() {
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [categories, setCategories] = useState<any[]>([]);
     const [newCategory, setNewCategory] = useState('');
+    const [newCategoryCode, setNewCategoryCode] = useState('');
 
     React.useEffect(() => {
         loadCategories();
@@ -33,10 +34,11 @@ export default function SettingsPage() {
         if (!newCategory.trim()) return;
         setLoading(true);
         try {
-            const result = await addExpenseCategory(newCategory.trim());
+            const result = await addExpenseCategory(newCategory.trim(), newCategoryCode.trim() || undefined);
             if (result.success) {
                 await loadCategories();
                 setNewCategory('');
+                setNewCategoryCode('');
                 setMessage({ type: 'success', text: 'Category added.' });
             } else {
                 setMessage({ type: 'error', text: result.error || 'Failed to add.' });
@@ -62,6 +64,53 @@ export default function SettingsPage() {
             setMessage({ type: 'error', text: 'Error deleting category.' });
         } finally {
             setLoading(false);
+        }
+    };
+
+    const handleExportCategories = async () => {
+        setLoading(true);
+        try {
+            const result = await exportExpenseCategoriesCsv();
+            if (result.success && result.csv) {
+                const blob = new Blob([result.csv], { type: 'text/csv;charset=utf-8;' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `expense_categories_${new Date().toISOString().split('T')[0]}.csv`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                setMessage({ type: 'success', text: 'Categories exported.' });
+            } else {
+                setMessage({ type: 'error', text: result.error || 'Export failed.' });
+            }
+        } catch (e) {
+            setMessage({ type: 'error', text: 'Export error.' });
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleImportCategories = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        setLoading(true);
+        try {
+            const formData = new FormData();
+            formData.append('file', file);
+            const result = await importExpenseCategories(formData);
+            if (result.success) {
+                await loadCategories();
+                setMessage({ type: 'success', text: `Imported: ${result.created}, updated: ${result.updated}.` });
+            } else {
+                setMessage({ type: 'error', text: result.error || 'Import failed.' });
+            }
+        } catch (e) {
+            setMessage({ type: 'error', text: 'Import error.' });
+        } finally {
+            setLoading(false);
+            if (e.target) e.target.value = '';
         }
     };
 
@@ -283,7 +332,13 @@ export default function SettingsPage() {
                     </CardHeader>
                     <CardContent>
                         <div className="space-y-4">
-                            <div className="flex gap-2">
+                            <div className="flex flex-col gap-2 sm:flex-row">
+                                <Input
+                                    placeholder="Category Code (optional)"
+                                    value={newCategoryCode}
+                                    onChange={(e) => setNewCategoryCode(e.target.value)}
+                                    className="sm:w-48"
+                                />
                                 <Input
                                     placeholder="New Category Name (e.g. Travel, Meals)"
                                     value={newCategory}
@@ -292,12 +347,33 @@ export default function SettingsPage() {
                                 <Button onClick={handleAddCategory} disabled={loading || !newCategory.trim()}>
                                     Add
                                 </Button>
+                                <div className="flex gap-2">
+                                    <Button variant="outline" onClick={handleExportCategories} disabled={loading}>
+                                        <FileDown className="mr-2 h-4 w-4" />
+                                        Export CSV
+                                    </Button>
+                                    <label className="inline-flex items-center">
+                                        <input
+                                            type="file"
+                                            accept=".csv,.xlsx,.xls"
+                                            className="hidden"
+                                            onChange={handleImportCategories}
+                                        />
+                                        <Button asChild variant="outline" disabled={loading}>
+                                            <span>
+                                                <FileUp className="mr-2 h-4 w-4" />
+                                                Import CSV
+                                            </span>
+                                        </Button>
+                                    </label>
+                                </div>
                             </div>
 
                             <div className="flex flex-wrap gap-2 pt-2">
                                 {categories.length === 0 && <span className="text-sm text-muted-foreground">No categories defined.</span>}
                                 {categories.map(cat => (
                                     <div key={cat.id} className="flex items-center gap-2 bg-muted/50 pl-3 pr-1 py-1 rounded-full border">
+                                        <span className="text-xs text-muted-foreground">{cat.code || '-'}</span>
                                         <span className="text-sm font-medium">{cat.name}</span>
                                         <Button
                                             variant="ghost"
@@ -313,8 +389,6 @@ export default function SettingsPage() {
                         </div>
                     </CardContent>
                 </Card>
-
-                <BackupSettingsCard />
 
                 <BackupSettingsCard />
 
@@ -580,4 +654,3 @@ function BackupSettingsCard() {
         </Card>
     );
 }
-

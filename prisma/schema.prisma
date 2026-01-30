@@ -235,12 +235,24 @@ model Project {
   tasks         Task[]
   allocations   Allocation[]  // Hard bookings
   expenses      Expense[]
+  budgetLines   ProjectBudgetLine[]
   
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt
 
   serviceAreaId String?
   serviceArea   ServiceArea?  @relation(fields: [serviceAreaId], references: [id])
+}
+
+model ProjectBudgetLine {
+  id           String   @id @default(uuid())
+  projectId    String
+  project      Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  category     String
+  subCategory  String?
+  plannedAmount Decimal @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 }
 
 model ServiceArea {
@@ -266,6 +278,7 @@ model Expense {
 
 model ExpenseCategory {
   id        String   @id @default(uuid())
+  code      String?  @unique
   name      String   @unique
   createdAt DateTime @default(now())
 }

@@ -27,11 +27,13 @@ export async function importExpenses(projectId: string, formData: FormData) {
             // Description: 說明, Description, Item, 摘要, 申請理由
             // Date: 申請日, Date, 日期
             // Applicant: 申請人, Applicant, Name
+            // Category: 會計科目, 科目, Category, Subject, Account, 科目代碼
 
             let amount = row['金額'] || row['Amount'] || row['Cost'] || row['amount'] || row['申請費用'] || row['請款金額'] || 0;
             let description = row['說明'] || row['摘要'] || row['Description'] || row['Item'] || row['申請理由'] || 'Imported Expense';
             let dateVal = row['申請日'] || row['Date'] || row['日期'] || new Date();
             let applicant = row['申請人'] || row['Applicant'] || row['Name'] || row['Incurred By'];
+            let categoryRaw = row['會計科目'] || row['科目'] || row['Category'] || row['Subject'] || row['Account'] || row['科目代碼'] || row['Account Code'] || row['Subject Code'];
 
             // Clean Amount
             if (typeof amount === 'string') {
@@ -49,13 +51,29 @@ export async function importExpenses(projectId: string, formData: FormData) {
             }
             if (isNaN(date.getTime())) date = new Date();
 
+            let category = 'General';
+            if (categoryRaw) {
+                const categoryText = String(categoryRaw).trim();
+                if (categoryText) {
+                    const match = await prisma.expenseCategory.findFirst({
+                        where: {
+                            OR: [
+                                { code: categoryText },
+                                { name: categoryText }
+                            ]
+                        }
+                    });
+                    category = match?.name || categoryText;
+                }
+            }
+
             expensesToCreate.push({
                 projectId,
                 description: String(description),
                 amount: Number(amount),
                 date: date,
                 incurredBy: applicant ? String(applicant) : null,
-                category: 'General' // Default
+                category
             });
         }
 
