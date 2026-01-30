@@ -482,47 +482,6 @@ export function FinancialView({ project, expenseCategories }: FinancialViewProps
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {/* Budget vs Actual */}
-                <Card>
-                    <CardHeader>
-                        <CardTitle>Budget vs Actual</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="space-y-4">
-                            <div className="flex items-center justify-between text-sm">
-                                <span className="text-muted-foreground">Planned Revenue</span>
-                                <span className="font-medium">{formatCurrency(metrics.plannedRevenue)}</span>
-                            </div>
-                            <div className="flex items-center justify-between text-sm">
-                                <span className="text-muted-foreground">Actual Revenue</span>
-                                <span className="font-medium">{formatCurrency(metrics.totalRevenue)}</span>
-                            </div>
-                            <div className="flex items-center justify-between text-sm">
-                                <span className="text-muted-foreground">Planned Direct Cost</span>
-                                <span className="font-medium text-blue-600">{formatCurrency(metrics.plannedDirectCost)}</span>
-                            </div>
-                            <div className="flex items-center justify-between text-sm">
-                                <span className="text-muted-foreground">Actual Direct Cost</span>
-                                <span className="font-medium text-red-600">{formatCurrency(metrics.actualCost)}</span>
-                            </div>
-                            <div className="flex items-center justify-between text-sm">
-                                <span className="text-muted-foreground">Planned Gross Profit</span>
-                                <span className="font-medium">{formatCurrency(metrics.plannedProfit)}</span>
-                            </div>
-                            <div className="flex items-center justify-between text-sm">
-                                <span className="text-muted-foreground">Actual Gross Profit</span>
-                                <span className={`font-medium ${metrics.profit >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                                    {formatCurrency(metrics.profit)}
-                                </span>
-                            </div>
-                            <div className="flex items-center justify-between text-sm">
-                                <span className="text-muted-foreground">Planned Margin</span>
-                                <span className="font-medium">{metrics.plannedMargin.toFixed(1)}%</span>
-                            </div>
-                        </div>
-                    </CardContent>
-                </Card>
-
                 {/* Budget Setup */}
                 <Card>
                     <CardHeader>
