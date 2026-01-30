@@ -380,6 +380,11 @@ export function FinancialView({ project, expenseCategories }: FinancialViewProps
         return items.sort((a, b) => b.usage - a.usage);
     }, [project]);
 
+    const plannedCostTotal = budgetStatus.reduce((sum, line) => sum + line.planned, 0);
+    const plannedRevenueTotal = metrics.plannedRevenue;
+    const plannedGrossProfit = plannedRevenueTotal - plannedCostTotal;
+    const plannedGrossMargin = plannedRevenueTotal > 0 ? (plannedGrossProfit / plannedRevenueTotal) * 100 : 0;
+
     const handleImportClick = () => {
         fileInputRef.current?.click();
     };
@@ -484,8 +489,35 @@ export function FinancialView({ project, expenseCategories }: FinancialViewProps
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {/* Budget Setup */}
                 <Card>
-                    <CardHeader>
+                    <CardHeader className="space-y-2">
                         <CardTitle>Cost Budget Setup</CardTitle>
+                        <div className="grid grid-cols-1 gap-2 md:grid-cols-4">
+                            <div className="rounded-md border bg-muted/30 px-3 py-2 text-sm">
+                                <div className="text-xs text-muted-foreground">Planned Cost</div>
+                                <div className="font-semibold">{formatCurrency(plannedCostTotal)}</div>
+                            </div>
+                            <div className="rounded-md border bg-muted/30 px-3 py-2 text-sm">
+                                <div className="text-xs text-muted-foreground">Planned Revenue</div>
+                                <div className="font-semibold">{formatCurrency(plannedRevenueTotal)}</div>
+                            </div>
+                            <div className="rounded-md border bg-muted/30 px-3 py-2 text-sm">
+                                <div className="text-xs text-muted-foreground">Planned Gross Profit</div>
+                                <div className={`font-semibold ${plannedGrossProfit >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                                    {formatCurrency(plannedGrossProfit)}
+                                </div>
+                            </div>
+                            <div className="rounded-md border bg-muted/30 px-3 py-2 text-sm">
+                                <div className="text-xs text-muted-foreground">Planned Margin</div>
+                                <div className={`font-semibold ${plannedGrossMargin >= 20 ? 'text-green-600' : 'text-rose-600'}`}>
+                                    {plannedGrossMargin.toFixed(1)}%
+                                </div>
+                            </div>
+                        </div>
+                        {plannedGrossMargin > 0 && plannedGrossMargin < 20 && (
+                            <div className="rounded-md border border-rose-200 bg-rose-50 px-3 py-2 text-xs text-rose-700">
+                                預估毛利率低於 20%，請確認預算或提高收入。
+                            </div>
+                        )}
                     </CardHeader>
                     <CardContent className="space-y-4">
                         <div className="grid grid-cols-1 gap-3 md:grid-cols-4">
