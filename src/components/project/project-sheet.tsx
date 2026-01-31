@@ -20,6 +20,7 @@ import { HelpCircle } from 'lucide-react';
 import { createProject, updateProject } from '@/app/admin/project/actions';
 import { useRouter } from 'next/navigation';
 import { Plus, Loader2 } from 'lucide-react';
+import { formatNumberInput, stripNumberFormatting } from '@/lib/format';
 
 interface ProjectSheetProps {
     project?: any; // If provided, edit mode
@@ -73,7 +74,7 @@ export function ProjectSheet({ project, trigger, open, defaultOpen, onOpenChange
                     status: project.status || 'ACTIVE',
                     startDate: project.startDate ? new Date(project.startDate).toISOString().split('T')[0] : '',
                     endDate: project.endDate ? new Date(project.endDate).toISOString().split('T')[0] : '',
-                    budget: project.budget ? String(project.budget) : '',
+                    budget: project.budget ? formatNumberInput(String(project.budget)) : '',
                     description: project.description || '',
                     serviceAreaId: project.serviceAreaId || ''
                 });
@@ -102,7 +103,7 @@ export function ProjectSheet({ project, trigger, open, defaultOpen, onOpenChange
             ...formData,
             startDate: formData.startDate ? new Date(formData.startDate) : undefined,
             endDate: formData.endDate ? new Date(formData.endDate) : undefined,
-            budget: formData.budget ? Number(formData.budget) : 0,
+            budget: formData.budget ? Number(stripNumberFormatting(formData.budget)) : 0,
             accountId: formData.accountId === 'none' || !formData.accountId ? undefined : formData.accountId,
             managerId: formData.managerId === 'none' || !formData.managerId ? undefined : formData.managerId,
             serviceAreaId: formData.serviceAreaId === 'none' || !formData.serviceAreaId ? undefined : formData.serviceAreaId
@@ -255,9 +256,11 @@ export function ProjectSheet({ project, trigger, open, defaultOpen, onOpenChange
                                 <Label htmlFor="budget">Budget ($)</Label>
                                 <Input
                                     id="budget"
-                                    type="number"
+                                    type="text"
+                                    inputMode="decimal"
                                     value={formData.budget}
-                                    onChange={e => setFormData({ ...formData, budget: e.target.value })}
+                                    onChange={e => setFormData({ ...formData, budget: formatNumberInput(e.target.value) })}
+                                    placeholder="0"
                                 />
                             </div>
                             <div className="space-y-2">

@@ -15,6 +15,7 @@ import { Edit2, Trash2, CheckCircle, DollarSign, Plus } from 'lucide-react';
 import { MilestoneDialog } from './milestone-dialog';
 import { deleteMilestone, toggleMilestonePayment } from '@/app/admin/project/actions';
 import { cn } from '@/lib/utils';
+import { formatNumber } from '@/lib/format';
 
 type Milestone = {
     id: string;
@@ -81,7 +82,7 @@ export function MilestoneList({ milestones, projectId }: { milestones: Milestone
                                     <span suppressHydrationWarning>{m.dueDate ? new Date(m.dueDate).toLocaleDateString() : 'TBD'}</span>
                                 </TableCell>
                                 <TableCell className="text-right font-mono">
-                                    ${Number(m.amount).toLocaleString()}
+                                    ${formatNumber(Number(m.amount))}
                                 </TableCell>
                                 <TableCell className="text-center">
                                     <Badge

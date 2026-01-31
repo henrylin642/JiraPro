@@ -24,6 +24,7 @@ import { ArrowRight, MoreHorizontal, Archive, LayoutDashboard, Trash, ChevronRig
 import { getProjects, archiveProject, deleteProject } from '@/app/admin/project/actions';
 import { useRouter } from 'next/navigation';
 import { ProjectSheet } from '@/components/project/project-sheet';
+import { formatNumber } from '@/lib/format';
 
 // Infer the type from the return value of getProjects
 type Projects = Awaited<ReturnType<typeof getProjects>>;
@@ -52,13 +53,7 @@ export function ProjectTableView({ projects, accounts = [], users = [], serviceA
         setExpandedProjects(newExpanded);
     };
 
-    const formatCurrency = (amount: number) => {
-        return new Intl.NumberFormat('en-US', {
-            style: 'currency',
-            currency: 'USD',
-            maximumFractionDigits: 0
-        }).format(amount);
-    };
+    const formatCurrency = (amount: number) => `$${formatNumber(amount)}`;
 
     const handleArchive = async (id: string) => {
         if (confirm('Are you sure you want to archive this project?')) {

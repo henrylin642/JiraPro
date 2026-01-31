@@ -13,6 +13,7 @@ import { GanttView } from '@/components/project/gantt-view';
 import { TaskBoard } from '@/components/project/task-board';
 import { MilestoneList } from '@/components/project/milestone-list';
 import { FinancialView } from '@/components/project/financial-view';
+import { formatNumber } from '@/lib/format';
 
 export const dynamic = 'force-dynamic';
 
@@ -74,7 +75,7 @@ export default async function ProjectDetailPage({
                     </CardHeader>
                     <CardContent>
                         <div className="text-2xl font-bold">
-                            ${project.milestones.reduce((sum: number, m: any) => sum + Number(m.amount), 0).toLocaleString()}
+                            ${formatNumber(project.milestones.reduce((sum: number, m: any) => sum + Number(m.amount), 0))}
                         </div>
                     </CardContent>
                 </Card>
