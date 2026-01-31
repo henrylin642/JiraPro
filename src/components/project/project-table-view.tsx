@@ -24,7 +24,7 @@ import { ArrowRight, MoreHorizontal, Archive, LayoutDashboard, Trash, ChevronRig
 import { getProjects, archiveProject, deleteProject } from '@/app/admin/project/actions';
 import { useRouter } from 'next/navigation';
 import { ProjectSheet } from '@/components/project/project-sheet';
-import { formatNumber } from '@/lib/format';
+import { formatCurrency } from '@/lib/format';
 
 // Infer the type from the return value of getProjects
 type Projects = Awaited<ReturnType<typeof getProjects>>;
@@ -53,7 +53,7 @@ export function ProjectTableView({ projects, accounts = [], users = [], serviceA
         setExpandedProjects(newExpanded);
     };
 
-    const formatCurrency = (amount: number) => `$${formatNumber(amount)}`;
+    const formatMoney = (amount: number, currency?: string) => formatCurrency(amount, currency || 'TWD');
 
     const handleArchive = async (id: string) => {
         if (confirm('Are you sure you want to archive this project?')) {
@@ -151,12 +151,12 @@ export function ProjectTableView({ projects, accounts = [], users = [], serviceA
                                         </Badge>
                                     </TableCell>
                                     <TableCell>{project.manager?.name || '-'}</TableCell>
-                                    <TableCell className="text-right">{formatCurrency(Number(project.budget))}</TableCell>
-                                    <TableCell className="text-right font-mono text-xs">{formatCurrency(personalCost)}</TableCell>
-                                    <TableCell className="text-right font-mono text-xs">{formatCurrency(expenseTotal)}</TableCell>
-                                    <TableCell className="text-right font-mono text-xs text-green-600">{formatCurrency(totalRevenue)}</TableCell>
+                                    <TableCell className="text-right">{formatMoney(Number(project.budget), project.currency)}</TableCell>
+                                    <TableCell className="text-right font-mono text-xs">{formatMoney(personalCost, project.currency)}</TableCell>
+                                    <TableCell className="text-right font-mono text-xs">{formatMoney(expenseTotal, project.currency)}</TableCell>
+                                    <TableCell className="text-right font-mono text-xs text-green-600">{formatMoney(totalRevenue, project.currency)}</TableCell>
                                     <TableCell className={`text-right font-bold ${margin >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                                        {formatCurrency(margin)}
+                                        {formatMoney(margin, project.currency)}
                                     </TableCell>
                                     <TableCell className="text-right">
                                         <DropdownMenu>
@@ -217,7 +217,7 @@ export function ProjectTableView({ projects, accounts = [], users = [], serviceA
                                                                             </Badge>
                                                                         </TableCell>
                                                                         <TableCell className="text-right font-mono">
-                                                                            {formatCurrency(Number(milestone.amount))}
+                                                                            {formatMoney(Number(milestone.amount), project.currency)}
                                                                         </TableCell>
                                                                     </TableRow>
                                                                 ))}

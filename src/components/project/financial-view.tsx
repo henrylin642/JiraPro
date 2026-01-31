@@ -13,7 +13,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Pencil, Trash2, Users as UsersIcon } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { formatNumber, formatNumberInput, stripNumberFormatting } from '@/lib/format';
+import { formatCurrency, formatNumber, formatNumberInput, stripNumberFormatting } from '@/lib/format';
 
 interface FinancialViewProps {
     project: any;
@@ -282,9 +282,8 @@ export function FinancialView({ project, expenseCategories }: FinancialViewProps
         };
     }, [project, estimatedLaborCost]);
 
-    const formatCurrency = (val: number) => {
-        return `$${formatNumber(val)}`;
-    };
+    const currency = project.currency || 'TWD';
+    const formatMoney = (val: number) => formatCurrency(val, currency);
 
     const monthlyBreakdown = useMemo(() => {
         const months = Array.from({ length: 12 }).map((_, idx) => ({
@@ -418,7 +417,7 @@ export function FinancialView({ project, expenseCategories }: FinancialViewProps
                     <FileSpreadsheet className="h-4 w-4 text-blue-600" />
                     <AlertTitle>Expenses Included</AlertTitle>
                     <AlertDescription>
-                        Actual Cost includes ${formatNumber(metrics.expenseCost)} expenses, ${formatNumber((metrics as any).hardLaborCost || 0)} from timesheets, and ${formatNumber((metrics as any).impliedLaborCost || 0)} from completed tasks.
+                        Actual Cost includes ${formatMoney(metrics.expenseCost)} expenses, ${formatMoney((metrics as any).hardLaborCost || 0)} from timesheets, and ${formatMoney((metrics as any).impliedLaborCost || 0)} from completed tasks.
                     </AlertDescription>
                 </Alert>
             )}
@@ -438,7 +437,7 @@ export function FinancialView({ project, expenseCategories }: FinancialViewProps
                         <DollarSign className="h-4 w-4 text-muted-foreground" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold">{formatCurrency(metrics.budget)}</div>
+                        <div className="text-2xl font-bold">{formatMoney(metrics.budget)}</div>
                     </CardContent>
                 </Card>
                 <Card>
@@ -447,7 +446,7 @@ export function FinancialView({ project, expenseCategories }: FinancialViewProps
                         <TrendingUp className="h-4 w-4 text-muted-foreground" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold text-green-600">{formatCurrency(metrics.totalRevenue)}</div>
+                        <div className="text-2xl font-bold text-green-600">{formatMoney(metrics.totalRevenue)}</div>
                     </CardContent>
                 </Card>
                 <Card>
@@ -456,7 +455,7 @@ export function FinancialView({ project, expenseCategories }: FinancialViewProps
                         <Calculator className="h-4 w-4 text-muted-foreground" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold text-red-600">{formatCurrency(metrics.actualCost)}</div>
+                        <div className="text-2xl font-bold text-red-600">{formatMoney(metrics.actualCost)}</div>
                     </CardContent>
                 </Card>
                 <Card>
@@ -466,7 +465,7 @@ export function FinancialView({ project, expenseCategories }: FinancialViewProps
                     </CardHeader>
                     <CardContent>
                         <div className={`text-2xl font-bold ${metrics.profit >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                            {formatCurrency(metrics.profit)}
+                            {formatMoney(metrics.profit)}
                         </div>
                     </CardContent>
                 </Card>
@@ -491,16 +490,16 @@ export function FinancialView({ project, expenseCategories }: FinancialViewProps
                         <div className="grid grid-cols-1 gap-2 md:grid-cols-4">
                             <div className="rounded-md border bg-muted/30 px-3 py-2 text-sm">
                                 <div className="text-xs text-muted-foreground">Planned Cost</div>
-                                <div className="font-semibold">{formatCurrency(plannedCostTotal)}</div>
+                                <div className="font-semibold">{formatMoney(plannedCostTotal)}</div>
                             </div>
                             <div className="rounded-md border bg-muted/30 px-3 py-2 text-sm">
                                 <div className="text-xs text-muted-foreground">Planned Revenue</div>
-                                <div className="font-semibold">{formatCurrency(plannedRevenueTotal)}</div>
+                                <div className="font-semibold">{formatMoney(plannedRevenueTotal)}</div>
                             </div>
                             <div className="rounded-md border bg-muted/30 px-3 py-2 text-sm">
                                 <div className="text-xs text-muted-foreground">Planned Gross Profit</div>
                                 <div className={`font-semibold ${plannedGrossProfit >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                                    {formatCurrency(plannedGrossProfit)}
+                                    {formatMoney(plannedGrossProfit)}
                                 </div>
                             </div>
                             <div className="rounded-md border bg-muted/30 px-3 py-2 text-sm">
@@ -567,10 +566,10 @@ export function FinancialView({ project, expenseCategories }: FinancialViewProps
                                         <div key={line.id} className="grid grid-cols-[1.2fr_1fr_1fr_1fr_1fr_120px] gap-2 px-3 py-2 text-sm items-center">
                                             <span>{line.baseCategory}</span>
                                             <span className="text-muted-foreground">{line.subCategory || '-'}</span>
-                                            <span className="text-right">{formatCurrency(line.planned)}</span>
-                                            <span className="text-right text-red-600">{formatCurrency(line.actual)}</span>
+                                            <span className="text-right">{formatMoney(line.planned)}</span>
+                                            <span className="text-right text-red-600">{formatMoney(line.actual)}</span>
                                             <span className={`text-right ${line.remaining >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                                                {formatCurrency(line.remaining)}
+                                                {formatMoney(line.remaining)}
                                             </span>
                                             <div className="flex justify-end gap-2">
                                                 <Button variant="outline" size="sm" onClick={() => handleStartEditBudget({ id: line.id, category: line.baseCategory, subCategory: line.subCategory, plannedAmount: line.planned })}>
@@ -606,12 +605,12 @@ export function FinancialView({ project, expenseCategories }: FinancialViewProps
                                 {monthlyBreakdown.months.map((m) => (
                                     <div key={m.month} className="grid grid-cols-[80px_1fr_1fr_1fr_1fr] px-3 py-2 text-sm">
                                         <span>{m.month}月</span>
-                                        <span className="text-right">{formatCurrency(m.revenue)}</span>
-                                        <span className="text-right">{formatCurrency(m.totalCost)}</span>
+                                        <span className="text-right">{formatMoney(m.revenue)}</span>
+                                        <span className="text-right">{formatMoney(m.totalCost)}</span>
                                         <span className={`text-right ${m.grossProfit >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                                            {formatCurrency(m.grossProfit)}
+                                            {formatMoney(m.grossProfit)}
                                         </span>
-                                        <span className="text-right text-muted-foreground">{formatCurrency(m.cumulativeProfit)}</span>
+                                        <span className="text-right text-muted-foreground">{formatMoney(m.cumulativeProfit)}</span>
                                     </div>
                                 ))}
                             </div>
@@ -642,7 +641,7 @@ export function FinancialView({ project, expenseCategories }: FinancialViewProps
                                                 </div>
                                             </div>
                                             <div className="font-bold text-sm text-amber-700">
-                                                ${formatNumber(p.cost)}
+                                                {formatMoney(p.cost)}
                                             </div>
                                         </div>
                                     ))}
@@ -651,11 +650,11 @@ export function FinancialView({ project, expenseCategories }: FinancialViewProps
                         )}
                         <div className="mt-4 pt-4 border-t flex justify-between items-center text-sm">
                             <span className="font-medium text-muted-foreground">Total Labor Cost (Actual)</span>
-                            <span className="font-bold text-amber-700">${formatNumber(metrics.timesheetCost)}</span>
+                            <span className="font-bold text-amber-700">{formatMoney(metrics.timesheetCost)}</span>
                         </div>
                         <div className="mt-2 flex justify-between items-center text-sm">
                             <span className="font-medium text-muted-foreground">Estimated Labor Cost (Planned)</span>
-                            <span className="font-bold text-blue-600">${formatNumber(estimatedLaborCost)}</span>
+                            <span className="font-bold text-blue-600">{formatMoney(estimatedLaborCost)}</span>
                         </div>
                     </CardContent>
                 </Card>
@@ -689,7 +688,7 @@ export function FinancialView({ project, expenseCategories }: FinancialViewProps
                                             <div className="flex items-center justify-between bg-muted/30 px-3 py-2 rounded-md">
                                                 <h4 className="font-semibold text-sm uppercase tracking-wider text-muted-foreground">{category}</h4>
                                                 <div className="font-bold text-sm text-muted-foreground">
-                                                    Subtotal: ${formatNumber(group.total)}
+                                                    Subtotal: {formatMoney(group.total)}
                                                 </div>
                                             </div>
                                             <div className="pl-2 space-y-1">
@@ -704,7 +703,7 @@ export function FinancialView({ project, expenseCategories }: FinancialViewProps
                                                         </div>
                                                         <div className="flex gap-4 items-center">
                                                             <div className="font-bold text-red-600 w-24 text-right">
-                                                                -${formatNumber(Number(e.amount))}
+                                                                -{formatMoney(Number(e.amount))}
                                                             </div>
                                                             <div className="flex gap-1">
                                                                 <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => openEditDialog(e)}>
@@ -793,7 +792,7 @@ export function FinancialView({ project, expenseCategories }: FinancialViewProps
                                         if (!match) return null;
                                         return (
                                             <div className="mt-2 text-xs text-muted-foreground">
-                                                剩餘預算：{formatCurrency(match.remaining)}（使用率 {match.usage.toFixed(1)}%）
+                                                剩餘預算：{formatMoney(match.remaining)}（使用率 {match.usage.toFixed(1)}%）
                                             </div>
                                         );
                                     })()}
@@ -890,7 +889,7 @@ export function FinancialView({ project, expenseCategories }: FinancialViewProps
                                             <div className="text-xs text-muted-foreground">Due: <span suppressHydrationWarning>{m.dueDate ? new Date(m.dueDate).toLocaleDateString() : 'N/A'}</span></div>
                                         </div>
                                         <div className="text-right">
-                                            <div className="font-bold">${formatNumber(Number(m.amount))}</div>
+                                            <div className="font-bold">{formatMoney(Number(m.amount))}</div>
                                             <div className={`text-xs ${m.isPaid ? 'text-green-600' : 'text-amber-600'}`}>
                                                 {m.isPaid ? 'Paid' : 'Unpaid'}
                                             </div>

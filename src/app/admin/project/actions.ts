@@ -369,6 +369,7 @@ export async function createProject(data: {
     startDate?: Date;
     endDate?: Date;
     budget?: number;
+    currency?: string;
     serviceAreaId?: string;
 }) {
     // Generate code (Simple PRJ-YYYYMMDD-XXXX)
@@ -388,6 +389,7 @@ export async function createProject(data: {
                 startDate: data.startDate,
                 endDate: data.endDate,
                 budget: data.budget,
+                currency: data.currency,
                 serviceAreaId: data.serviceAreaId,
             }
         });
@@ -408,6 +410,7 @@ export async function updateProject(id: string, data: {
     startDate?: Date | null;
     endDate?: Date | null;
     budget?: number;
+    currency?: string;
     serviceAreaId?: string | null;
 }) {
     try {
@@ -422,6 +425,7 @@ export async function updateProject(id: string, data: {
                 startDate: data.startDate,
                 endDate: data.endDate,
                 budget: data.budget,
+                currency: data.currency,
                 serviceAreaId: data.serviceAreaId,
             }
         });

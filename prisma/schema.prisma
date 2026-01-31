@@ -229,6 +229,7 @@ model Project {
   startDate     DateTime?
   endDate       DateTime?
   budget        Decimal       @default(0)
+  currency      String        @default("TWD") // TWD, USD, CNY
   
   // Relations
   milestones    Milestone[]

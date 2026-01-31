@@ -46,6 +46,7 @@ export function ProjectSheet({ project, trigger, open, defaultOpen, onOpenChange
         startDate: '',
         endDate: '',
         budget: '',
+        currency: 'TWD',
         description: '',
         serviceAreaId: ''
     });
@@ -75,6 +76,7 @@ export function ProjectSheet({ project, trigger, open, defaultOpen, onOpenChange
                     startDate: project.startDate ? new Date(project.startDate).toISOString().split('T')[0] : '',
                     endDate: project.endDate ? new Date(project.endDate).toISOString().split('T')[0] : '',
                     budget: project.budget ? formatNumberInput(String(project.budget)) : '',
+                    currency: project.currency || 'TWD',
                     description: project.description || '',
                     serviceAreaId: project.serviceAreaId || ''
                 });
@@ -88,6 +90,7 @@ export function ProjectSheet({ project, trigger, open, defaultOpen, onOpenChange
                     startDate: '',
                     endDate: '',
                     budget: '',
+                    currency: 'TWD',
                     description: '',
                     serviceAreaId: ''
                 });
@@ -104,6 +107,7 @@ export function ProjectSheet({ project, trigger, open, defaultOpen, onOpenChange
             startDate: formData.startDate ? new Date(formData.startDate) : undefined,
             endDate: formData.endDate ? new Date(formData.endDate) : undefined,
             budget: formData.budget ? Number(stripNumberFormatting(formData.budget)) : 0,
+            currency: formData.currency,
             accountId: formData.accountId === 'none' || !formData.accountId ? undefined : formData.accountId,
             managerId: formData.managerId === 'none' || !formData.managerId ? undefined : formData.managerId,
             serviceAreaId: formData.serviceAreaId === 'none' || !formData.serviceAreaId ? undefined : formData.serviceAreaId
@@ -253,15 +257,30 @@ export function ProjectSheet({ project, trigger, open, defaultOpen, onOpenChange
 
                         <div className="grid grid-cols-2 gap-4">
                             <div className="space-y-2">
-                                <Label htmlFor="budget">Budget ($)</Label>
-                                <Input
-                                    id="budget"
-                                    type="text"
-                                    inputMode="decimal"
-                                    value={formData.budget}
-                                    onChange={e => setFormData({ ...formData, budget: formatNumberInput(e.target.value) })}
-                                    placeholder="0"
-                                />
+                                <Label htmlFor="budget">Budget</Label>
+                                <div className="flex gap-2">
+                                    <Input
+                                        id="budget"
+                                        type="text"
+                                        inputMode="decimal"
+                                        value={formData.budget}
+                                        onChange={e => setFormData({ ...formData, budget: formatNumberInput(e.target.value) })}
+                                        placeholder="0"
+                                    />
+                                    <Select
+                                        value={formData.currency}
+                                        onValueChange={v => setFormData({ ...formData, currency: v })}
+                                    >
+                                        <SelectTrigger className="w-[110px]">
+                                            <SelectValue />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="TWD">TWD</SelectItem>
+                                            <SelectItem value="USD">USD</SelectItem>
+                                            <SelectItem value="CNY">CNY</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                </div>
                             </div>
                             <div className="space-y-2">
                                 <div className="flex items-center gap-2">

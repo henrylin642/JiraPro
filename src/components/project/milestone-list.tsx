@@ -15,7 +15,7 @@ import { Edit2, Trash2, CheckCircle, DollarSign, Plus } from 'lucide-react';
 import { MilestoneDialog } from './milestone-dialog';
 import { deleteMilestone, toggleMilestonePayment } from '@/app/admin/project/actions';
 import { cn } from '@/lib/utils';
-import { formatNumber } from '@/lib/format';
+import { formatCurrency } from '@/lib/format';
 
 type Milestone = {
     id: string;
@@ -26,7 +26,7 @@ type Milestone = {
     isPaid: boolean;
 };
 
-export function MilestoneList({ milestones, projectId }: { milestones: Milestone[], projectId: string }) {
+export function MilestoneList({ milestones, projectId, currency = 'TWD' }: { milestones: Milestone[], projectId: string; currency?: string }) {
     const [openDialog, setOpenDialog] = useState(false);
     const [editingMilestone, setEditingMilestone] = useState<Milestone | null>(null);
     const [loadingId, setLoadingId] = useState<string | null>(null);
@@ -82,7 +82,7 @@ export function MilestoneList({ milestones, projectId }: { milestones: Milestone
                                     <span suppressHydrationWarning>{m.dueDate ? new Date(m.dueDate).toLocaleDateString() : 'TBD'}</span>
                                 </TableCell>
                                 <TableCell className="text-right font-mono">
-                                    ${formatNumber(Number(m.amount))}
+                                    {formatCurrency(Number(m.amount), currency)}
                                 </TableCell>
                                 <TableCell className="text-center">
                                     <Badge
