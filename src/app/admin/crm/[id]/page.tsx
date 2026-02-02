@@ -20,6 +20,7 @@ import { OpportunityDialog } from '@/components/crm/opportunity-dialog';
 import { STAGE_LABELS } from '@/lib/crm-constants';
 import { calculateDealHealth } from '@/lib/deal-health';
 import { DealHealthCard } from '@/components/crm/deal-health-card';
+import { OpportunityGoalSection } from '@/components/crm/opportunity-goal-section';
 
 
 export const dynamic = 'force-dynamic';
@@ -145,11 +146,17 @@ export default async function OpportunityDetailPage({
                         </div>
                     </TabsContent>
 
-                    <TabsContent value="tasks" className="h-[calc(100vh-250px)]">
-                        <TaskBoard
-                            initialTasks={opportunity.tasks as any[]}
-                            opportunityId={opportunity.id}
-                        />
+                    <TabsContent value="tasks" className="h-[calc(100vh-250px)] overflow-auto">
+                        <div className="space-y-6 pb-10">
+                            <OpportunityGoalSection
+                                opportunityId={opportunity.id}
+                                goals={(opportunity as any).goals || []}
+                            />
+                            <TaskBoard
+                                initialTasks={opportunity.tasks as any[]}
+                                opportunityId={opportunity.id}
+                            />
+                        </div>
                     </TabsContent>
 
 

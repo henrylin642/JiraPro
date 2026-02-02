@@ -103,6 +103,9 @@ export async function getOpportunityById(id: string) {
                     }
                 },
                 orderBy: { createdAt: 'desc' }
+            },
+            goals: {
+                orderBy: { targetDate: 'asc' }
             }
         },
     });
@@ -582,5 +585,39 @@ export async function deleteInteraction(id: string, opportunityId: string) {
     } catch (error) {
         console.error("Error deleting interaction:", error);
         return { success: false, error: "Failed to delete interaction" };
+    }
+}
+
+export async function createDealGoal(data: {
+    opportunityId: string;
+    description: string;
+    targetDate: Date | null;
+}) {
+    try {
+        await prisma.opportunityGoal.create({
+            data: {
+                opportunityId: data.opportunityId,
+                description: data.description,
+                targetDate: data.targetDate,
+            }
+        });
+        revalidatePath(`/admin/crm/${data.opportunityId}`);
+        return { success: true };
+    } catch (error) {
+        console.error("Error creating deal goal:", error);
+        return { success: false, error: "Failed to create deal goal" };
+    }
+}
+
+export async function deleteDealGoal(id: string, opportunityId: string) {
+    try {
+        await prisma.opportunityGoal.delete({
+            where: { id }
+        });
+        revalidatePath(`/admin/crm/${opportunityId}`);
+        return { success: true };
+    } catch (error) {
+        console.error("Error deleting deal goal:", error);
+        return { success: false, error: "Failed to delete deal goal" };
     }
 }

@@ -136,6 +136,21 @@ model Opportunity {
   createdAt      DateTime         @default(now())
   updatedAt      DateTime         @updatedAt
   stageUpdatedAt DateTime         @default(now())
+
+  goals          OpportunityGoal[]
+}
+
+model OpportunityGoal {
+  id            String      @id @default(uuid())
+  opportunityId String
+  opportunity   Opportunity @relation(fields: [opportunityId], references: [id], onDelete: Cascade)
+  
+  description   String
+  targetDate    DateTime?   // e.g. "March 2026"
+  isCompleted   Boolean     @default(false)
+  
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
 }
 
 // --- Product Management ---
