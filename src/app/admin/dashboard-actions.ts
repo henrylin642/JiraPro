@@ -159,6 +159,9 @@ export async function getPortfolio() {
                     },
                     serviceArea: {
                         select: { name: true }
+                    },
+                    account: {
+                        select: { name: true }
                     }
                 }
             }),
@@ -190,6 +193,9 @@ export async function getPortfolio() {
                     tasks: {
                         where: { status: { not: 'DONE' } },
                         select: { dueDate: true }
+                    },
+                    account: {
+                        select: { name: true }
                     }
                 }
             })
@@ -208,6 +214,7 @@ export async function getPortfolio() {
                 date: p.endDate,
                 owner: p.manager?.name || null,
                 serviceArea: p.serviceArea?.name || null,
+                client: p.account?.name || null,
             })),
             ...opportunities.map(o => {
                 const estimatedValue = Number(o.estimatedValue);
@@ -238,6 +245,7 @@ export async function getPortfolio() {
                     serviceArea: o.serviceArea?.name || null,
                     healthScore: health.score,
                     riskScore: Math.max(0, 100 - health.score),
+                    client: o.account?.name || null,
                 };
             })
         ];

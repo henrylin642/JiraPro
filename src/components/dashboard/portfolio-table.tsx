@@ -31,6 +31,7 @@ type PortfolioItem = {
     serviceArea: string | null;
     healthScore?: number | null;
     riskScore?: number | null;
+    client?: string | null;
 };
 
 type SortConfig = {
@@ -167,108 +168,112 @@ export function PortfolioTable({ data }: { data: PortfolioItem[] }) {
                         onScroll={handleMainScroll}
                     >
                         <Table ref={tableRef} className="min-w-[1200px]">
-                        <TableHeader>
-                            <TableRow>
-                                <TableHead className="sticky left-0 z-30 w-[300px] border-r bg-background cursor-pointer hover:bg-slate-50" onClick={() => handleSort('name')}>
-                                    <div className="flex items-center">
-                                        Name {sortConfig?.key === 'name' && <ArrowUpDown className="ml-2 h-4 w-4" />}
-                                    </div>
-                                </TableHead>
-                                <TableHead>Type</TableHead>
-                                <TableHead>Service Area</TableHead>
-                                <TableHead>Owner</TableHead>
-                                <TableHead>Status</TableHead>
-                                <TableHead className="text-right cursor-pointer hover:bg-slate-50" onClick={() => handleSort('value')}>
-                                    <div className="flex items-center justify-end">
-                                        Value {sortConfig?.key === 'value' && <ArrowUpDown className="ml-2 h-4 w-4" />}
-                                    </div>
-                                </TableHead>
-                                <TableHead className="text-center">Health</TableHead>
-                                <TableHead className="text-center">Risk</TableHead>
-                                <TableHead className="text-right">Probability</TableHead>
-                                <TableHead className="text-right cursor-pointer hover:bg-slate-50" onClick={() => handleSort('weightedValue')}>
-                                    <div className="flex items-center justify-end">
-                                        Weighted Value {sortConfig?.key === 'weightedValue' && <ArrowUpDown className="ml-2 h-4 w-4" />}
-                                    </div>
-                                </TableHead>
-                                <TableHead className="text-right">Est. End/Close</TableHead>
-                                <TableHead className="text-right">Edit</TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            {filteredData.map((item) => (
-                                <TableRow key={item.id} className="group">
-                                    <TableCell className="sticky left-0 z-20 border-r bg-background font-medium group-hover:bg-muted/50">
-                                        <div className="flex flex-col">
-                                            <span>{item.name}</span>
-                                            {item.code && <span className="text-xs text-muted-foreground">{item.code}</span>}
-                                        </div>
-                                    </TableCell>
-                                    <TableCell>
-                                        {item.type === 'PROJECT' ? (
-                                            <Badge variant="default" className="bg-blue-600 hover:bg-blue-700">
-                                                <Briefcase className="w-3 h-3 mr-1" /> Project
-                                            </Badge>
-                                        ) : (
-                                            <Badge variant="secondary" className="bg-purple-100 text-purple-700 hover:bg-purple-200 border-purple-200">
-                                                <Target className="w-3 h-3 mr-1" /> Opportunity
-                                            </Badge>
-                                        )}
-                                    </TableCell>
-                                    <TableCell>
-                                        {item.serviceArea || <span className="text-muted-foreground">-</span>}
-                                    </TableCell>
-                                    <TableCell>
-                                        {item.owner || <span className="text-muted-foreground">-</span>}
-                                    </TableCell>
-                                    <TableCell>
-                                        <Badge variant="outline">{item.status.replace('_', ' ')}</Badge>
-                                    </TableCell>
-                                    <TableCell className="text-right">
-                                        {formatCurrency(item.value)}
-                                    </TableCell>
-                                    <TableCell className="text-center">
-                                        {item.type === 'OPPORTUNITY' && typeof item.healthScore === 'number' ? (
-                                            <HealthBadge score={item.healthScore} />
-                                        ) : (
-                                            <span className="text-muted-foreground text-sm">-</span>
-                                        )}
-                                    </TableCell>
-                                    <TableCell className="text-center">
-                                        {item.type === 'OPPORTUNITY' ? (
-                                            <Badge variant="outline" className={`text-xs ${getRiskTone(item.riskScore)}`}>
-                                                <ShieldAlert className="h-3 w-3 mr-1" />
-                                                {formatRisk(item.riskScore)}
-                                            </Badge>
-                                        ) : (
-                                            <span className="text-muted-foreground text-sm">-</span>
-                                        )}
-                                    </TableCell>
-                                    <TableCell className="text-right">
-                                        {item.probability}%
-                                    </TableCell>
-                                    <TableCell className="text-right font-bold">
-                                        {formatCurrency(item.weightedValue)}
-                                    </TableCell>
-                                    <TableCell className="text-right text-muted-foreground text-sm">
-                                        {formatDate(item.date)}
-                                    </TableCell>
-                                    <TableCell className="text-right">
-                                        <Link href={item.type === 'PROJECT' ? `/admin/project/${item.id}?edit=1` : `/admin/crm/${item.id}?edit=1`}>
-                                            <Button variant="outline" size="sm">Edit</Button>
-                                        </Link>
-                                    </TableCell>
-                                </TableRow>
-                            ))}
-                            {filteredData.length === 0 && (
+                            <TableHeader>
                                 <TableRow>
-                                    <TableCell colSpan={12} className="text-center h-24 text-muted-foreground">
-                                        No matching records found.
-                                    </TableCell>
+                                    <TableHead className="sticky left-0 z-30 w-[300px] border-r bg-background cursor-pointer hover:bg-slate-50" onClick={() => handleSort('name')}>
+                                        <div className="flex items-center">
+                                            Name {sortConfig?.key === 'name' && <ArrowUpDown className="ml-2 h-4 w-4" />}
+                                        </div>
+                                    </TableHead>
+                                    <TableHead>Type</TableHead>
+                                    <TableHead>Client</TableHead>
+                                    <TableHead>Service Area</TableHead>
+                                    <TableHead>Owner</TableHead>
+                                    <TableHead>Status</TableHead>
+                                    <TableHead className="text-right cursor-pointer hover:bg-slate-50" onClick={() => handleSort('value')}>
+                                        <div className="flex items-center justify-end">
+                                            Value {sortConfig?.key === 'value' && <ArrowUpDown className="ml-2 h-4 w-4" />}
+                                        </div>
+                                    </TableHead>
+                                    <TableHead className="text-center">Health</TableHead>
+                                    <TableHead className="text-center">Risk</TableHead>
+                                    <TableHead className="text-right">Probability</TableHead>
+                                    <TableHead className="text-right cursor-pointer hover:bg-slate-50" onClick={() => handleSort('weightedValue')}>
+                                        <div className="flex items-center justify-end">
+                                            Weighted Value {sortConfig?.key === 'weightedValue' && <ArrowUpDown className="ml-2 h-4 w-4" />}
+                                        </div>
+                                    </TableHead>
+                                    <TableHead className="text-right">Est. End/Close</TableHead>
+                                    <TableHead className="text-right">Edit</TableHead>
                                 </TableRow>
-                            )}
-                        </TableBody>
-                    </Table>
+                            </TableHeader>
+                            <TableBody>
+                                {filteredData.map((item) => (
+                                    <TableRow key={item.id} className="group">
+                                        <TableCell className="sticky left-0 z-20 border-r bg-background font-medium group-hover:bg-muted/50">
+                                            <div className="flex flex-col">
+                                                <span>{item.name}</span>
+                                                {item.code && <span className="text-xs text-muted-foreground">{item.code}</span>}
+                                            </div>
+                                        </TableCell>
+                                        <TableCell>
+                                            {item.type === 'PROJECT' ? (
+                                                <Badge variant="default" className="bg-blue-600 hover:bg-blue-700">
+                                                    <Briefcase className="w-3 h-3 mr-1" /> Project
+                                                </Badge>
+                                            ) : (
+                                                <Badge variant="secondary" className="bg-purple-100 text-purple-700 hover:bg-purple-200 border-purple-200">
+                                                    <Target className="w-3 h-3 mr-1" /> Opportunity
+                                                </Badge>
+                                            )}
+                                        </TableCell>
+                                        <TableCell>
+                                            {item.client || <span className="text-muted-foreground">-</span>}
+                                        </TableCell>
+                                        <TableCell>
+                                            {item.serviceArea || <span className="text-muted-foreground">-</span>}
+                                        </TableCell>
+                                        <TableCell>
+                                            {item.owner || <span className="text-muted-foreground">-</span>}
+                                        </TableCell>
+                                        <TableCell>
+                                            <Badge variant="outline">{item.status.replace('_', ' ')}</Badge>
+                                        </TableCell>
+                                        <TableCell className="text-right">
+                                            {formatCurrency(item.value)}
+                                        </TableCell>
+                                        <TableCell className="text-center">
+                                            {item.type === 'OPPORTUNITY' && typeof item.healthScore === 'number' ? (
+                                                <HealthBadge score={item.healthScore} />
+                                            ) : (
+                                                <span className="text-muted-foreground text-sm">-</span>
+                                            )}
+                                        </TableCell>
+                                        <TableCell className="text-center">
+                                            {item.type === 'OPPORTUNITY' ? (
+                                                <Badge variant="outline" className={`text-xs ${getRiskTone(item.riskScore)}`}>
+                                                    <ShieldAlert className="h-3 w-3 mr-1" />
+                                                    {formatRisk(item.riskScore)}
+                                                </Badge>
+                                            ) : (
+                                                <span className="text-muted-foreground text-sm">-</span>
+                                            )}
+                                        </TableCell>
+                                        <TableCell className="text-right">
+                                            {item.probability}%
+                                        </TableCell>
+                                        <TableCell className="text-right font-bold">
+                                            {formatCurrency(item.weightedValue)}
+                                        </TableCell>
+                                        <TableCell className="text-right text-muted-foreground text-sm">
+                                            {formatDate(item.date)}
+                                        </TableCell>
+                                        <TableCell className="text-right">
+                                            <Link href={item.type === 'PROJECT' ? `/admin/project/${item.id}?edit=1` : `/admin/crm/${item.id}?edit=1`}>
+                                                <Button variant="outline" size="sm">Edit</Button>
+                                            </Link>
+                                        </TableCell>
+                                    </TableRow>
+                                ))}
+                                {filteredData.length === 0 && (
+                                    <TableRow>
+                                        <TableCell colSpan={13} className="text-center h-24 text-muted-foreground">
+                                            No matching records found.
+                                        </TableCell>
+                                    </TableRow>
+                                )}
+                            </TableBody>
+                        </Table>
                     </div>
                 </div>
                 <div className="mt-2 text-xs text-muted-foreground">
