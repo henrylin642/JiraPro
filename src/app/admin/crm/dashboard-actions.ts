@@ -41,9 +41,6 @@ export async function getSalesStats() {
             stageMap.set(s, { stage: s, count: 0, value: 0, weightedValue: 0 });
         });
 
-        let wonCount = 0;
-        let closedCount = 0; // Won + Lost (if we included lost)
-
         opportunities.forEach(opp => {
             const val = Number(opp.estimatedValue);
             const prob = opp.probability / 100;
@@ -58,17 +55,24 @@ export async function getSalesStats() {
                 s.value += val;
                 s.weightedValue += weighted;
             }
-
-            if (opp.stage === 'CLOSED_WON') wonCount++;
         });
 
         // Simple Win Rate: Won / Total (This is a simplified metric, usually it's Won / (Won + Lost))
         // Since we filtered out CLOSED_LOST above, let's fetch ALL for win rate calc
-        const [allOpps, lostOpps, wonOpps] = await Promise.all([
-            prisma.opportunity.count(),
-            prisma.opportunity.count({ where: { stage: 'CLOSED_LOST' } }),
-            prisma.opportunity.count({ where: { stage: 'CLOSED_WON' } })
-        ]);
+        const oppsByStage = await prisma.opportunity.groupBy({
+            by: ['stage'],
+            _count: {
+                stage: true
+            },
+            where: {
+                stage: {
+                    in: ['CLOSED_WON', 'CLOSED_LOST']
+                }
+            }
+        });
+
+        const wonOpps = oppsByStage.find(s => s.stage === 'CLOSED_WON')?._count.stage || 0;
+        const lostOpps = oppsByStage.find(s => s.stage === 'CLOSED_LOST')?._count.stage || 0;
 
         const closedTotal = wonOpps + lostOpps;
         stats.winRate = closedTotal > 0 ? (wonOpps / closedTotal) * 100 : 0;
