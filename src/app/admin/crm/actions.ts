@@ -3,6 +3,7 @@
 import prisma from '@/lib/prisma';
 import { revalidatePath } from 'next/cache';
 import { calculateDealHealth } from '@/lib/deal-health';
+import { validateOpportunityCreation } from './validation';
 
 export type OpportunityWithAccount = {
     id: string;
@@ -141,24 +142,12 @@ export async function createOpportunity(data: {
     probabilityOverrideReason?: string;
 }) {
     try {
-        const trimmedReason = data.probabilityOverrideReason?.trim() || '';
-        const health = calculateDealHealth({
-            stage: data.stage,
-            checklist: [],
-            ownerId: data.ownerId,
-            expectedCloseDate: data.expectedCloseDate,
-            estimatedValue: data.estimatedValue,
-            serviceAreaId: data.serviceAreaId,
-            stageUpdatedAt: new Date(),
-            lastInteractionAt: null,
-            openTasks: [],
-            currentProbability: data.probability,
-        });
-        const probabilityGap = Math.abs(health.recommendedProbability - data.probability);
-
-        if (probabilityGap >= 20 && !trimmedReason) {
-            return { success: false, error: 'PROBABILITY_REASON_REQUIRED' };
+        const validation = validateOpportunityCreation(data);
+        if (!validation.success) {
+            return { success: false, error: validation.error };
         }
+
+        const trimmedReason = data.probabilityOverrideReason?.trim() || '';
 
         const opportunity = await prisma.opportunity.create({
             data: {
