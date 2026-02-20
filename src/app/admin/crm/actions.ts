@@ -3,6 +3,7 @@
 import prisma from '@/lib/prisma';
 import { revalidatePath } from 'next/cache';
 import { calculateDealHealth } from '@/lib/deal-health';
+import { calculateWinLossStats } from './stats-logic';
 
 export type OpportunityWithAccount = {
     id: string;
@@ -322,24 +323,7 @@ export async function getWinLossStats() {
             }
         });
 
-        const stats = {
-            won: 0,
-            lost: 0,
-            reasons: {} as Record<string, number>
-        };
-
-        closedOpps.forEach(opp => {
-            if (opp.stage === 'CLOSED_WON') {
-                stats.won++;
-            } else {
-                stats.lost++;
-                if (opp.lossReason) {
-                    stats.reasons[opp.lossReason] = (stats.reasons[opp.lossReason] || 0) + 1;
-                }
-            }
-        });
-
-        return stats;
+        return calculateWinLossStats(closedOpps);
     } catch (error) {
         console.error("Error fetching win/loss stats:", error);
         return { won: 0, lost: 0, reasons: {} };
