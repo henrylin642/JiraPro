@@ -1,5 +1,5 @@
 import React from 'react';
-import { getAccountDetails, addContact, logInteraction } from '@/app/admin/crm/account-actions';
+import { getAccountDetails, addContact } from '@/app/admin/crm/account-actions';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';

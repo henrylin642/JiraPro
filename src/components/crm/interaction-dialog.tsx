@@ -20,9 +20,6 @@ interface InteractionDialogProps {
     accountId: string;
 }
 
-// TODO: In a real app, get current userId from Session
-const MOCK_USER_ID = 'user-id-placeholder';
-
 export function InteractionDialog({ trigger, accountId }: InteractionDialogProps) {
     const router = useRouter();
     const [open, setOpen] = useState(false);
@@ -37,22 +34,7 @@ export function InteractionDialog({ trigger, accountId }: InteractionDialogProps
         e.preventDefault();
         setLoading(true);
         try {
-            // Need a way to get Current User ID. For now hardcoding or using the first user from seed if possible, 
-            // but since this is client side, we'll rely on server action to handle user or pass a mock.
-            // The server action expects userId. 
-            // Let's assume we pass a placeholder and the server handles it or we need to fetch it.
-            // For now, I'll pass a known ID from the seed manually if I knew it, or let's use a "System" user concept.
-            // Actually, let's fix the server action to use a default or params.
-            // Wait, the seed created an Admin user. I'll need to fetch a user ID. 
-            // For this iterate, I will hardcode the Admin ID from the seed if I can find it, or fix the action.
-            // BETTER: pass a temporary ID, and I'll update the action to look up a user if needed.
-
-            // To make it work immediately without Auth/Session logic implemented yet:
-            // I'll fetch the first user in the action if userId is missing/invalid, or just pass a dummy string 
-            // and ensure the database has that user or the action handles it.
-            // Let's assume the user is "Admin" for now which we seeded. I'll use a placeholder and handle in action.
-
-            await logInteraction(accountId, "mock-user-id", { ...formData, date });
+            await logInteraction(accountId, { ...formData, date });
             setFormData({ type: 'MEETING', notes: '' });
             setOpen(false);
             router.refresh();
