@@ -3,8 +3,52 @@
 import { prisma } from '@/lib/prisma';
 import { revalidatePath } from 'next/cache';
 import { getCurrentUser } from '@/lib/auth';
-import { Prisma } from '@prisma/client';
+import {
+    Prisma,
+    User,
+    Account,
+    Product,
+    ResourceProfile,
+    Contact,
+    Interaction,
+    Feature,
+    RoadmapItem,
+    Opportunity,
+    Project,
+    Milestone,
+    Task,
+    Allocation,
+    Idea,
+    TimesheetEntry,
+    ExpenseCategory,
+    ProjectBudgetLine,
+    ServiceArea
+} from '@prisma/client';
 import * as XLSX from 'xlsx';
+
+// Define the shape of the backup data
+interface BackupData {
+    timestamp: string;
+    version: string;
+    users: User[];
+    accounts: Account[];
+    products: Product[];
+    resourceProfiles: ResourceProfile[];
+    contacts: Contact[];
+    interactions: Interaction[];
+    features: (Feature & { opportunities: { id: string }[] })[];
+    roadmapItems: RoadmapItem[];
+    opportunities: (Opportunity & { features: { id: string }[] })[];
+    projects: Project[];
+    milestones: Milestone[];
+    tasks: (Task & { parent?: unknown; subtasks?: unknown })[];
+    allocations: Allocation[];
+    ideas: Idea[];
+    timesheetEntries: TimesheetEntry[];
+    expenseCategories: ExpenseCategory[];
+    projectBudgetLines: ProjectBudgetLine[];
+    serviceAreas: ServiceArea[];
+}
 
 export async function getBackupSettings() {
     try {
@@ -67,7 +111,7 @@ export async function restoreFromBackupId(id: string) {
         // Convert Json to strong type or string for processing
         // Prisma Json type is mapped to any/object.
         // We can treat it as the data object directly.
-        const data = backup.data as any; // Cast for now
+        const data = backup.data as unknown as BackupData;
 
         // Reuse restore logic - create a mock File/FormData or extract logic
         // Refactoring restoreSystem to take an object is better.
@@ -161,7 +205,7 @@ export async function backupSystem() {
         await prisma.systemBackup.create({
             data: {
                 filename,
-                data: data as any, // Cast to any for Prisma Json
+                data: data as unknown as Prisma.InputJsonValue,
                 size
             }
         });
@@ -181,143 +225,10 @@ export async function restoreSystem(formData: FormData) {
 
     try {
         const text = await file.text();
-        const data = JSON.parse(text);
+        // Validation happens in restoreSystemData but we need to cast here
+        const data = JSON.parse(text) as BackupData;
 
-        // Validation - Basic check
-        if (!data.version || !data.users) {
-            return { success: false, error: 'Invalid backup file format' };
-        }
-
-        await prisma.$transaction(async (tx) => {
-            // 1. DELETE ALL (Reverse Order)
-            // Note: Use deleteMany({}) to clear tables. Order matters for FK constraints.
-            await tx.expenseCategory.deleteMany();
-            await tx.serviceArea.deleteMany(); // Delete Service Areas
-            await tx.timesheetEntry.deleteMany();
-            await tx.projectBudgetLine.deleteMany();
-            await tx.allocation.deleteMany();
-            await tx.idea.deleteMany();
-            // Feature <-> Opportunity is implicit. Breaking relations usually fine if both deleted?
-            // Actually, implicit tables cascade delete.
-            await tx.interaction.deleteMany();
-            await tx.contact.deleteMany();
-            // Task self-reference: Delete all usually works or might need recursive logic?
-            // SQLite/Prisma typically handles 'deleteMany' without checking constraints row-by-row if no restrict.
-            // But if restrict... Task->Project is ok. Task->Task?
-            // To be safe, we can try deleting. If it fails on self-ref, we might need to nullify parents first.
-            // Let's try direct delete.
-            await tx.task.deleteMany();
-            await tx.milestone.deleteMany();
-            await tx.project.deleteMany();
-            await tx.opportunity.deleteMany(); // Cascade breaks features link
-            await tx.roadmapItem.deleteMany();
-            await tx.feature.deleteMany();
-            await tx.product.deleteMany();
-            await tx.resourceProfile.deleteMany();
-            await tx.account.deleteMany();
-            await tx.user.deleteMany();
-
-            // 2. RESTORE ALL (Forward Order)
-            // Note: We ignore many-to-many link tables in createMany usually, dealing with them via connect?
-            // Prisma createMany DOES NOT support nested relations (connect).
-            // So we must iterate for tables with relations if we want to restore links.
-            // Performance hit, but necessary for correct restoration of relations.
-
-            // A. Users
-            if (data.users?.length) await tx.user.createMany({ data: data.users });
-
-            // B. Accounts
-            if (data.accounts?.length) await tx.account.createMany({ data: data.accounts });
-
-            // C. Products
-            if (data.products?.length) await tx.product.createMany({ data: data.products });
-
-            // D. ResourceProfiles
-            if (data.resourceProfiles?.length) await tx.resourceProfile.createMany({ data: data.resourceProfiles });
-
-            // E. Contacts
-            if (data.contacts?.length) await tx.contact.createMany({ data: data.contacts });
-
-            // F. Interactions
-            if (data.interactions?.length) await tx.interaction.createMany({ data: data.interactions });
-
-            // G. Features (Has relation to Opportunity, but we restore Opportunity later. Just create Feature first.)
-            // We need to strip 'opportunities' from the data object if it exists from backup include.
-            for (const f of data.features || []) {
-                const { opportunities, ...rest } = f;
-                await tx.feature.create({ data: rest });
-            }
-
-            // H. RoadmapItems
-            if (data.roadmapItems?.length) await tx.roadmapItem.createMany({ data: data.roadmapItems });
-
-            // I. Opportunities (Need to connect Features)
-            // Data has 'features' array of IDs from backup?
-            // Backup used: include: { features: { select: { id: true } } }
-            // So structure is: { ..., features: [ { id: '...' }, { id: '...' } ] }
-            for (const o of data.opportunities || []) {
-                const { features, ...rest } = o;
-                await tx.opportunity.create({
-                    data: {
-                        ...rest,
-                        features: {
-                            connect: features // This works perfectly matching the include structure
-                        }
-                    }
-                });
-            }
-
-            // J. Projects
-            if (data.projects?.length) await tx.project.createMany({ data: data.projects });
-
-            // K. Milestones
-            if (data.milestones?.length) await tx.milestone.createMany({ data: data.milestones });
-
-            // L. Tasks (Complex: Self-relation)
-            // Strategy: Create all tasks with parentId = null (or stripped), then update them.
-            // Or simpler: Iterate and create. If parent exists, connect.
-            // If parent is created LATER, this fails.
-            // So: 1. Create all without parents. 2. Update all with parents.
-            if (data.tasks?.length) {
-                // Pass 1: Create w/o parent
-                const tasksWithParents = [];
-                for (const t of data.tasks) {
-                    const { parentId, parent, subtasks, ...rest } = t; // Strip relations
-                    if (parentId) tasksWithParents.push({ id: t.id, parentId });
-                    await tx.task.create({ data: rest }); // 'rest' has no parentId
-                }
-                // Pass 2: Link parents
-                for (const t of tasksWithParents) {
-                    await tx.task.update({
-                        where: { id: t.id },
-                        data: { parentId: t.parentId }
-                    });
-                }
-            }
-
-            // M. Allocations
-            if (data.allocations?.length) await tx.allocation.createMany({ data: data.allocations });
-
-            // N. Ideas
-            // Idea depends on Feature (optional). Feature exists.
-            if (data.ideas?.length) await tx.idea.createMany({ data: data.ideas });
-
-            // O. TimesheetEntries
-            if (data.timesheetEntries?.length) await tx.timesheetEntry.createMany({ data: data.timesheetEntries });
-
-            // P. Expense Categories
-            if (data.expenseCategories?.length) await tx.expenseCategory.createMany({ data: data.expenseCategories });
-
-            // Q. Service Areas
-            if (data.serviceAreas?.length) await tx.serviceArea.createMany({ data: data.serviceAreas });
-
-        }, {
-            maxWait: 10000,
-            timeout: 20000
-        });
-
-        revalidatePath('/');
-        return { success: true };
+        return await restoreSystemData(data);
     } catch (error) {
         console.error('Restore failed:', error);
         return { success: false, error: 'Restore failed: ' + (error as Error).message };
@@ -325,7 +236,7 @@ export async function restoreSystem(formData: FormData) {
 }
 
 // Internal helper for restoring raw data object
-async function restoreSystemData(data: any) {
+async function restoreSystemData(data: BackupData) {
     if (!data.version || !data.users) {
         return { success: false, error: 'Invalid backup format' };
     }
@@ -366,6 +277,7 @@ async function restoreSystemData(data: any) {
             if (data.interactions?.length) await tx.interaction.createMany({ data: data.interactions });
             // G. Features
             for (const f of data.features || []) {
+                // eslint-disable-next-line @typescript-eslint/no-unused-vars
                 const { opportunities, ...rest } = f;
                 await tx.feature.create({ data: rest });
             }
@@ -391,6 +303,7 @@ async function restoreSystemData(data: any) {
             if (data.tasks?.length) {
                 const tasksWithParents = [];
                 for (const t of data.tasks) {
+                    // eslint-disable-next-line @typescript-eslint/no-unused-vars
                     const { parentId, parent, subtasks, ...rest } = t;
                     if (parentId) tasksWithParents.push({ id: t.id, parentId });
                     await tx.task.create({ data: rest });
@@ -498,7 +411,7 @@ export async function importExpenseCategories(formData: FormData) {
         const workbook = XLSX.read(buffer, { type: 'buffer' });
         const sheetName = workbook.SheetNames[0];
         const sheet = workbook.Sheets[sheetName];
-        const rows = XLSX.utils.sheet_to_json(sheet) as Record<string, any>[];
+        const rows = XLSX.utils.sheet_to_json(sheet) as Record<string, unknown>[];
 
         let created = 0;
         let updated = 0;
