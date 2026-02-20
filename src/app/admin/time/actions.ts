@@ -73,46 +73,73 @@ export async function saveTimesheet(userId: string, entries: TimesheetData[]) {
         const costRate = userProfile?.costRate ? Number(userProfile.costRate) : 0;
         const billableRate = userProfile?.billableRate ? Number(userProfile.billableRate) : 0;
 
-        for (const entry of entries) {
-            // Check if exists
-            const existing = await prisma.timesheetEntry.findFirst({
+        if (entries.length > 0) {
+            // Optimization: Fetch all potentially existing entries in one query
+            const existingEntries = await prisma.timesheetEntry.findMany({
                 where: {
                     userId,
-                    taskId: entry.taskId,
-                    date: entry.date
+                    OR: entries.map(e => ({
+                        taskId: e.taskId,
+                        date: e.date
+                    }))
                 }
             });
 
-            if (entry.hours <= 0) {
-                // Delete if hours are 0 or less
-                if (existing) {
-                    await prisma.timesheetEntry.delete({ where: { id: existing.id } });
-                }
-                continue;
+            // Create a lookup map for existing entries
+            const existingMap = new Map<string, typeof existingEntries[0]>();
+            for (const entry of existingEntries) {
+                const key = `${entry.taskId}_${entry.date.getTime()}`;
+                existingMap.set(key, entry);
             }
 
-            if (existing) {
-                await prisma.timesheetEntry.update({
-                    where: { id: existing.id },
-                    data: {
-                        hours: entry.hours,
-                        description: entry.description,
-                        costRate, // Update snapshot rate on edit to allow corrections
-                        billableRate,
+            const operations = [];
+
+            // Deduplicate entries (last write wins) to avoid conflicting operations in the same transaction
+            const uniqueEntriesMap = new Map<string, TimesheetData>();
+            for (const entry of entries) {
+                const key = `${entry.taskId}_${entry.date.getTime()}`;
+                uniqueEntriesMap.set(key, entry);
+            }
+
+            for (const entry of uniqueEntriesMap.values()) {
+                const key = `${entry.taskId}_${entry.date.getTime()}`;
+                const existing = existingMap.get(key);
+
+                if (entry.hours <= 0) {
+                    // Delete if hours are 0 or less
+                    if (existing) {
+                        operations.push(prisma.timesheetEntry.delete({ where: { id: existing.id } }));
                     }
-                });
-            } else {
-                await prisma.timesheetEntry.create({
-                    data: {
-                        userId,
-                        taskId: entry.taskId,
-                        date: entry.date,
-                        hours: entry.hours,
-                        description: entry.description,
-                        costRate,
-                        billableRate,
-                    }
-                });
+                    continue;
+                }
+
+                if (existing) {
+                    operations.push(prisma.timesheetEntry.update({
+                        where: { id: existing.id },
+                        data: {
+                            hours: entry.hours,
+                            description: entry.description,
+                            costRate, // Update snapshot rate on edit to allow corrections
+                            billableRate,
+                        }
+                    }));
+                } else {
+                    operations.push(prisma.timesheetEntry.create({
+                        data: {
+                            userId,
+                            taskId: entry.taskId,
+                            date: entry.date,
+                            hours: entry.hours,
+                            description: entry.description,
+                            costRate,
+                            billableRate,
+                        }
+                    }));
+                }
+            }
+
+            if (operations.length > 0) {
+                await prisma.$transaction(operations);
             }
         }
 
