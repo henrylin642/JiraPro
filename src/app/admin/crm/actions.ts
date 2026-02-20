@@ -3,6 +3,7 @@
 import prisma from '@/lib/prisma';
 import { revalidatePath } from 'next/cache';
 import { calculateDealHealth } from '@/lib/deal-health';
+import { calculateStageAndProbability } from '@/lib/checklist-logic';
 
 export type OpportunityWithAccount = {
     id: string;
@@ -271,8 +272,6 @@ export async function updateOpportunity(id: string, data: {
 }
 
 
-import { STAGE_CHECKLISTS, BASE_PROBABILITIES, STAGE_ORDER } from '@/lib/crm-constants';
-
 export async function getSalesForecast() {
     try {
         const opportunities = await prisma.opportunity.findMany({
@@ -435,50 +434,7 @@ export async function updateOpportunityChecklist(id: string, checklist: string[]
             select: { stage: true },
         });
 
-        // Find the highest stage that has a checked item
-        // We iterate in reverse order of STAGE_ORDER (excluding CLOSED_LOST for auto-promotion, maybe?)
-        // Let's include all except maybe CLOSED_LOST which is usually manual, but let's follow the rule "Where the check is".
-        // If I check "Contract Signed", I am in CLOSED_WON.
-
-        let newStage = 'LEAD'; // Default
-
-        // Check in reverse order (highest stage first)
-        // We only consider stages in STAGE_ORDER that are NOT CLOSED_LOST for auto-determination?
-        // Actually, if we want "Status is where check is", if I confirm "Post Mortem", am I in CLOSED_LOST?
-        // Maybe. Let's include all.
-
-        for (let i = STAGE_ORDER.length - 1; i >= 0; i--) {
-            const stage = STAGE_ORDER[i];
-            const items = STAGE_CHECKLISTS[stage];
-            if (!items) continue;
-
-            // If any item in this stage is checked
-            const hasCheckedItem = items.some(item => checklist.includes(item.id));
-            if (hasCheckedItem) {
-                newStage = stage;
-                break;
-            }
-        }
-
-        // Calculate new probability
-        let probability = BASE_PROBABILITIES[newStage] || 0;
-
-        // Find all checked items configurations to add weights
-        let addedProb = 0;
-        Object.values(STAGE_CHECKLISTS).forEach(list => {
-            list.forEach(item => {
-                if (checklist.includes(item.id)) {
-                    addedProb += item.weight;
-                }
-            });
-        });
-
-        // Cap at 100
-        probability = Math.min(100, probability + addedProb);
-
-        // Special case overrides
-        if (newStage === 'CLOSED_WON') probability = 100;
-        if (newStage === 'CLOSED_LOST') probability = 0;
+        const { stage: newStage, probability } = calculateStageAndProbability(checklist);
 
         const stageChanged = current?.stage !== newStage;
 
