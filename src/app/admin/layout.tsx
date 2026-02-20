@@ -15,6 +15,10 @@ export default async function AdminLayout({
         redirect('/login');
     }
 
+    if (user.role !== 'ADMIN') {
+        redirect('/login');
+    }
+
     return (
         <div className="flex h-screen overflow-hidden bg-background">
             <AdminSidebar user={user} />
