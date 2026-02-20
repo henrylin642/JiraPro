@@ -9,7 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { ThumbsUp, GitPullRequest, Plus } from 'lucide-react';
+import { ThumbsUp, GitPullRequest, Plus, MoreVertical, Pencil, Trash2 } from 'lucide-react';
 
 
 import { createIdea, voteIdea, promoteToFeature, updateIdea, deleteIdea } from '@/app/admin/product/actions';
@@ -29,7 +29,6 @@ import {
     AlertDialogHeader,
     AlertDialogTitle
 } from "@/components/ui/alert-dialog";
-import { MoreVertical, Pencil, Trash2 } from 'lucide-react';
 
 type Idea = {
     id: string;
