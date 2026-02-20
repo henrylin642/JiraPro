@@ -1,9 +1,12 @@
 import { PrismaClient } from '@prisma/client';
+import bcrypt from 'bcrypt';
 
 const prisma = new PrismaClient({});
 
 async function main() {
     console.log('🌱 Starting seed...');
+
+    const hashedPassword = await bcrypt.hash('password123', 10);
 
     // 1. Clean up existing data (Order matters for foreign keys!)
     // Removed deleteMany to prevent data loss on re-seeding
@@ -16,7 +19,7 @@ async function main() {
         update: {},
         create: {
             email: 'admin@company.com',
-            password: 'password123',
+            password: hashedPassword,
             name: 'Admin User',
             role: 'ADMIN',
             resourceProfile: {
@@ -35,7 +38,7 @@ async function main() {
         update: {},
         create: {
             email: 'alice@company.com',
-            password: 'password123',
+            password: hashedPassword,
             name: 'Alice Sales',
             role: 'MANAGER',
             resourceProfile: {
@@ -54,7 +57,7 @@ async function main() {
         update: {},
         create: {
             email: 'bob@company.com',
-            password: 'password123',
+            password: hashedPassword,
             name: 'Bob PM',
             role: 'MANAGER',
             resourceProfile: {
@@ -73,7 +76,7 @@ async function main() {
         update: {},
         create: {
             email: 'charlie@company.com',
-            password: 'password123',
+            password: hashedPassword,
             name: 'Charlie Dev',
             role: 'EMPLOYEE',
             resourceProfile: {
@@ -92,7 +95,7 @@ async function main() {
         update: {},
         create: {
             email: 'diana@company.com',
-            password: 'password123',
+            password: hashedPassword,
             name: 'Diana Design',
             role: 'EMPLOYEE',
             resourceProfile: {
@@ -112,7 +115,7 @@ async function main() {
         update: {},
         create: {
             email: 'henry.lin@lig.com.tw',
-            password: 'password123', // Default password
+            password: hashedPassword, // Default password
             name: 'Henry Lin',
             role: 'ADMIN',
             resourceProfile: {

@@ -3,6 +3,7 @@
 import { cookies } from 'next/headers';
 import prisma from '@/lib/prisma';
 import { redirect } from 'next/navigation';
+import bcrypt from 'bcrypt';
 
 const AUTH_COOKIE = 'jira_pro_auth_user';
 
@@ -19,7 +20,24 @@ export async function login(formData: FormData) {
             where: { email },
         });
 
-        if (!user || user.password !== password) { // In production, use bcrypt.compare
+        let isPasswordValid = false;
+
+        // Check if password stored is a bcrypt hash
+        if (user && user.password.startsWith('$2')) {
+            isPasswordValid = await bcrypt.compare(password, user.password);
+        } else if (user && user.password === password) {
+            // Legacy plaintext fallback
+            isPasswordValid = true;
+
+            // Auto-migrate to bcrypt
+            const hashedPassword = await bcrypt.hash(password, 10);
+            await prisma.user.update({
+                where: { id: user.id },
+                data: { password: hashedPassword },
+            });
+        }
+
+        if (!user || !isPasswordValid) {
             return { error: 'Invalid credentials' };
         }
 
