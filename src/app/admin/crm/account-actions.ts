@@ -2,6 +2,7 @@
 
 import prisma from '@/lib/prisma';
 import { revalidatePath } from 'next/cache';
+import { getCurrentUser } from '@/lib/auth';
 
 
 export async function getAccounts() {
@@ -142,12 +143,17 @@ export async function addContact(accountId: string, data: { name: string; title?
     }
 }
 
-export async function logInteraction(accountId: string, userId: string, data: { type: string; notes?: string; date: Date }) {
+export async function logInteraction(accountId: string, data: { type: string; notes?: string; date: Date }) {
     try {
+        const user = await getCurrentUser();
+        if (!user) {
+            return { success: false, error: "Unauthorized" };
+        }
+
         await prisma.interaction.create({
             data: {
                 accountId,
-                userId,
+                userId: user.id,
                 type: data.type,
                 notes: data.notes,
                 date: data.date
