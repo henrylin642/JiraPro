@@ -183,11 +183,21 @@ export async function restoreSystem(formData: FormData) {
         const text = await file.text();
         const data = JSON.parse(text);
 
-        // Validation - Basic check
-        if (!data.version || !data.users) {
-            return { success: false, error: 'Invalid backup file format' };
-        }
+        return await restoreSystemData(data);
+    } catch (error) {
+        console.error('Restore failed:', error);
+        return { success: false, error: 'Restore failed: ' + (error as Error).message };
+    }
+}
 
+// Internal helper for restoring raw data object
+async function restoreSystemData(data: any) {
+    // Validation - Basic check
+    if (!data.version || !data.users) {
+        return { success: false, error: 'Invalid backup format' };
+    }
+
+    try {
         await prisma.$transaction(async (tx) => {
             // 1. DELETE ALL (Reverse Order)
             // Note: Use deleteMany({}) to clear tables. Order matters for FK constraints.
@@ -308,117 +318,22 @@ export async function restoreSystem(formData: FormData) {
             // P. Expense Categories
             if (data.expenseCategories?.length) await tx.expenseCategory.createMany({ data: data.expenseCategories });
 
-            // Q. Service Areas
-            if (data.serviceAreas?.length) await tx.serviceArea.createMany({ data: data.serviceAreas });
-
-        }, {
-            maxWait: 10000,
-            timeout: 20000
-        });
-
-        revalidatePath('/');
-        return { success: true };
-    } catch (error) {
-        console.error('Restore failed:', error);
-        return { success: false, error: 'Restore failed: ' + (error as Error).message };
-    }
-}
-
-// Internal helper for restoring raw data object
-async function restoreSystemData(data: any) {
-    if (!data.version || !data.users) {
-        return { success: false, error: 'Invalid backup format' };
-    }
-
-    try {
-        await prisma.$transaction(async (tx) => {
-            // 1. DELETE ALL
-            await tx.expenseCategory.deleteMany();
-            await tx.serviceArea.deleteMany();
-            await tx.timesheetEntry.deleteMany();
-            await tx.allocation.deleteMany();
-            await tx.idea.deleteMany();
-            await tx.interaction.deleteMany();
-            await tx.contact.deleteMany();
-            await tx.task.deleteMany();
-            await tx.milestone.deleteMany();
-            await tx.project.deleteMany();
-            await tx.opportunity.deleteMany();
-            await tx.roadmapItem.deleteMany();
-            await tx.feature.deleteMany();
-            await tx.product.deleteMany();
-            await tx.resourceProfile.deleteMany();
-            await tx.account.deleteMany();
-            await tx.user.deleteMany();
-
-            // 2. RESTORE (Simplified copy-paste from original function for now, or we can refactor original to call this if we extract logic properly)
-            // A. Users
-            if (data.users?.length) await tx.user.createMany({ data: data.users });
-            // B. Accounts
-            if (data.accounts?.length) await tx.account.createMany({ data: data.accounts });
-            // C. Products
-            if (data.products?.length) await tx.product.createMany({ data: data.products });
-            // D. ResourceProfiles
-            if (data.resourceProfiles?.length) await tx.resourceProfile.createMany({ data: data.resourceProfiles });
-            // E. Contacts
-            if (data.contacts?.length) await tx.contact.createMany({ data: data.contacts });
-            // F. Interactions
-            if (data.interactions?.length) await tx.interaction.createMany({ data: data.interactions });
-            // G. Features
-            for (const f of data.features || []) {
-                const { opportunities, ...rest } = f;
-                await tx.feature.create({ data: rest });
-            }
-            // H. RoadmapItems
-            if (data.roadmapItems?.length) await tx.roadmapItem.createMany({ data: data.roadmapItems });
-            // I. Opportunities
-            for (const o of data.opportunities || []) {
-                const { features, ...rest } = o;
-                await tx.opportunity.create({
-                    data: {
-                        ...rest,
-                        features: {
-                            connect: features
-                        }
-                    }
-                });
-            }
-            // J. Projects
-            if (data.projects?.length) await tx.project.createMany({ data: data.projects });
-            // K. Milestones
-            if (data.milestones?.length) await tx.milestone.createMany({ data: data.milestones });
-            // L. Tasks
-            if (data.tasks?.length) {
-                const tasksWithParents = [];
-                for (const t of data.tasks) {
-                    const { parentId, parent, subtasks, ...rest } = t;
-                    if (parentId) tasksWithParents.push({ id: t.id, parentId });
-                    await tx.task.create({ data: rest });
-                }
-                for (const t of tasksWithParents) {
-                    await tx.task.update({ where: { id: t.id }, data: { parentId: t.parentId } });
-                }
-            }
-            // M. Allocations
-            if (data.allocations?.length) await tx.allocation.createMany({ data: data.allocations });
-            // N. Ideas
-            if (data.ideas?.length) await tx.idea.createMany({ data: data.ideas });
-            // O. TimesheetEntries
-            if (data.timesheetEntries?.length) await tx.timesheetEntry.createMany({ data: data.timesheetEntries });
-            // P. Expense Categories
-            if (data.expenseCategories?.length) await tx.expenseCategory.createMany({ data: data.expenseCategories });
             // Q. Project Budget Lines
             if (data.projectBudgetLines?.length) await tx.projectBudgetLine.createMany({ data: data.projectBudgetLines });
+
             // R. Service Areas
             if (data.serviceAreas?.length) await tx.serviceArea.createMany({ data: data.serviceAreas });
 
-        }, { maxWait: 20000, timeout: 40000 });
+        }, {
+            maxWait: 20000,
+            timeout: 40000
+        });
 
         revalidatePath('/');
         return { success: true };
     } catch (e) {
         console.error("Restore logic failed", e);
-        throw e;
+        return { success: false, error: 'Restore failed: ' + (e as Error).message };
     }
 }
 
