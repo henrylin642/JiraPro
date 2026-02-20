@@ -5,6 +5,7 @@ import { revalidatePath } from 'next/cache';
 import { getCurrentUser } from '@/lib/auth';
 import { Prisma } from '@prisma/client';
 import * as XLSX from 'xlsx';
+import bcrypt from 'bcrypt';
 
 export async function getBackupSettings() {
     try {
@@ -87,15 +88,16 @@ export async function changePassword(currentPassword: string, newPassword: strin
         }
 
         // Verify current password
-        // Note: In a real app, use bcrypt.compare here. Currently using plain text as per existing pattern.
-        if (user.password !== currentPassword) {
+        const isMatch = await bcrypt.compare(currentPassword, user.password);
+        if (!isMatch) {
             return { success: false, error: 'Incorrect current password' };
         }
 
         // Update password
+        const hashedPassword = await bcrypt.hash(newPassword, 10);
         await prisma.user.update({
             where: { id: user.id },
-            data: { password: newPassword }
+            data: { password: hashedPassword }
         });
 
         // Revalidate
