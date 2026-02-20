@@ -3,12 +3,11 @@
 import React, { useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Download, Upload, AlertTriangle, CheckCircle, Loader2, FileDown, FileUp } from 'lucide-react';
-import { backupSystem, restoreSystem, getExpenseCategories, addExpenseCategory, deleteExpenseCategory, changePassword, getBackupSettings, updateBackupSettings, getBackups, restoreFromBackupId, exportExpenseCategoriesCsv, importExpenseCategories } from './actions';
+import { Download, Upload, AlertTriangle, CheckCircle, Loader2, FileDown, FileUp, Trash2, Clock, History, MapPin } from 'lucide-react';
+import { backupSystem, restoreSystem, getExpenseCategories, addExpenseCategory, deleteExpenseCategory, changePassword, getBackupSettings, updateBackupSettings, getBackups, restoreFromBackupId, exportExpenseCategoriesCsv, importExpenseCategories, getServiceAreas, addServiceArea, deleteServiceArea, seedServiceAreas } from './actions';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
-import { Trash2, Clock, History } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -397,9 +396,6 @@ export default function SettingsPage() {
         </div>
     );
 }
-
-import { getServiceAreas, addServiceArea, deleteServiceArea, seedServiceAreas } from './actions';
-import { MapPin } from 'lucide-react';
 
 function ServiceAreaSettings() {
     const [areas, setAreas] = useState<any[]>([]);
