@@ -1,9 +1,10 @@
 import React from 'react';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
-import { ArrowLeft, Building2, Calendar, DollarSign, Percent } from 'lucide-react';
+import { ArrowLeft, Building2, Calendar, DollarSign, Percent, ExternalLink } from 'lucide-react';
 import { TaskBoard } from '@/components/project/task-board';
 import { Badge } from '@/components/ui/badge';
+import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -60,6 +61,9 @@ export default async function OpportunityDetailPage({
         currentProbability: opportunity.probability,
     });
 
+    const budgetGap = opportunity.clientBudget ? opportunity.estimatedValue - opportunity.clientBudget : 0;
+    const isOverBudget = budgetGap > 0;
+
     return (
         <div className="flex flex-col h-screen bg-background">
             {/* Header */}
@@ -97,9 +101,23 @@ export default async function OpportunityDetailPage({
                                     Target: {new Date(opportunity.expectedCloseDate).toLocaleDateString()}
                                 </Badge>
                             )}
+                            {opportunity.jiraTicketKey && (
+                                <a href={`https://jira.com/browse/${opportunity.jiraTicketKey}`} target="_blank" rel="noopener noreferrer">
+                                    <Badge variant="secondary" className="flex gap-1 hover:bg-muted cursor-pointer">
+                                        <ExternalLink className="h-3 w-3" />
+                                        {opportunity.jiraTicketKey}
+                                    </Badge>
+                                </a>
+                            )}
                         </div>
                     </div>
                     <div className="flex items-center gap-6">
+                        <div className="text-right">
+                            <div className="text-[10px] text-muted-foreground uppercase tracking-wider font-semibold">Client Budget</div>
+                            <div className={cn("font-mono font-bold text-xl", isOverBudget ? "text-red-500" : "text-muted-foreground")}>
+                                {opportunity.clientBudget ? `$${opportunity.clientBudget.toLocaleString()}` : '-'}
+                            </div>
+                        </div>
                         <div className="text-right">
                             <div className="text-[10px] text-muted-foreground uppercase tracking-wider font-semibold">Owner</div>
                             <div className="font-medium">{opportunity.owner?.name || 'Unassigned'}</div>

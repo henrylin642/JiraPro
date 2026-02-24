@@ -115,6 +115,7 @@ export async function getOpportunityById(id: string) {
     return {
         ...opportunity,
         estimatedValue: Number(opportunity.estimatedValue),
+        clientBudget: opportunity.clientBudget ? Number(opportunity.clientBudget) : null,
         allocations: opportunity.allocations.map((alloc) => ({
             ...alloc,
             resource: {
@@ -139,6 +140,8 @@ export async function createOpportunity(data: {
     ownerId?: string;
     serviceAreaId?: string;
     probabilityOverrideReason?: string;
+    clientBudget?: number;
+    jiraTicketKey?: string;
 }) {
     try {
         const trimmedReason = data.probabilityOverrideReason?.trim() || '';
@@ -171,6 +174,8 @@ export async function createOpportunity(data: {
                 ownerId: data.ownerId,
                 serviceAreaId: data.serviceAreaId,
                 probabilityOverrideReason: trimmedReason || null,
+                clientBudget: data.clientBudget,
+                jiraTicketKey: data.jiraTicketKey,
             },
         });
         revalidatePath('/admin/crm');
@@ -199,6 +204,8 @@ export async function updateOpportunity(id: string, data: {
     ownerId?: string | null;
     serviceAreaId?: string | null;
     probabilityOverrideReason?: string;
+    clientBudget?: number | null;
+    jiraTicketKey?: string | null;
 }) {
     try {
         const current = await prisma.opportunity.findUnique({
@@ -258,6 +265,8 @@ export async function updateOpportunity(id: string, data: {
                 serviceAreaId: data.serviceAreaId,
                 stageUpdatedAt: stageChanged ? new Date() : undefined,
                 probabilityOverrideReason: trimmedReason ? trimmedReason : (data.probabilityOverrideReason !== undefined ? null : current.probabilityOverrideReason),
+                clientBudget: data.clientBudget,
+                jiraTicketKey: data.jiraTicketKey,
             },
         });
         revalidatePath('/admin/crm');

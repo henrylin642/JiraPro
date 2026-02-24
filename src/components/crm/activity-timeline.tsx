@@ -128,6 +128,20 @@ export function ActivityTimeline({
         }
     };
 
+    const quickActions = [
+        { label: 'Voicemail', type: 'CALL', note: 'Left voicemail for client.' },
+        { label: 'Email Sent', type: 'EMAIL', note: 'Sent follow-up email.' },
+        { label: 'Discovery Call', type: 'CALL', note: 'Discovery call completed.' },
+    ];
+
+    const handleQuickAction = (action: typeof quickActions[0]) => {
+        setFormData(prev => ({
+            ...prev,
+            type: action.type,
+            notes: action.note,
+        }));
+    };
+
     return (
         <div className="grid gap-6 md:grid-cols-2">
             {/* Left Column: Form */}
@@ -141,6 +155,22 @@ export function ActivityTimeline({
                     </CardTitle>
                 </CardHeader>
                 <CardContent>
+                    {!editingId && (
+                        <div className="flex gap-2 mb-4 flex-wrap">
+                            {quickActions.map(action => (
+                                <Button
+                                    key={action.label}
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => handleQuickAction(action)}
+                                    type="button"
+                                    className="text-xs h-7 px-2"
+                                >
+                                    {action.label}
+                                </Button>
+                            ))}
+                        </div>
+                    )}
                     <form onSubmit={handleSubmit} className="space-y-4">
                         <div className="grid grid-cols-2 gap-4">
                             <div className="space-y-2">

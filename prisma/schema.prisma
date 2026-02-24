@@ -6,61 +6,60 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
   directUrl = env("DIRECT_URL") // Used for migrations
 }
 
 // --- IAM & Resource Management ---
 
 model User {
-  id            String    @id @default(uuid())
-  email         String    @unique
-  password      String    @default("password123") // Temporary default for migration
-  name          String
-  role          String    @default("EMPLOYEE") // ADMIN, MANAGER, EMPLOYEE, OBSERVER
-  avatarUrl     String?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String   @default("password123") // Temporary default for migration
+  name      String
+  role      String   @default("EMPLOYEE") // ADMIN, MANAGER, EMPLOYEE, OBSERVER
+  avatarUrl String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   // Relations
-  resourceProfile ResourceProfile?
-  managedProjects Project[]        @relation("ProjectManager")
-  ownedOpportunities Opportunity[] @relation("OpportunityOwner")
-  assignedTasks   Task[]           @relation("TaskAssignee")
-  timesheets      TimesheetEntry[]
-  createdIdeas    Idea[]
-  interactions    Interaction[]
+  resourceProfile    ResourceProfile?
+  managedProjects    Project[]        @relation("ProjectManager")
+  ownedOpportunities Opportunity[]    @relation("OpportunityOwner")
+  assignedTasks      Task[]           @relation("TaskAssignee")
+  timesheets         TimesheetEntry[]
+  createdIdeas       Idea[]
+  interactions       Interaction[]
 }
 
 model ResourceProfile {
-  id             String   @id @default(uuid())
-  userId         String   @unique
-  user           User     @relation(fields: [userId], references: [id])
-  
-  title          String?  // e.g. Senior Backend Engineer
-  skills         String?  // Comma separated or JSON
-  costRate       Decimal  @default(0) // Hourly cost to company
-  billableRate   Decimal  @default(0) // Hourly rate billed to client
-  monthlySalary  Decimal  @default(0) // Monthly base salary
-  capacityHours  Int      @default(40) // Weekly capacity
-  
-  allocations    Allocation[]
+  id     String @id @default(uuid())
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id])
+
+  title         String? // e.g. Senior Backend Engineer
+  skills        String? // Comma separated or JSON
+  costRate      Decimal @default(0) // Hourly cost to company
+  billableRate  Decimal @default(0) // Hourly rate billed to client
+  monthlySalary Decimal @default(0) // Monthly base salary
+  capacityHours Int     @default(40) // Weekly capacity
+
+  allocations Allocation[]
 }
 
 // --- CRM (Customer Relationship Management) ---
 
-
 model Account {
-  id            String   @id @default(uuid())
-  name          String
-  industry      String?
-  website       String?
-  phone         String?
-  address       String?
-  taxId         String?  // VAT/Tax Number
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  id        String   @id @default(uuid())
+  name      String
+  industry  String?
+  website   String?
+  phone     String?
+  address   String?
+  taxId     String? // VAT/Tax Number
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   opportunities Opportunity[]
   projects      Project[]
@@ -69,108 +68,110 @@ model Account {
 }
 
 model Contact {
-  id        String   @id @default(uuid())
+  id        String  @id @default(uuid())
   accountId String
-  account   Account  @relation(fields: [accountId], references: [id])
+  account   Account @relation(fields: [accountId], references: [id])
   name      String
-  title     String?  // Job Title
+  title     String? // Job Title
   email     String?
   phone     String?
   linkedIn  String?
   notes     String?
-  
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
 model Interaction {
-  id        String   @id @default(uuid())
+  id        String  @id @default(uuid())
   accountId String
-  account   Account  @relation(fields: [accountId], references: [id])
-  
-  type      String   // CALL, MEETING, EMAIL, OTHER
-  date      DateTime @default(now())
-  notes     String?
-  
+  account   Account @relation(fields: [accountId], references: [id])
+
+  type  String // CALL, MEETING, EMAIL, OTHER
+  date  DateTime @default(now())
+  notes String?
+
   opportunityId String?
   opportunity   Opportunity? @relation(fields: [opportunityId], references: [id])
-  
-  userId    String   // The internal user who performed the interaction
-  user      User     @relation(fields: [userId], references: [id])
-  
+
+  userId String // The internal user who performed the interaction
+  user   User   @relation(fields: [userId], references: [id])
+
   createdAt DateTime @default(now())
 }
 
 model Opportunity {
-  id             String           @id @default(uuid())
-  title          String
-  accountId      String
-  account        Account          @relation(fields: [accountId], references: [id])
-  
-  features       Feature[]        // Features required for this opportunity
-  
-  stage          String           @default("LEAD") // LEAD, QUALIFICATION, PROPOSAL, NEGOTIATION, CLOSED_WON, CLOSED_LOST
-  probability    Int              @default(0) // 0-100%
-  estimatedValue Decimal          @default(0)
-  expectedCloseDate DateTime?
+  id        String  @id @default(uuid())
+  title     String
+  accountId String
+  account   Account @relation(fields: [accountId], references: [id])
+
+  features Feature[] // Features required for this opportunity
+
+  stage                     String    @default("LEAD") // LEAD, QUALIFICATION, PROPOSAL, NEGOTIATION, CLOSED_WON, CLOSED_LOST
+  probability               Int       @default(0) // 0-100%
+  estimatedValue            Decimal   @default(0)
+  expectedCloseDate         DateTime?
   probabilityOverrideReason String?
-  
-  checklist      String?          // Stores checked items as JSON string e.g. "[\"BANT_Budget\"]"
-  lossReason     String?          // Reason for closing as lost
 
-  ownerId        String?
-  owner          User?            @relation("OpportunityOwner", fields: [ownerId], references: [id])
+  clientBudget  Decimal?
+  jiraTicketKey String?
 
-  
+  checklist  String? // Stores checked items as JSON string e.g. "[\"BANT_Budget\"]"
+  lossReason String? // Reason for closing as lost
+
+  ownerId String?
+  owner   User?   @relation("OpportunityOwner", fields: [ownerId], references: [id])
+
   // Pre-sales
-  allocations    Allocation[]     // Soft bookings
-  interactions   Interaction[]    // Activity Log
-  tasks          Task[]           // Project tasks linked to this opportunity
-    
+  allocations  Allocation[] // Soft bookings
+  interactions Interaction[] // Activity Log
+  tasks        Task[] // Project tasks linked to this opportunity
+
   // Conversion
   convertedProjectId String?
 
   serviceAreaId String?
-  serviceArea   ServiceArea?     @relation(fields: [serviceAreaId], references: [id])
-  
-  createdAt      DateTime         @default(now())
-  updatedAt      DateTime         @updatedAt
-  stageUpdatedAt DateTime         @default(now())
+  serviceArea   ServiceArea? @relation(fields: [serviceAreaId], references: [id])
 
-  goals          OpportunityGoal[]
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  stageUpdatedAt DateTime @default(now())
+
+  goals OpportunityGoal[]
 }
 
 model OpportunityGoal {
   id            String      @id @default(uuid())
   opportunityId String
   opportunity   Opportunity @relation(fields: [opportunityId], references: [id], onDelete: Cascade)
-  
-  description   String
-  targetDate    DateTime?   // e.g. "March 2026"
-  isCompleted   Boolean     @default(false)
-  
-  createdAt     DateTime    @default(now())
-  updatedAt     DateTime    @updatedAt
+
+  description String
+  targetDate  DateTime? // e.g. "March 2026"
+  isCompleted Boolean   @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 // --- Product Management ---
 
 model Product {
-  id          String   @id @default(uuid())
+  id          String  @id @default(uuid())
   name        String
   description String?
-  
-  features    Feature[]
-  roadmap     RoadmapItem[]
+
+  features      Feature[]
+  roadmap       RoadmapItem[]
   businessModel BusinessModelCanvas?
 }
 
 model BusinessModelCanvas {
-  id          String   @id @default(uuid())
-  productId   String   @unique
-  product     Product  @relation(fields: [productId], references: [id])
-  
-  keyPartners           String? 
+  id        String  @id @default(uuid())
+  productId String  @unique
+  product   Product @relation(fields: [productId], references: [id])
+
+  keyPartners           String?
   keyActivities         String?
   keyResources          String?
   valuePropositions     String?
@@ -179,103 +180,105 @@ model BusinessModelCanvas {
   customerSegments      String?
   costStructure         String?
   revenueStreams        String?
-  
+
   updatedAt DateTime @updatedAt
 }
 
 model Feature {
-  id          String   @id @default(uuid())
+  id          String  @id @default(uuid())
   productId   String
-  product     Product  @relation(fields: [productId], references: [id])
+  product     Product @relation(fields: [productId], references: [id])
   title       String
   description String?
-  status      String   // e.g. Backlog, Planned, Released
-  
+  status      String // e.g. Backlog, Planned, Released
+
   opportunities Opportunity[] // Opportunities driving this feature
-  ideas       Idea[]   // Linked ideas
+  ideas         Idea[] // Linked ideas
 
   // RICE Scoring
-  riceReach      Int      @default(0)
-  riceImpact     Decimal  @default(0) // 3 (Massive), 2 (High), 1 (Medium), 0.5 (Low), 0.25 (Minimal)
-  riceConfidence Int      @default(0) // Percentage 0-100
-  riceEffort     Decimal  @default(0) // Person-months
-  riceScore      Decimal  @default(0) // (Reach * Impact * Confidence%) / Effort
+  riceReach      Int     @default(0)
+  riceImpact     Decimal @default(0) // 3 (Massive), 2 (High), 1 (Medium), 0.5 (Low), 0.25 (Minimal)
+  riceConfidence Int     @default(0) // Percentage 0-100
+  riceEffort     Decimal @default(0) // Person-months
+  riceScore      Decimal @default(0) // (Reach * Impact * Confidence%) / Effort
 }
 
 model RoadmapItem {
-  id          String   @id @default(uuid())
-  productId   String
-  product     Product  @relation(fields: [productId], references: [id])
-  title       String
-  startDate   DateTime
-  endDate     DateTime
-  version     String?  // e.g. v1.0
+  id        String   @id @default(uuid())
+  productId String
+  product   Product  @relation(fields: [productId], references: [id])
+  title     String
+  startDate DateTime
+  endDate   DateTime
+  version   String? // e.g. v1.0
 }
 
 model Idea {
-  id          String   @id @default(uuid())
+  id          String  @id @default(uuid())
   title       String
   description String?
   creatorId   String
-  creator     User     @relation(fields: [creatorId], references: [id])
-  
-  featureId   String?
-  feature     Feature? @relation(fields: [featureId], references: [id])
-  
-  votes       Int      @default(0)
-  createdAt   DateTime @default(now())
+  creator     User    @relation(fields: [creatorId], references: [id])
+
+  featureId String?
+  feature   Feature? @relation(fields: [featureId], references: [id])
+
+  votes     Int      @default(0)
+  createdAt DateTime @default(now())
 }
 
 // --- Project Management ---
 
 model Project {
-  id            String        @id @default(uuid())
-  name          String
-  code          String?       @unique // e.g. PRJ-001
-  description   String?
-  status        String        @default("PLANNING") // PLANNING, ACTIVE, ON_HOLD, COMPLETED, CANCELLED
-  
-  accountId     String?
-  account       Account?      @relation(fields: [accountId], references: [id])
-  
-  managerId     String?
-  manager       User?         @relation("ProjectManager", fields: [managerId], references: [id])
-  
-  startDate     DateTime?
-  endDate       DateTime?
-  budget        Decimal       @default(0)
-  currency      String        @default("TWD") // TWD, USD, CNY
-  
+  id          String  @id @default(uuid())
+  name        String
+  code        String? @unique // e.g. PRJ-001
+  description String?
+  status      String  @default("PLANNING") // PLANNING, ACTIVE, ON_HOLD, COMPLETED, CANCELLED
+
+  accountId String?
+  account   Account? @relation(fields: [accountId], references: [id])
+
+  managerId String?
+  manager   User?   @relation("ProjectManager", fields: [managerId], references: [id])
+
+  startDate DateTime?
+  endDate   DateTime?
+  budget    Decimal   @default(0)
+  currency  String    @default("TWD") // TWD, USD, CNY
+
+  jiraProjectKey String?
+
   // Relations
-  milestones    Milestone[]
-  tasks         Task[]
-  allocations   Allocation[]  // Hard bookings
-  expenses      Expense[]
-  budgetLines   ProjectBudgetLine[]
-  
-  createdAt     DateTime      @default(now())
-  updatedAt     DateTime      @updatedAt
+  milestones  Milestone[]
+  tasks       Task[]
+  allocations Allocation[] // Hard bookings
+  expenses    Expense[]
+  budgetLines ProjectBudgetLine[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   serviceAreaId String?
-  serviceArea   ServiceArea?  @relation(fields: [serviceAreaId], references: [id])
+  serviceArea   ServiceArea? @relation(fields: [serviceAreaId], references: [id])
 }
 
 model ProjectBudgetLine {
-  id           String   @id @default(uuid())
-  projectId    String
-  project      Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  category     String
-  subCategory  String?
-  plannedAmount Decimal @default(0)
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  id            String   @id @default(uuid())
+  projectId     String
+  project       Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  category      String
+  subCategory   String?
+  plannedAmount Decimal  @default(0)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 }
 
 model ServiceArea {
-  id        String    @id @default(uuid())
-  name      String    @unique
-  createdAt DateTime  @default(now())
-  
+  id        String   @id @default(uuid())
+  name      String   @unique
+  createdAt DateTime @default(now())
+
   projects      Project[]
   opportunities Opportunity[]
 }
@@ -287,8 +290,8 @@ model Expense {
   description String
   amount      Decimal
   date        DateTime
-  category    String?  // e.g. "Software", "Hardware"
-  incurredBy  String?  // Name of applicant
+  category    String? // e.g. "Software", "Hardware"
+  incurredBy  String? // Name of applicant
   createdAt   DateTime @default(now())
 }
 
@@ -300,86 +303,86 @@ model ExpenseCategory {
 }
 
 model Milestone {
-  id          String   @id @default(uuid())
-  projectId   String
-  project     Project  @relation(fields: [projectId], references: [id])
-  name        String
-  dueDate     DateTime?
-  amount      Decimal  @default(0) // Billing amount
-  isPaid      Boolean  @default(false)
-  
-  tasks       Task[]
+  id        String    @id @default(uuid())
+  projectId String
+  project   Project   @relation(fields: [projectId], references: [id])
+  name      String
+  dueDate   DateTime?
+  amount    Decimal   @default(0) // Billing amount
+  isPaid    Boolean   @default(false)
+
+  tasks Task[]
 }
 
 model Task {
-  id          String    @id @default(uuid())
-  projectId   String?
-  project     Project?   @relation(fields: [projectId], references: [id])
-  
+  id        String   @id @default(uuid())
+  projectId String?
+  project   Project? @relation(fields: [projectId], references: [id])
+
   opportunityId String?
-  opportunity Opportunity? @relation(fields: [opportunityId], references: [id])
-  
+  opportunity   Opportunity? @relation(fields: [opportunityId], references: [id])
+
   milestoneId String?
   milestone   Milestone? @relation(fields: [milestoneId], references: [id])
-  
+
   title       String
   description String?
-  status      String     @default("TODO") // TODO, IN_PROGRESS, REVIEW, DONE
-  priority    String     @default("MEDIUM") // LOW, MEDIUM, HIGH, URGENT
-  
-  assigneeId  String?
-  assignee    User?      @relation("TaskAssignee", fields: [assigneeId], references: [id])
-  
-  startDate   DateTime?
-  dueDate     DateTime?
-  estimatedHours Float?
-  
-  timesheets  TimesheetEntry[]
-  
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
+  status      String  @default("TODO") // TODO, IN_PROGRESS, REVIEW, DONE
+  priority    String  @default("MEDIUM") // LOW, MEDIUM, HIGH, URGENT
 
-  parentId    String?
-  parent      Task?      @relation("SubTasks", fields: [parentId], references: [id])
-  subtasks    Task[]     @relation("SubTasks")
+  assigneeId String?
+  assignee   User?   @relation("TaskAssignee", fields: [assigneeId], references: [id])
+
+  startDate      DateTime?
+  dueDate        DateTime?
+  estimatedHours Float?
+
+  timesheets TimesheetEntry[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  parentId String?
+  parent   Task?   @relation("SubTasks", fields: [parentId], references: [id])
+  subtasks Task[]  @relation("SubTasks")
 }
 
 // --- Resource & Finance ---
 
 model Allocation {
-  id            String   @id @default(uuid())
-  resourceId    String
-  resource      ResourceProfile @relation(fields: [resourceId], references: [id])
-  
-  projectId     String?
-  project       Project? @relation(fields: [projectId], references: [id])
-  
+  id         String          @id @default(uuid())
+  resourceId String
+  resource   ResourceProfile @relation(fields: [resourceId], references: [id])
+
+  projectId String?
+  project   Project? @relation(fields: [projectId], references: [id])
+
   opportunityId String?
   opportunity   Opportunity? @relation(fields: [opportunityId], references: [id])
-  
-  startDate     DateTime
-  endDate       DateTime
-  percentage    Int      @default(100) // Allocation %
-  type          String   // "SOFT" or "HARD"
+
+  startDate  DateTime
+  endDate    DateTime
+  percentage Int      @default(100) // Allocation %
+  type       String // "SOFT" or "HARD"
 }
 
 model TimesheetEntry {
-  id          String   @id @default(uuid())
-  userId      String
-  user        User     @relation(fields: [userId], references: [id])
-  
-  taskId      String?
-  task        Task?    @relation(fields: [taskId], references: [id])
-  
+  id     String @id @default(uuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  taskId String?
+  task   Task?   @relation(fields: [taskId], references: [id])
+
   date        DateTime
   hours       Decimal
   description String?
-  
+
   // Financial Snapshot (captured at time of entry)
-  costRate    Decimal  @default(0)
+  costRate     Decimal @default(0)
   billableRate Decimal @default(0)
-  
-  createdAt   DateTime @default(now())
+
+  createdAt DateTime @default(now())
 }
 
 // --- System Management ---

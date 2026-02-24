@@ -1,0 +1,325 @@
+
+> jira-pro@0.1.0 dev
+> next dev
+
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+   ▲ Next.js 16.0.10 (Turbopack)
+   - Local:         http://localhost:3000
+   - Network:       http://192.168.0.2:3000
+
+ ✓ Starting...
+Attention: Next.js now collects completely anonymous telemetry regarding usage.
+This information is used to shape Next.js' roadmap and prioritize features.
+You can learn more, including how to opt-out if you'd not like to participate in this anonymous program, by visiting the following URL:
+https://nextjs.org/telemetry
+
+ ✓ Ready in 1122ms
+ ○ Compiling /login ...
+ HEAD /login 200 in 3.5s (compile: 3.3s, render: 197ms)
+ GET /login 200 in 72ms (compile: 6ms, render: 66ms)
+ POST /login 200 in 2.9s (compile: 4ms, render: 2.9s)
+ ○ Compiling /admin ...
+Only plain objects can be passed to Client Components from Server Components. Decimal objects are not supported.
+  {id: ..., userId: ..., title: "CTO", skills: ..., costRate: Decimal, billableRate: ..., monthlySalary: ..., capacityHours: ...}
+                                                              ^^^^^^^
+Only plain objects can be passed to Client Components from Server Components. Decimal objects are not supported.
+  {id: ..., userId: ..., title: "CTO", skills: ..., costRate: ..., billableRate: Decimal, monthlySalary: ..., capacityHours: ...}
+                                                                                 ^^^^^^^
+Only plain objects can be passed to Client Components from Server Components. Decimal objects are not supported.
+  {id: ..., userId: ..., title: "CTO", skills: ..., costRate: ..., billableRate: ..., monthlySalary: Decimal, capacityHours: ...}
+                                                                                                     ^^^^^^^
+Only plain objects can be passed to Client Components from Server Components. Decimal objects are not supported.
+  {id: ..., userId: ..., title: "CTO", skills: ..., costRate: Decimal, billableRate: ..., monthlySalary: ..., capacityHours: ...}
+                                                              ^^^^^^^
+Only plain objects can be passed to Client Components from Server Components. Decimal objects are not supported.
+  {id: ..., userId: ..., title: "CTO", skills: ..., costRate: ..., billableRate: Decimal, monthlySalary: ..., capacityHours: ...}
+                                                                                 ^^^^^^^
+Only plain objects can be passed to Client Components from Server Components. Decimal objects are not supported.
+  {id: ..., userId: ..., title: "CTO", skills: ..., costRate: ..., billableRate: ..., monthlySalary: Decimal, capacityHours: ...}
+                                                                                                     ^^^^^^^
+ GET /admin 200 in 16.3s (compile: 3.5s, render: 12.9s)
+ GET /admin 200 in 13.8s (compile: 4ms, render: 13.8s)
+ GET /login 200 in 56ms (compile: 4ms, render: 52ms)
+ POST /login 200 in 1475ms (compile: 4ms, render: 1470ms)
+Only plain objects can be passed to Client Components from Server Components. Decimal objects are not supported.
+  {id: ..., userId: ..., title: "CTO", skills: ..., costRate: Decimal, billableRate: ..., monthlySalary: ..., capacityHours: ...}
+                                                              ^^^^^^^
+Only plain objects can be passed to Client Components from Server Components. Decimal objects are not supported.
+  {id: ..., userId: ..., title: "CTO", skills: ..., costRate: ..., billableRate: Decimal, monthlySalary: ..., capacityHours: ...}
+                                                                                 ^^^^^^^
+Only plain objects can be passed to Client Components from Server Components. Decimal objects are not supported.
+  {id: ..., userId: ..., title: "CTO", skills: ..., costRate: ..., billableRate: ..., monthlySalary: Decimal, capacityHours: ...}
+                                                                                                     ^^^^^^^
+Only plain objects can be passed to Client Components from Server Components. Decimal objects are not supported.
+  {id: ..., userId: ..., title: "CTO", skills: ..., costRate: Decimal, billableRate: ..., monthlySalary: ..., capacityHours: ...}
+                                                              ^^^^^^^
+Only plain objects can be passed to Client Components from Server Components. Decimal objects are not supported.
+  {id: ..., userId: ..., title: "CTO", skills: ..., costRate: ..., billableRate: Decimal, monthlySalary: ..., capacityHours: ...}
+                                                                                 ^^^^^^^
+Only plain objects can be passed to Client Components from Server Components. Decimal objects are not supported.
+  {id: ..., userId: ..., title: "CTO", skills: ..., costRate: ..., billableRate: ..., monthlySalary: Decimal, capacityHours: ...}
+                                                                                                     ^^^^^^^
+Only plain objects can be passed to Client Components from Server Components. Decimal objects are not supported.
+  {id: ..., userId: ..., title: "CTO", skills: ..., costRate: Decimal, billableRate: ..., monthlySalary: ..., capacityHours: ...}
+                                                              ^^^^^^^
+Only plain objects can be passed to Client Components from Server Components. Decimal objects are not supported.
+  {id: ..., userId: ..., title: "CTO", skills: ..., costRate: ..., billableRate: Decimal, monthlySalary: ..., capacityHours: ...}
+                                                                                 ^^^^^^^
+Only plain objects can be passed to Client Components from Server Components. Decimal objects are not supported.
+  {id: ..., userId: ..., title: "CTO", skills: ..., costRate: ..., billableRate: ..., monthlySalary: Decimal, capacityHours: ...}
+                                                                                                     ^^^^^^^
+ GET /admin 200 in 8.4s (compile: 6ms, render: 8.4s)
+ GET /admin 200 in 8.5s (compile: 3ms, render: 8.5s)
+ GET /admin/crm 200 in 7.0s (compile: 2.9s, render: 4.1s)
+Only plain objects can be passed to Client Components from Server Components. Decimal objects are not supported.
+  {id: ..., title: ..., accountId: ..., stage: ..., probability: ..., estimatedValue: ..., expectedCloseDate: ..., probabilityOverrideReason: ..., clientBudget: Decimal, jiraTicketKey: ..., checklist: ..., lossReason: ..., ownerId: ..., convertedProjectId: ..., serviceAreaId: ..., createdAt: ..., updatedAt: ..., stageUpdatedAt: ...}
+                                                                                                                                                                 ^^^^^^^
+ POST /admin/crm 200 in 2.1s (compile: 6ms, render: 2.1s)
+ GET /admin/crm 200 in 879ms (compile: 3ms, render: 876ms)
+ GET /login 200 in 67ms (compile: 4ms, render: 63ms)
+ POST /login 200 in 1468ms (compile: 3ms, render: 1465ms)
+Only plain objects can be passed to Client Components from Server Components. Decimal objects are not supported.
+  {id: ..., userId: ..., title: "CTO", skills: ..., costRate: Decimal, billableRate: ..., monthlySalary: ..., capacityHours: ...}
+                                                              ^^^^^^^
+Only plain objects can be passed to Client Components from Server Components. Decimal objects are not supported.
+  {id: ..., userId: ..., title: "CTO", skills: ..., costRate: ..., billableRate: Decimal, monthlySalary: ..., capacityHours: ...}
+                                                                                 ^^^^^^^
+Only plain objects can be passed to Client Components from Server Components. Decimal objects are not supported.
+  {id: ..., userId: ..., title: "CTO", skills: ..., costRate: ..., billableRate: ..., monthlySalary: Decimal, capacityHours: ...}
+                                                                                                     ^^^^^^^
+Only plain objects can be passed to Client Components from Server Components. Decimal objects are not supported.
+  {id: ..., userId: ..., title: "CTO", skills: ..., costRate: Decimal, billableRate: ..., monthlySalary: ..., capacityHours: ...}
+                                                              ^^^^^^^
+Only plain objects can be passed to Client Components from Server Components. Decimal objects are not supported.
+  {id: ..., userId: ..., title: "CTO", skills: ..., costRate: ..., billableRate: Decimal, monthlySalary: ..., capacityHours: ...}
+                                                                                 ^^^^^^^
+Only plain objects can be passed to Client Components from Server Components. Decimal objects are not supported.
+  {id: ..., userId: ..., title: "CTO", skills: ..., costRate: ..., billableRate: ..., monthlySalary: Decimal, capacityHours: ...}
+                                                                                                     ^^^^^^^
+Only plain objects can be passed to Client Components from Server Components. Decimal objects are not supported.
+  {id: ..., userId: ..., title: "CTO", skills: ..., costRate: Decimal, billableRate: ..., monthlySalary: ..., capacityHours: ...}
+                                                              ^^^^^^^
+Only plain objects can be passed to Client Components from Server Components. Decimal objects are not supported.
+  {id: ..., userId: ..., title: "CTO", skills: ..., costRate: ..., billableRate: Decimal, monthlySalary: ..., capacityHours: ...}
+                                                                                 ^^^^^^^
+Only plain objects can be passed to Client Components from Server Components. Decimal objects are not supported.
+  {id: ..., userId: ..., title: "CTO", skills: ..., costRate: ..., billableRate: ..., monthlySalary: Decimal, capacityHours: ...}
+                                                                                                     ^^^^^^^
+ GET /admin 200 in 5.0s (compile: 3ms, render: 5.0s)
+ GET /admin 200 in 5.0s (compile: 3ms, render: 5.0s)
+Only plain objects can be passed to Client Components from Server Components. Decimal objects are not supported.
+  {id: ..., title: ..., accountId: ..., stage: ..., probability: ..., estimatedValue: ..., expectedCloseDate: ..., probabilityOverrideReason: ..., clientBudget: Decimal, jiraTicketKey: ..., checklist: ..., lossReason: ..., ownerId: ..., convertedProjectId: ..., serviceAreaId: ..., createdAt: ..., updatedAt: ..., stageUpdatedAt: ..., account: ..., owner: ..., serviceArea: ..., healthScore: ..., healthSignals: ..., recommendedProbability: ..., probabilityDelta: ...}
+                                                                                                                                                                 ^^^^^^^
+ GET /admin/crm 200 in 3.7s (compile: 4ms, render: 3.7s)
+Only plain objects can be passed to Client Components from Server Components. Decimal objects are not supported.
+  {id: ..., title: ..., accountId: ..., stage: ..., probability: ..., estimatedValue: ..., expectedCloseDate: ..., probabilityOverrideReason: ..., clientBudget: Decimal, jiraTicketKey: ..., checklist: ..., lossReason: ..., ownerId: ..., convertedProjectId: ..., serviceAreaId: ..., createdAt: ..., updatedAt: ..., stageUpdatedAt: ...}
+                                                                                                                                                                 ^^^^^^^
+Only plain objects can be passed to Client Components from Server Components. Decimal objects are not supported.
+  {id: ..., userId: ..., title: "CTO", skills: ..., costRate: Decimal, billableRate: ..., monthlySalary: ..., capacityHours: ...}
+                                                              ^^^^^^^
+Only plain objects can be passed to Client Components from Server Components. Decimal objects are not supported.
+  {id: ..., userId: ..., title: "CTO", skills: ..., costRate: ..., billableRate: Decimal, monthlySalary: ..., capacityHours: ...}
+                                                                                 ^^^^^^^
+Only plain objects can be passed to Client Components from Server Components. Decimal objects are not supported.
+  {id: ..., userId: ..., title: "CTO", skills: ..., costRate: ..., billableRate: ..., monthlySalary: Decimal, capacityHours: ...}
+                                                                                                     ^^^^^^^
+Only plain objects can be passed to Client Components from Server Components. Decimal objects are not supported.
+  {id: ..., userId: ..., title: "CTO", skills: ..., costRate: Decimal, billableRate: ..., monthlySalary: ..., capacityHours: ...}
+                                                              ^^^^^^^
+Only plain objects can be passed to Client Components from Server Components. Decimal objects are not supported.
+  {id: ..., userId: ..., title: "CTO", skills: ..., costRate: ..., billableRate: Decimal, monthlySalary: ..., capacityHours: ...}
+                                                                                 ^^^^^^^
+Only plain objects can be passed to Client Components from Server Components. Decimal objects are not supported.
+  {id: ..., userId: ..., title: "CTO", skills: ..., costRate: ..., billableRate: ..., monthlySalary: Decimal, capacityHours: ...}
+                                                                                                     ^^^^^^^
+Only plain objects can be passed to Client Components from Server Components. Decimal objects are not supported.
+  {id: ..., title: ..., accountId: ..., stage: ..., probability: ..., estimatedValue: ..., expectedCloseDate: ..., probabilityOverrideReason: ..., clientBudget: Decimal, jiraTicketKey: ..., checklist: ..., lossReason: ..., ownerId: ..., convertedProjectId: ..., serviceAreaId: ..., createdAt: ..., updatedAt: ..., stageUpdatedAt: ..., account: ..., owner: ..., serviceArea: ..., healthScore: ..., healthSignals: ..., recommendedProbability: ..., probabilityDelta: ...}
+                                                                                                                                                                 ^^^^^^^
+Only plain objects can be passed to Client Components from Server Components. Decimal objects are not supported.
+  {id: ..., title: ..., accountId: ..., stage: ..., probability: ..., estimatedValue: ..., expectedCloseDate: ..., probabilityOverrideReason: ..., clientBudget: Decimal, jiraTicketKey: ..., checklist: ..., lossReason: ..., ownerId: ..., convertedProjectId: ..., serviceAreaId: ..., createdAt: ..., updatedAt: ..., stageUpdatedAt: ..., account: ..., owner: ..., serviceArea: ..., healthScore: ..., healthSignals: ..., recommendedProbability: ..., probabilityDelta: ...}
+                                                                                                                                                                 ^^^^^^^
+ POST /admin/crm 200 in 4.9s (compile: 3ms, render: 4.9s)
+Only plain objects can be passed to Client Components from Server Components. Decimal objects are not supported.
+  {id: ..., title: ..., accountId: ..., stage: ..., probability: ..., estimatedValue: ..., expectedCloseDate: ..., probabilityOverrideReason: ..., clientBudget: Decimal, jiraTicketKey: ..., checklist: ..., lossReason: ..., ownerId: ..., convertedProjectId: ..., serviceAreaId: ..., createdAt: ..., updatedAt: ..., stageUpdatedAt: ..., account: ..., owner: ..., serviceArea: ..., healthScore: ..., healthSignals: ..., recommendedProbability: ..., probabilityDelta: ...}
+                                                                                                                                                                 ^^^^^^^
+Only plain objects can be passed to Client Components from Server Components. Decimal objects are not supported.
+  {id: ..., title: ..., accountId: ..., stage: ..., probability: ..., estimatedValue: ..., expectedCloseDate: ..., probabilityOverrideReason: ..., clientBudget: Decimal, jiraTicketKey: ..., checklist: ..., lossReason: ..., ownerId: ..., convertedProjectId: ..., serviceAreaId: ..., createdAt: ..., updatedAt: ..., stageUpdatedAt: ..., account: ..., owner: ..., serviceArea: ..., healthScore: ..., healthSignals: ..., recommendedProbability: ..., probabilityDelta: ...}
+                                                                                                                                                                 ^^^^^^^
+ GET /admin/crm 200 in 4.8s (compile: 3ms, render: 4.7s)
+Only plain objects can be passed to Client Components from Server Components. Decimal objects are not supported.
+  {id: ..., userId: ..., title: ..., skills: ..., costRate: ..., billableRate: ..., monthlySalary: Decimal, capacityHours: ..., user: ...}
+                                                                                                   ^^^^^^^
+Only plain objects can be passed to Client Components from Server Components. Decimal objects are not supported.
+  {id: ..., userId: ..., title: "BD", skills: ..., costRate: ..., billableRate: ..., monthlySalary: Decimal, capacityHours: ..., user: ...}
+                                                                                                    ^^^^^^^
+Only plain objects can be passed to Client Components from Server Components. Decimal objects are not supported.
+  {id: ..., userId: ..., title: "COO", skills: ..., costRate: ..., billableRate: ..., monthlySalary: Decimal, capacityHours: ..., user: ...}
+                                                                                                     ^^^^^^^
+Only plain objects can be passed to Client Components from Server Components. Decimal objects are not supported.
+  {id: ..., userId: ..., title: "CTO", skills: ..., costRate: ..., billableRate: ..., monthlySalary: Decimal, capacityHours: ..., user: ...}
+                                                                                                     ^^^^^^^
+Only plain objects can be passed to Client Components from Server Components. Decimal objects are not supported.
+  {id: ..., userId: ..., title: "PM", skills: ..., costRate: ..., billableRate: ..., monthlySalary: Decimal, capacityHours: ..., user: ...}
+                                                                                                    ^^^^^^^
+Only plain objects can be passed to Client Components from Server Components. Decimal objects are not supported.
+  {id: ..., userId: ..., title: ..., skills: ..., costRate: ..., billableRate: ..., monthlySalary: Decimal, capacityHours: ..., user: ...}
+                                                                                                   ^^^^^^^
+Only plain objects can be passed to Client Components from Server Components. Decimal objects are not supported.
+  {id: ..., userId: ..., title: ..., skills: ..., costRate: ..., billableRate: ..., monthlySalary: Decimal, capacityHours: ..., user: ...}
+                                                                                                   ^^^^^^^
+Only plain objects can be passed to Client Components from Server Components. Decimal objects are not supported.
+  {id: ..., userId: ..., title: ..., skills: ..., costRate: ..., billableRate: ..., monthlySalary: Decimal, capacityHours: ..., user: ...}
+                                                                                                   ^^^^^^^
+Only plain objects can be passed to Client Components from Server Components. Decimal objects are not supported.
+  {id: ..., userId: ..., title: ..., skills: ..., costRate: ..., billableRate: ..., monthlySalary: Decimal, capacityHours: ..., user: ...}
+                                                                                                   ^^^^^^^
+Only plain objects can be passed to Client Components from Server Components. Decimal objects are not supported.
+  {id: ..., userId: ..., title: "BD", skills: ..., costRate: ..., billableRate: ..., monthlySalary: Decimal, capacityHours: ..., user: ...}
+                                                                                                    ^^^^^^^
+Only plain objects can be passed to Client Components from Server Components. Decimal objects are not supported.
+  {id: ..., userId: ..., title: Null, skills: ..., costRate: ..., billableRate: ..., monthlySalary: Decimal, capacityHours: ..., user: ...}
+                                                                                                    ^^^^^^^
+Only plain objects can be passed to Client Components from Server Components. Decimal objects are not supported.
+  {id: ..., userId: ..., title: "CTO", skills: ..., costRate: ..., billableRate: ..., monthlySalary: Decimal, capacityHours: ..., user: ...}
+                                                                                                     ^^^^^^^
+Only plain objects can be passed to Client Components from Server Components. Decimal objects are not supported.
+  {id: ..., userId: ..., title: ..., skills: ..., costRate: ..., billableRate: ..., monthlySalary: Decimal, capacityHours: ..., user: ...}
+                                                                                                   ^^^^^^^
+Only plain objects can be passed to Client Components from Server Components. Decimal objects are not supported.
+  {id: ..., userId: ..., title: ..., skills: ..., costRate: ..., billableRate: ..., monthlySalary: Decimal, capacityHours: ..., user: ...}
+                                                                                                   ^^^^^^^
+Only plain objects can be passed to Client Components from Server Components. Decimal objects are not supported.
+  {id: ..., userId: ..., title: ..., skills: ..., costRate: ..., billableRate: ..., monthlySalary: Decimal, capacityHours: ..., user: ...}
+                                                                                                   ^^^^^^^
+Only plain objects can be passed to Client Components from Server Components. Decimal objects are not supported.
+  {id: ..., userId: ..., title: ..., skills: ..., costRate: ..., billableRate: ..., monthlySalary: Decimal, capacityHours: ..., user: ...}
+                                                                                                   ^^^^^^^
+ GET /admin/crm/9bbb9cc4-1746-4f3f-a4ef-edd316a881c6 200 in 13.5s (compile: 3.6s, render: 10.0s)
+ GET /login 200 in 71ms (compile: 3ms, render: 67ms)
+ POST /login 200 in 1470ms (compile: 5ms, render: 1465ms)
+Only plain objects can be passed to Client Components from Server Components. Decimal objects are not supported.
+  {id: ..., userId: ..., title: "CTO", skills: ..., costRate: Decimal, billableRate: ..., monthlySalary: ..., capacityHours: ...}
+                                                              ^^^^^^^
+Only plain objects can be passed to Client Components from Server Components. Decimal objects are not supported.
+  {id: ..., userId: ..., title: "CTO", skills: ..., costRate: ..., billableRate: Decimal, monthlySalary: ..., capacityHours: ...}
+                                                                                 ^^^^^^^
+Only plain objects can be passed to Client Components from Server Components. Decimal objects are not supported.
+  {id: ..., userId: ..., title: "CTO", skills: ..., costRate: ..., billableRate: ..., monthlySalary: Decimal, capacityHours: ...}
+                                                                                                     ^^^^^^^
+Only plain objects can be passed to Client Components from Server Components. Decimal objects are not supported.
+  {id: ..., userId: ..., title: "CTO", skills: ..., costRate: Decimal, billableRate: ..., monthlySalary: ..., capacityHours: ...}
+                                                              ^^^^^^^
+Only plain objects can be passed to Client Components from Server Components. Decimal objects are not supported.
+  {id: ..., userId: ..., title: "CTO", skills: ..., costRate: ..., billableRate: Decimal, monthlySalary: ..., capacityHours: ...}
+                                                                                 ^^^^^^^
+Only plain objects can be passed to Client Components from Server Components. Decimal objects are not supported.
+  {id: ..., userId: ..., title: "CTO", skills: ..., costRate: ..., billableRate: ..., monthlySalary: Decimal, capacityHours: ...}
+                                                                                                     ^^^^^^^
+Only plain objects can be passed to Client Components from Server Components. Decimal objects are not supported.
+  {id: ..., userId: ..., title: "CTO", skills: ..., costRate: Decimal, billableRate: ..., monthlySalary: ..., capacityHours: ...}
+                                                              ^^^^^^^
+Only plain objects can be passed to Client Components from Server Components. Decimal objects are not supported.
+  {id: ..., userId: ..., title: "CTO", skills: ..., costRate: ..., billableRate: Decimal, monthlySalary: ..., capacityHours: ...}
+                                                                                 ^^^^^^^
+Only plain objects can be passed to Client Components from Server Components. Decimal objects are not supported.
+  {id: ..., userId: ..., title: "CTO", skills: ..., costRate: ..., billableRate: ..., monthlySalary: Decimal, capacityHours: ...}
+                                                                                                     ^^^^^^^
+ GET /admin 200 in 5.1s (compile: 4ms, render: 5.1s)
+ GET /admin 200 in 5.0s (compile: 3ms, render: 5.0s)
+Only plain objects can be passed to Client Components from Server Components. Decimal objects are not supported.
+  {id: ..., title: ..., accountId: ..., stage: ..., probability: ..., estimatedValue: ..., expectedCloseDate: ..., probabilityOverrideReason: ..., clientBudget: Decimal, jiraTicketKey: ..., checklist: ..., lossReason: ..., ownerId: ..., convertedProjectId: ..., serviceAreaId: ..., createdAt: ..., updatedAt: ..., stageUpdatedAt: ..., account: ..., owner: ..., serviceArea: ..., healthScore: ..., healthSignals: ..., recommendedProbability: ..., probabilityDelta: ...}
+                                                                                                                                                                 ^^^^^^^
+Only plain objects can be passed to Client Components from Server Components. Decimal objects are not supported.
+  {id: ..., title: ..., accountId: ..., stage: ..., probability: ..., estimatedValue: ..., expectedCloseDate: ..., probabilityOverrideReason: ..., clientBudget: Decimal, jiraTicketKey: ..., checklist: ..., lossReason: ..., ownerId: ..., convertedProjectId: ..., serviceAreaId: ..., createdAt: ..., updatedAt: ..., stageUpdatedAt: ..., account: ..., owner: ..., serviceArea: ..., healthScore: ..., healthSignals: ..., recommendedProbability: ..., probabilityDelta: ...}
+                                                                                                                                                                 ^^^^^^^
+ GET /admin/crm 200 in 3.9s (compile: 3ms, render: 3.9s)
+Only plain objects can be passed to Client Components from Server Components. Decimal objects are not supported.
+  {id: ..., title: ..., accountId: ..., stage: ..., probability: ..., estimatedValue: ..., expectedCloseDate: ..., probabilityOverrideReason: ..., clientBudget: Decimal, jiraTicketKey: ..., checklist: ..., lossReason: ..., ownerId: ..., convertedProjectId: ..., serviceAreaId: ..., createdAt: ..., updatedAt: ..., stageUpdatedAt: ...}
+                                                                                                                                                                 ^^^^^^^
+Only plain objects can be passed to Client Components from Server Components. Decimal objects are not supported.
+  {id: ..., userId: ..., title: "CTO", skills: ..., costRate: Decimal, billableRate: ..., monthlySalary: ..., capacityHours: ...}
+                                                              ^^^^^^^
+Only plain objects can be passed to Client Components from Server Components. Decimal objects are not supported.
+  {id: ..., userId: ..., title: "CTO", skills: ..., costRate: ..., billableRate: Decimal, monthlySalary: ..., capacityHours: ...}
+                                                                                 ^^^^^^^
+Only plain objects can be passed to Client Components from Server Components. Decimal objects are not supported.
+  {id: ..., userId: ..., title: "CTO", skills: ..., costRate: ..., billableRate: ..., monthlySalary: Decimal, capacityHours: ...}
+                                                                                                     ^^^^^^^
+Only plain objects can be passed to Client Components from Server Components. Decimal objects are not supported.
+  {id: ..., userId: ..., title: "CTO", skills: ..., costRate: Decimal, billableRate: ..., monthlySalary: ..., capacityHours: ...}
+                                                              ^^^^^^^
+Only plain objects can be passed to Client Components from Server Components. Decimal objects are not supported.
+  {id: ..., userId: ..., title: "CTO", skills: ..., costRate: ..., billableRate: Decimal, monthlySalary: ..., capacityHours: ...}
+                                                                                 ^^^^^^^
+Only plain objects can be passed to Client Components from Server Components. Decimal objects are not supported.
+  {id: ..., userId: ..., title: "CTO", skills: ..., costRate: ..., billableRate: ..., monthlySalary: Decimal, capacityHours: ...}
+                                                                                                     ^^^^^^^
+Only plain objects can be passed to Client Components from Server Components. Decimal objects are not supported.
+  {id: ..., title: ..., accountId: ..., stage: ..., probability: ..., estimatedValue: ..., expectedCloseDate: ..., probabilityOverrideReason: ..., clientBudget: Decimal, jiraTicketKey: ..., checklist: ..., lossReason: ..., ownerId: ..., convertedProjectId: ..., serviceAreaId: ..., createdAt: ..., updatedAt: ..., stageUpdatedAt: ..., account: ..., owner: ..., serviceArea: ..., healthScore: ..., healthSignals: ..., recommendedProbability: ..., probabilityDelta: ...}
+                                                                                                                                                                 ^^^^^^^
+Only plain objects can be passed to Client Components from Server Components. Decimal objects are not supported.
+  {id: ..., title: ..., accountId: ..., stage: ..., probability: ..., estimatedValue: ..., expectedCloseDate: ..., probabilityOverrideReason: ..., clientBudget: Decimal, jiraTicketKey: ..., checklist: ..., lossReason: ..., ownerId: ..., convertedProjectId: ..., serviceAreaId: ..., createdAt: ..., updatedAt: ..., stageUpdatedAt: ..., account: ..., owner: ..., serviceArea: ..., healthScore: ..., healthSignals: ..., recommendedProbability: ..., probabilityDelta: ...}
+                                                                                                                                                                 ^^^^^^^
+Only plain objects can be passed to Client Components from Server Components. Decimal objects are not supported.
+  {id: ..., title: ..., accountId: ..., stage: ..., probability: ..., estimatedValue: ..., expectedCloseDate: ..., probabilityOverrideReason: ..., clientBudget: Decimal, jiraTicketKey: ..., checklist: ..., lossReason: ..., ownerId: ..., convertedProjectId: ..., serviceAreaId: ..., createdAt: ..., updatedAt: ..., stageUpdatedAt: ..., account: ..., owner: ..., serviceArea: ..., healthScore: ..., healthSignals: ..., recommendedProbability: ..., probabilityDelta: ...}
+                                                                                                                                                                 ^^^^^^^
+ POST /admin/crm 200 in 5.1s (compile: 4ms, render: 5.1s)
+Only plain objects can be passed to Client Components from Server Components. Decimal objects are not supported.
+  {id: ..., title: ..., accountId: ..., stage: ..., probability: ..., estimatedValue: ..., expectedCloseDate: ..., probabilityOverrideReason: ..., clientBudget: Decimal, jiraTicketKey: ..., checklist: ..., lossReason: ..., ownerId: ..., convertedProjectId: ..., serviceAreaId: ..., createdAt: ..., updatedAt: ..., stageUpdatedAt: ..., account: ..., owner: ..., serviceArea: ..., healthScore: ..., healthSignals: ..., recommendedProbability: ..., probabilityDelta: ...}
+                                                                                                                                                                 ^^^^^^^
+Only plain objects can be passed to Client Components from Server Components. Decimal objects are not supported.
+  {id: ..., title: ..., accountId: ..., stage: ..., probability: ..., estimatedValue: ..., expectedCloseDate: ..., probabilityOverrideReason: ..., clientBudget: Decimal, jiraTicketKey: ..., checklist: ..., lossReason: ..., ownerId: ..., convertedProjectId: ..., serviceAreaId: ..., createdAt: ..., updatedAt: ..., stageUpdatedAt: ..., account: ..., owner: ..., serviceArea: ..., healthScore: ..., healthSignals: ..., recommendedProbability: ..., probabilityDelta: ...}
+                                                                                                                                                                 ^^^^^^^
+Only plain objects can be passed to Client Components from Server Components. Decimal objects are not supported.
+  {id: ..., title: ..., accountId: ..., stage: ..., probability: ..., estimatedValue: ..., expectedCloseDate: ..., probabilityOverrideReason: ..., clientBudget: Decimal, jiraTicketKey: ..., checklist: ..., lossReason: ..., ownerId: ..., convertedProjectId: ..., serviceAreaId: ..., createdAt: ..., updatedAt: ..., stageUpdatedAt: ..., account: ..., owner: ..., serviceArea: ..., healthScore: ..., healthSignals: ..., recommendedProbability: ..., probabilityDelta: ...}
+                                                                                                                                                                 ^^^^^^^
+ GET /admin/crm 200 in 4.7s (compile: 3ms, render: 4.7s)
+Only plain objects can be passed to Client Components from Server Components. Decimal objects are not supported.
+  {id: ..., userId: ..., title: ..., skills: ..., costRate: ..., billableRate: ..., monthlySalary: Decimal, capacityHours: ..., user: ...}
+                                                                                                   ^^^^^^^
+Only plain objects can be passed to Client Components from Server Components. Decimal objects are not supported.
+  {id: ..., userId: ..., title: "BD", skills: ..., costRate: ..., billableRate: ..., monthlySalary: Decimal, capacityHours: ..., user: ...}
+                                                                                                    ^^^^^^^
+Only plain objects can be passed to Client Components from Server Components. Decimal objects are not supported.
+  {id: ..., userId: ..., title: "COO", skills: ..., costRate: ..., billableRate: ..., monthlySalary: Decimal, capacityHours: ..., user: ...}
+                                                                                                     ^^^^^^^
+Only plain objects can be passed to Client Components from Server Components. Decimal objects are not supported.
+  {id: ..., userId: ..., title: "CTO", skills: ..., costRate: ..., billableRate: ..., monthlySalary: Decimal, capacityHours: ..., user: ...}
+                                                                                                     ^^^^^^^
+Only plain objects can be passed to Client Components from Server Components. Decimal objects are not supported.
+  {id: ..., userId: ..., title: "PM", skills: ..., costRate: ..., billableRate: ..., monthlySalary: Decimal, capacityHours: ..., user: ...}
+                                                                                                    ^^^^^^^
+Only plain objects can be passed to Client Components from Server Components. Decimal objects are not supported.
+  {id: ..., userId: ..., title: ..., skills: ..., costRate: ..., billableRate: ..., monthlySalary: Decimal, capacityHours: ..., user: ...}
+                                                                                                   ^^^^^^^
+Only plain objects can be passed to Client Components from Server Components. Decimal objects are not supported.
+  {id: ..., userId: ..., title: ..., skills: ..., costRate: ..., billableRate: ..., monthlySalary: Decimal, capacityHours: ..., user: ...}
+                                                                                                   ^^^^^^^
+Only plain objects can be passed to Client Components from Server Components. Decimal objects are not supported.
+  {id: ..., userId: ..., title: ..., skills: ..., costRate: ..., billableRate: ..., monthlySalary: Decimal, capacityHours: ..., user: ...}
+                                                                                                   ^^^^^^^
+Only plain objects can be passed to Client Components from Server Components. Decimal objects are not supported.
+  {id: ..., userId: ..., title: ..., skills: ..., costRate: ..., billableRate: ..., monthlySalary: Decimal, capacityHours: ..., user: ...}
+                                                                                                   ^^^^^^^
+Only plain objects can be passed to Client Components from Server Components. Decimal objects are not supported.
+  {id: ..., userId: ..., title: "BD", skills: ..., costRate: ..., billableRate: ..., monthlySalary: Decimal, capacityHours: ..., user: ...}
+                                                                                                    ^^^^^^^
+Only plain objects can be passed to Client Components from Server Components. Decimal objects are not supported.
+  {id: ..., userId: ..., title: Null, skills: ..., costRate: ..., billableRate: ..., monthlySalary: Decimal, capacityHours: ..., user: ...}
+                                                                                                    ^^^^^^^
+Only plain objects can be passed to Client Components from Server Components. Decimal objects are not supported.
+  {id: ..., userId: ..., title: "CTO", skills: ..., costRate: ..., billableRate: ..., monthlySalary: Decimal, capacityHours: ..., user: ...}
+                                                                                                     ^^^^^^^
+Only plain objects can be passed to Client Components from Server Components. Decimal objects are not supported.
+  {id: ..., userId: ..., title: ..., skills: ..., costRate: ..., billableRate: ..., monthlySalary: Decimal, capacityHours: ..., user: ...}
+                                                                                                   ^^^^^^^
+Only plain objects can be passed to Client Components from Server Components. Decimal objects are not supported.
+  {id: ..., userId: ..., title: ..., skills: ..., costRate: ..., billableRate: ..., monthlySalary: Decimal, capacityHours: ..., user: ...}
+                                                                                                   ^^^^^^^
+Only plain objects can be passed to Client Components from Server Components. Decimal objects are not supported.
+  {id: ..., userId: ..., title: ..., skills: ..., costRate: ..., billableRate: ..., monthlySalary: Decimal, capacityHours: ..., user: ...}
+                                                                                                   ^^^^^^^
+Only plain objects can be passed to Client Components from Server Components. Decimal objects are not supported.
+  {id: ..., userId: ..., title: ..., skills: ..., costRate: ..., billableRate: ..., monthlySalary: Decimal, capacityHours: ..., user: ...}
+                                                                                                   ^^^^^^^
+ GET /admin/crm/9bbb9cc4-1746-4f3f-a4ef-edd316a881c6 200 in 10.4s (compile: 30ms, render: 10.4s)
