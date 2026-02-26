@@ -22,6 +22,11 @@ export async function getBackupSettings() {
 }
 
 export async function updateBackupSettings(enabled: boolean, hour: number) {
+    const user = await getCurrentUser();
+    if (!user || user.role !== 'ADMIN') {
+        return { success: false, error: 'Unauthorized' };
+    }
+
     try {
         if (enabled) {
             await prisma.systemSetting.upsert({
@@ -57,6 +62,11 @@ export async function getBackups() {
 }
 
 export async function restoreFromBackupId(id: string) {
+    const user = await getCurrentUser();
+    if (!user || user.role !== 'ADMIN') {
+        return { success: false, error: 'Unauthorized' };
+    }
+
     try {
         const backup = await prisma.systemBackup.findUnique({
             where: { id }
@@ -109,6 +119,11 @@ export async function changePassword(currentPassword: string, newPassword: strin
 }
 
 export async function backupSystem() {
+    const user = await getCurrentUser();
+    if (!user || user.role !== 'ADMIN') {
+        return { success: false, error: 'Unauthorized' };
+    }
+
     try {
         const users = await prisma.user.findMany();
         const accounts = await prisma.account.findMany();
@@ -174,6 +189,11 @@ export async function backupSystem() {
 }
 
 export async function restoreSystem(formData: FormData) {
+    const user = await getCurrentUser();
+    if (!user || user.role !== 'ADMIN') {
+        return { success: false, error: 'Unauthorized' };
+    }
+
     const file = formData.get('file') as File;
     if (!file) {
         return { success: false, error: 'No file provided' };
@@ -435,6 +455,11 @@ export async function getExpenseCategories() {
 }
 
 export async function addExpenseCategory(name: string, code?: string) {
+    const user = await getCurrentUser();
+    if (!user || user.role !== 'ADMIN') {
+        return { success: false, error: 'Unauthorized' };
+    }
+
     try {
         const trimmedCode = code?.trim() || null;
 
@@ -488,6 +513,11 @@ export async function exportExpenseCategoriesCsv() {
 }
 
 export async function importExpenseCategories(formData: FormData) {
+    const user = await getCurrentUser();
+    if (!user || user.role !== 'ADMIN') {
+        return { success: false, error: 'Unauthorized' };
+    }
+
     try {
         const file = formData.get('file') as File;
         if (!file) {
@@ -540,6 +570,11 @@ export async function importExpenseCategories(formData: FormData) {
 }
 
 export async function deleteExpenseCategory(id: string) {
+    const user = await getCurrentUser();
+    if (!user || user.role !== 'ADMIN') {
+        return { success: false, error: 'Unauthorized' };
+    }
+
     try {
         await prisma.expenseCategory.delete({
             where: { id }
@@ -566,6 +601,11 @@ export async function getServiceAreas() {
 }
 
 export async function addServiceArea(name: string) {
+    const user = await getCurrentUser();
+    if (!user || user.role !== 'ADMIN') {
+        return { success: false, error: 'Unauthorized' };
+    }
+
     try {
         const existing = await prisma.serviceArea.findUnique({
             where: { name }
@@ -589,6 +629,11 @@ export async function addServiceArea(name: string) {
 }
 
 export async function deleteServiceArea(id: string) {
+    const user = await getCurrentUser();
+    if (!user || user.role !== 'ADMIN') {
+        return { success: false, error: 'Unauthorized' };
+    }
+
     try {
         await prisma.serviceArea.delete({
             where: { id }
@@ -604,6 +649,11 @@ export async function deleteServiceArea(id: string) {
 }
 
 export async function seedServiceAreas() {
+    const user = await getCurrentUser();
+    if (!user || user.role !== 'ADMIN') {
+        return { success: false, error: 'Unauthorized' };
+    }
+
     const TAIWAN_AREAS = [
         "Keelung City", "Taipei City", "New Taipei City", "Taoyuan City",
         "Hsinchu City", "Hsinchu County", "Miaoli County", "Taichung City",
