@@ -3,6 +3,7 @@
 import { cookies } from 'next/headers';
 import prisma from '@/lib/prisma';
 import { redirect } from 'next/navigation';
+import { signToken, verifyToken } from './auth-utils';
 
 const AUTH_COOKIE = 'jira_pro_auth_user';
 
@@ -24,7 +25,7 @@ export async function login(formData: FormData) {
         }
 
         const cookieStore = await cookies();
-        cookieStore.set(AUTH_COOKIE, user.id, {
+        cookieStore.set(AUTH_COOKIE, signToken(user.id), {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
             path: '/',
@@ -46,7 +47,8 @@ export async function logout() {
 
 export async function getCurrentUser() {
     const cookieStore = await cookies();
-    const userId = cookieStore.get(AUTH_COOKIE)?.value;
+    const token = cookieStore.get(AUTH_COOKIE)?.value;
+    const userId = token ? verifyToken(token) : null;
 
     if (!userId) {
         return null;
@@ -60,7 +62,7 @@ export async function getCurrentUser() {
             }
         });
         return user;
-    } catch (error) {
+    } catch {
         return null;
     }
 }
