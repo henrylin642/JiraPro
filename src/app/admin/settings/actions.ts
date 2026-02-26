@@ -503,6 +503,14 @@ export async function importExpenseCategories(formData: FormData) {
         let created = 0;
         let updated = 0;
 
+        const existingCategories = await prisma.expenseCategory.findMany();
+        const codeMap = new Map(existingCategories.map(c => [c.code, c]));
+        const nameMap = new Map(existingCategories.map(c => [c.name, c]));
+
+        const updatesByCode = new Map<string, { name: string, code: string }>();
+        const createsByCode = new Map<string, { name: string, code: string }>();
+        const createsByName = new Map<string, { name: string, code: null }>();
+
         for (const row of rows) {
             const rawCode = row['code'] || row['Code'] || row['科目代碼'] || row['Account Code'] || row['Subject Code'] || '';
             const rawName = row['name'] || row['Name'] || row['科目名稱'] || row['Subject'] || row['Category'] || '';
@@ -511,27 +519,60 @@ export async function importExpenseCategories(formData: FormData) {
             if (!name) continue;
 
             if (code) {
-                const exists = await prisma.expenseCategory.findUnique({ where: { code } });
-                if (exists) {
-                    await prisma.expenseCategory.update({ where: { code }, data: { name } });
+                if (codeMap.has(code)) {
+                    const existing = codeMap.get(code)!;
+                    if (existing.name !== name) {
+                        updatesByCode.set(code, { name, code });
+                    } else {
+                        updatesByCode.delete(code);
+                    }
                     updated++;
                 } else {
-                    await prisma.expenseCategory.create({ data: { name, code } });
-                    created++;
+                    createsByCode.set(code, { name, code });
                 }
             } else {
-                const exists = await prisma.expenseCategory.findUnique({ where: { name } });
-                if (exists) {
+                if (nameMap.has(name)) {
                     updated++;
                 } else {
-                    await prisma.expenseCategory.create({ data: { name } });
-                    created++;
+                    createsByName.set(name, { name, code: null });
                 }
             }
         }
 
-        revalidatePath('/admin/settings');
-        revalidatePath('/admin/project');
+        const creates = [...createsByCode.values()];
+        const namesInCodeCreates = new Set([...createsByCode.values()].map(x => x.name));
+
+        for (const c of createsByName.values()) {
+            if (!namesInCodeCreates.has(c.name)) {
+                creates.push(c);
+            } else {
+                updated++;
+            }
+        }
+
+        created = creates.length;
+
+        if (creates.length > 0) {
+            await prisma.expenseCategory.createMany({ data: creates });
+        }
+
+        if (updatesByCode.size > 0) {
+            const updateOps = [...updatesByCode.values()];
+            const CHUNK_SIZE = 50;
+            for (let i = 0; i < updateOps.length; i += CHUNK_SIZE) {
+                const chunk = updateOps.slice(i, i + CHUNK_SIZE);
+                await Promise.all(chunk.map(op =>
+                    prisma.expenseCategory.update({ where: { code: op.code }, data: { name: op.name } })
+                ));
+            }
+        }
+
+        try {
+            revalidatePath('/admin/settings');
+            revalidatePath('/admin/project');
+        } catch (e) {
+            console.error("Failed to revalidate path", e);
+        }
         return { success: true, created, updated };
     } catch (error) {
         console.error("Error importing expense categories:", error);
