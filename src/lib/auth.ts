@@ -3,6 +3,7 @@
 import { cookies } from 'next/headers';
 import prisma from '@/lib/prisma';
 import { redirect } from 'next/navigation';
+import bcrypt from 'bcrypt';
 
 const AUTH_COOKIE = 'jira_pro_auth_user';
 
@@ -19,7 +20,9 @@ export async function login(formData: FormData) {
             where: { email },
         });
 
-        if (!user || user.password !== password) { // In production, use bcrypt.compare
+        const isValid = user && (await bcrypt.compare(password, user.password));
+
+        if (!isValid) {
             return { error: 'Invalid credentials' };
         }
 
