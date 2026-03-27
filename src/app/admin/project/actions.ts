@@ -573,31 +573,34 @@ export async function archiveProject(id: string) {
 
 export async function deleteProject(id: string) {
     try {
-        // 1. Delete Expenses
-        await prisma.expense.deleteMany({ where: { projectId: id } });
+        // Parallelize independent delete operations
+        const deleteExpenses = prisma.expense.deleteMany({ where: { projectId: id } });
+        const deleteAllocations = prisma.allocation.deleteMany({ where: { projectId: id } });
 
-        // 2. Find all tasks to delete their timesheets
-        const tasks = await prisma.task.findMany({
-            where: { projectId: id },
-            select: { id: true }
-        });
-        const taskIds = tasks.map(t => t.id);
-
-        // 3. Delete Timesheets associated with these tasks
-        if (taskIds.length > 0) {
-            await prisma.timesheetEntry.deleteMany({
-                where: { taskId: { in: taskIds } }
+        const deleteTasksAndMilestones = (async () => {
+            // 2. Find all tasks to delete their timesheets
+            const tasks = await prisma.task.findMany({
+                where: { projectId: id },
+                select: { id: true }
             });
-        }
+            const taskIds = tasks.map(t => t.id);
 
-        // 4. Delete Tasks
-        await prisma.task.deleteMany({ where: { projectId: id } });
+            // 3. Delete Timesheets associated with these tasks
+            if (taskIds.length > 0) {
+                await prisma.timesheetEntry.deleteMany({
+                    where: { taskId: { in: taskIds } }
+                });
+            }
 
-        // 5. Delete Milestones
-        await prisma.milestone.deleteMany({ where: { projectId: id } });
+            // 4. Delete Tasks
+            await prisma.task.deleteMany({ where: { projectId: id } });
 
-        // 6. Delete Allocations
-        await prisma.allocation.deleteMany({ where: { projectId: id } });
+            // 5. Delete Milestones
+            await prisma.milestone.deleteMany({ where: { projectId: id } });
+        })();
+
+        // Wait for all pre-deletion steps to complete
+        await Promise.all([deleteExpenses, deleteAllocations, deleteTasksAndMilestones]);
 
         // 7. Delete Project
         await prisma.project.delete({ where: { id } });
