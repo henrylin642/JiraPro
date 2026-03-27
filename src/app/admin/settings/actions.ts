@@ -5,6 +5,7 @@ import { revalidatePath } from 'next/cache';
 import { getCurrentUser } from '@/lib/auth';
 import { Prisma } from '@prisma/client';
 import * as XLSX from 'xlsx';
+import { BackupDataSchema, BackupData } from '@/lib/backup-schema';
 
 export async function getBackupSettings() {
     try {
@@ -181,11 +182,14 @@ export async function restoreSystem(formData: FormData) {
 
     try {
         const text = await file.text();
-        const data = JSON.parse(text);
+        const rawData = JSON.parse(text);
+        let data: BackupData;
 
-        // Validation - Basic check
-        if (!data.version || !data.users) {
-            return { success: false, error: 'Invalid backup file format' };
+        try {
+            data = BackupDataSchema.parse(rawData);
+        } catch (error) {
+            console.error('Validation error:', error);
+            return { success: false, error: 'Invalid backup file format: ' + (error as Error).message };
         }
 
         await prisma.$transaction(async (tx) => {
@@ -325,9 +329,13 @@ export async function restoreSystem(formData: FormData) {
 }
 
 // Internal helper for restoring raw data object
-async function restoreSystemData(data: any) {
-    if (!data.version || !data.users) {
-        return { success: false, error: 'Invalid backup format' };
+async function restoreSystemData(rawData: any) {
+    let data: BackupData;
+    try {
+        data = BackupDataSchema.parse(rawData);
+    } catch (error) {
+        console.error('Validation error:', error);
+        return { success: false, error: 'Invalid backup format: ' + (error as Error).message };
     }
 
     try {
