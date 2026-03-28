@@ -60,6 +60,8 @@ type OpportunityData = {
     ownerId: string | null;
     serviceAreaId?: string | null;
     probabilityOverrideReason?: string | null;
+    clientBudget?: number | null;
+    jiraTicketKey?: string | null;
 };
 
 interface OpportunityDialogProps {
@@ -90,6 +92,8 @@ export function OpportunityDialog({ accounts = [], users = [], serviceAreas = []
         ownerId: 'unassigned',
         serviceAreaId: 'unassigned',
         probabilityOverrideReason: '',
+        clientBudget: '',
+        jiraTicketKey: '',
     });
 
     useEffect(() => {
@@ -113,6 +117,8 @@ export function OpportunityDialog({ accounts = [], users = [], serviceAreas = []
                     ownerId: opportunity.ownerId || 'unassigned',
                     serviceAreaId: opportunity.serviceAreaId || 'unassigned',
                     probabilityOverrideReason: opportunity.probabilityOverrideReason || '',
+                    clientBudget: opportunity.clientBudget ? String(opportunity.clientBudget) : '',
+                    jiraTicketKey: opportunity.jiraTicketKey || '',
                 });
             } else {
                 // Reset for Create mode
@@ -126,6 +132,8 @@ export function OpportunityDialog({ accounts = [], users = [], serviceAreas = []
                     ownerId: 'unassigned',
                     serviceAreaId: 'unassigned',
                     probabilityOverrideReason: '',
+                    clientBudget: '',
+                    jiraTicketKey: '',
                 });
             }
         }
@@ -147,6 +155,8 @@ export function OpportunityDialog({ accounts = [], users = [], serviceAreas = []
             ownerId: formData.ownerId === 'unassigned' ? undefined : (formData.ownerId || undefined),
             serviceAreaId: formData.serviceAreaId === 'unassigned' ? undefined : (formData.serviceAreaId || undefined),
             probabilityOverrideReason: formData.probabilityOverrideReason,
+            clientBudget: (formData.clientBudget !== '' && formData.clientBudget !== undefined) ? Number(formData.clientBudget) : undefined,
+            jiraTicketKey: formData.jiraTicketKey || undefined,
         };
 
         try {
@@ -287,13 +297,24 @@ export function OpportunityDialog({ accounts = [], users = [], serviceAreas = []
                             </Select>
                         </div>
                         <div className="grid grid-cols-4 items-center gap-4">
-                            <Label htmlFor="value" className="text-right">Value ($)</Label>
+                            <Label htmlFor="value" className="text-right">Est. Value ($)</Label>
                             <Input
                                 id="value"
                                 type="number"
                                 value={formData.estimatedValue}
                                 onChange={(e) => setFormData({ ...formData, estimatedValue: Number(e.target.value) })}
                                 className="col-span-3"
+                            />
+                        </div>
+                        <div className="grid grid-cols-4 items-center gap-4">
+                            <Label htmlFor="clientBudget" className="text-right">Client Budget</Label>
+                            <Input
+                                id="clientBudget"
+                                type="number"
+                                value={formData.clientBudget}
+                                onChange={(e) => setFormData({ ...formData, clientBudget: e.target.value })}
+                                className="col-span-3"
+                                placeholder="Optional"
                             />
                         </div>
                         <div className="grid grid-cols-4 items-center gap-4">
@@ -336,6 +357,16 @@ export function OpportunityDialog({ accounts = [], users = [], serviceAreas = []
                                 value={formData.expectedCloseDate}
                                 onChange={(e) => setFormData({ ...formData, expectedCloseDate: e.target.value })}
                                 className="col-span-3"
+                            />
+                        </div>
+                        <div className="grid grid-cols-4 items-center gap-4">
+                            <Label htmlFor="jiraTicketKey" className="text-right">Jira Key</Label>
+                            <Input
+                                id="jiraTicketKey"
+                                value={formData.jiraTicketKey}
+                                onChange={(e) => setFormData({ ...formData, jiraTicketKey: e.target.value })}
+                                className="col-span-3"
+                                placeholder="e.g. PROJ-123"
                             />
                         </div>
                     </div>
