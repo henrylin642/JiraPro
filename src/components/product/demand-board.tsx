@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
@@ -56,20 +56,10 @@ export function DemandBoard({ ideas, users, products }: { ideas: Idea[], users: 
     const [selectedIdeaId, setSelectedIdeaId] = useState<string | null>(null);
 
     // Form states
-    const [newIdea, setNewIdea] = useState({ title: '', description: '', creatorId: users[0]?.id || '' });
     const [promoteProductId, setPromoteProductId] = useState(products[0]?.id || '');
 
     const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
     const [editIdea, setEditIdea] = useState<Idea | null>(null);
-
-    const handleCreate = async () => {
-        // This is now handled by the IdeaDialog onSave prop, but we keep this empty implementation or remove it 
-        // if the dialog calls createIdea directly. But wait, createIdea matches signature.
-        // Actually, the onSave prop matches (data) => Promise<void>.
-        // Re-read IdeaDialog usage: onSave={createIdea}
-        // createIdea is an async server action: (data: {title, description, creatorId}) => Promise<void>
-        // It matches.
-    };
 
     // We need these restore for existing JSX below
     const handleVote = async (id: string) => {
