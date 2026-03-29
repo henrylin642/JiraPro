@@ -155,9 +155,24 @@ export async function deleteProduct(id: string) {
         // though Prisma schema might not have cascade delete set up everywhere)
 
         // Delete features (and their related ideas/opportunities links if any)
-        const features = await prisma.feature.findMany({ where: { productId: id } });
-        for (const f of features) {
-            await deleteFeature(f.id);
+        const features = await prisma.feature.findMany({
+            where: { productId: id },
+            select: { id: true }
+        });
+        const featureIds = features.map(f => f.id);
+
+        if (featureIds.length > 0) {
+            // Unlink ideas first
+            await prisma.idea.updateMany({
+                where: { featureId: { in: featureIds } },
+                data: { featureId: null }
+            });
+
+            // Remove features
+            // Implicit opportunity links are handled by Prisma/DB cascade delete on implicit m-n table
+            await prisma.feature.deleteMany({
+                where: { id: { in: featureIds } }
+            });
         }
 
         // Delete roadmap items
