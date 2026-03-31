@@ -6,12 +6,13 @@ export const dynamic = 'force-dynamic'; // Prevent static caching
 
 export async function GET(request: NextRequest) {
     // Basic security check (e.g., secret token)
-    // For now, we'll allow it to be public or strictly time-checked?
     // In production, checking an Authorization header is strictly recommended.
-    // const authHeader = request.headers.get('authorization');
-    // if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
-    //     return new NextResponse('Unauthorized', { status: 401 });
-    // }
+    const authHeader = request.headers.get('authorization');
+    const cronSecret = process.env.CRON_SECRET;
+
+    if (!cronSecret || authHeader !== `Bearer ${cronSecret}`) {
+        return new NextResponse('Unauthorized', { status: 401 });
+    }
 
     try {
         const settings = await getBackupSettings();
