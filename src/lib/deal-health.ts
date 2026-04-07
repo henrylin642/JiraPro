@@ -67,80 +67,64 @@ const parseChecklist = (checklist?: string | string[] | null) => {
     }
 };
 
-export function calculateDealHealth(input: DealHealthInput): DealHealth {
-    const checklistItems = parseChecklist(input.checklist);
-    const stageBase = BASE_PROBABILITIES[input.stage] ?? 0;
+function calculateChecklistScore(checklist: string | string[] | null | undefined, stage: string): number {
+    const checklistItems = parseChecklist(checklist);
+    const stageBase = BASE_PROBABILITIES[stage] ?? 0;
 
     const checkedWeight = Object.values(STAGE_CHECKLISTS).reduce((sum, items) => {
         return sum + items.reduce((itemSum, item) => itemSum + (checklistItems.includes(item.id) ? item.weight : 0), 0);
     }, 0);
 
-    const checklistScore = clamp(stageBase + checkedWeight);
+    return clamp(stageBase + checkedWeight);
+}
 
+function calculateCompletenessScore(input: DealHealthInput): number {
     const completenessItems = [
         Boolean(input.ownerId),
         Boolean(input.expectedCloseDate),
         typeof input.estimatedValue === 'number' && input.estimatedValue > 0,
         Boolean(input.serviceAreaId),
     ];
-    const completenessScore = (completenessItems.filter(Boolean).length / completenessItems.length) * 100;
+    return (completenessItems.filter(Boolean).length / completenessItems.length) * 100;
+}
 
-    const lastInteractionDate = toDate(input.lastInteractionAt);
-    const lastInteractionDays = daysSince(lastInteractionDate);
+function calculateInteractionScore(lastInteractionDays: number | null): number {
+    if (lastInteractionDays === null) return 0;
+    if (lastInteractionDays <= 7) return 100;
+    if (lastInteractionDays <= 14) return 70;
+    if (lastInteractionDays <= 30) return 40;
+    return 10;
+}
 
-    let interactionScore = 0;
-    if (lastInteractionDays === null) {
-        interactionScore = 0;
-    } else if (lastInteractionDays <= 7) {
-        interactionScore = 100;
-    } else if (lastInteractionDays <= 14) {
-        interactionScore = 70;
-    } else if (lastInteractionDays <= 30) {
-        interactionScore = 40;
-    } else {
-        interactionScore = 10;
-    }
-
-    const openTasks = input.openTasks ?? [];
+function calculateNextStepScore(openTasks: { dueDate?: Date | string | null }[]): number {
     const openTaskCount = openTasks.length;
     const openDueDates = openTasks.map(task => toDate(task.dueDate)).filter(Boolean) as Date[];
     const today = new Date();
 
-    let nextStepScore = 0;
-    if (openTaskCount === 0) {
-        nextStepScore = 0;
-    } else if (openDueDates.length === 0) {
-        nextStepScore = 60;
-    } else if (openDueDates.some(date => date >= today)) {
-        nextStepScore = 100;
-    } else {
-        nextStepScore = 30;
-    }
+    if (openTaskCount === 0) return 0;
+    if (openDueDates.length === 0) return 60;
+    if (openDueDates.some(date => date >= today)) return 100;
+    return 30;
+}
 
-    const stageDate = toDate(input.stageUpdatedAt);
-    const stageAgeDays = daysSince(stageDate);
-    let stageAgeScore = 50;
-    if (stageAgeDays === null) {
-        stageAgeScore = 50;
-    } else if (stageAgeDays <= 14) {
-        stageAgeScore = 100;
-    } else if (stageAgeDays <= 30) {
-        stageAgeScore = 70;
-    } else if (stageAgeDays <= 60) {
-        stageAgeScore = 40;
-    } else {
-        stageAgeScore = 10;
-    }
+function calculateStageAgeScore(stageAgeDays: number | null): number {
+    if (stageAgeDays === null) return 50;
+    if (stageAgeDays <= 14) return 100;
+    if (stageAgeDays <= 30) return 70;
+    if (stageAgeDays <= 60) return 40;
+    return 10;
+}
 
-    const score = clamp(
-        checklistScore * 0.35 +
-        completenessScore * 0.2 +
-        interactionScore * 0.2 +
-        nextStepScore * 0.15 +
-        stageAgeScore * 0.1
-    );
-
+function generateHealthSignals(
+    input: DealHealthInput,
+    checklistScore: number,
+    lastInteractionDays: number | null,
+    stageAgeDays: number | null,
+    openTasks: { dueDate?: Date | string | null }[]
+): DealHealthSignal[] {
     const signals: DealHealthSignal[] = [];
+    const today = new Date();
+
     if (!input.ownerId) {
         signals.push({ id: 'no_owner', label: 'No owner assigned', severity: 'high' });
     }
@@ -157,6 +141,9 @@ export function calculateDealHealth(input: DealHealthInput): DealHealth {
         signals.push({ id: 'no_recent_activity', label: 'No recent activity', severity: 'medium' });
     }
 
+    const openTaskCount = openTasks.length;
+    const openDueDates = openTasks.map(task => toDate(task.dueDate)).filter(Boolean) as Date[];
+
     if (openTaskCount === 0) {
         signals.push({ id: 'no_next_step', label: 'No next step scheduled', severity: 'high' });
     } else if (openDueDates.length > 0 && openDueDates.every(date => date < today)) {
@@ -171,7 +158,22 @@ export function calculateDealHealth(input: DealHealthInput): DealHealth {
         signals.push({ id: 'low_checklist', label: 'Low qualification completeness', severity: 'low' });
     }
 
+    return signals;
+}
+
+function calculateRecommendedProbability(
+    input: DealHealthInput,
+    checklistScore: number,
+    lastInteractionDays: number | null,
+    stageAgeDays: number | null,
+    openTasks: { dueDate?: Date | string | null }[]
+): number {
     let recommendedProbability = checklistScore;
+    const today = new Date();
+    const expectedCloseDate = toDate(input.expectedCloseDate);
+    const openTaskCount = openTasks.length;
+    const openDueDates = openTasks.map(task => toDate(task.dueDate)).filter(Boolean) as Date[];
+
     if (!input.ownerId) recommendedProbability -= 10;
     if (!input.expectedCloseDate) recommendedProbability -= 5;
     if (expectedCloseDate && expectedCloseDate < today) recommendedProbability -= 15;
@@ -180,7 +182,35 @@ export function calculateDealHealth(input: DealHealthInput): DealHealth {
     if (openDueDates.length > 0 && openDueDates.every(date => date < today)) recommendedProbability -= 10;
     if (stageAgeDays !== null && stageAgeDays > 30) recommendedProbability -= 10;
 
-    recommendedProbability = clamp(recommendedProbability);
+    return clamp(recommendedProbability);
+}
+
+export function calculateDealHealth(input: DealHealthInput): DealHealth {
+    const checklistScore = calculateChecklistScore(input.checklist, input.stage);
+    const completenessScore = calculateCompletenessScore(input);
+
+    const lastInteractionDate = toDate(input.lastInteractionAt);
+    const lastInteractionDays = daysSince(lastInteractionDate);
+    const interactionScore = calculateInteractionScore(lastInteractionDays);
+
+    const openTasks = input.openTasks ?? [];
+    const openTaskCount = openTasks.length;
+    const nextStepScore = calculateNextStepScore(openTasks);
+
+    const stageDate = toDate(input.stageUpdatedAt);
+    const stageAgeDays = daysSince(stageDate);
+    const stageAgeScore = calculateStageAgeScore(stageAgeDays);
+
+    const score = clamp(
+        checklistScore * 0.35 +
+        completenessScore * 0.2 +
+        interactionScore * 0.2 +
+        nextStepScore * 0.15 +
+        stageAgeScore * 0.1
+    );
+
+    const signals = generateHealthSignals(input, checklistScore, lastInteractionDays, stageAgeDays, openTasks);
+    const recommendedProbability = calculateRecommendedProbability(input, checklistScore, lastInteractionDays, stageAgeDays, openTasks);
 
     const currentProbability = typeof input.currentProbability === 'number' ? input.currentProbability : checklistScore;
 
